@@ -9,6 +9,7 @@ package com.yulaev.tacotime;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import com.yulaev.tacotime.gamelogic.GameGrid;
 import com.yulaev.tacotime.gameobjects.CoffeeGirl;
 import com.yulaev.tacotime.gameobjects.CoffeeMachine;
 import com.yulaev.tacotime.gameobjects.GameItem;
@@ -19,6 +20,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -129,6 +132,8 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		return super.onTouchEvent(event);
 	}
 	
+	Paint gridPaint;
+	
 	@Override
 	protected void onDraw(Canvas canvas) {
 		canvas.drawColor(Color.BLACK);
@@ -140,7 +145,15 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 	 * @param voAr An ArrayList of ViewObjects that will be drawn
 	 */
 	protected void onDraw(Canvas canvas, ArrayList<ViewObject> voAr) {
+		if(gridPaint == null) {
+			gridPaint = new Paint();
+			gridPaint.setColor(Color.GRAY);
+		}
+		
 		canvas.drawColor(Color.BLACK);
+		
+		canvas.drawRect(0,0, GameGrid.maxCanvasX(), GameGrid.maxCanvasY(), gridPaint);
+		Log.v(activitynametag, "onDraw() drawing a grey rectangle around (" + GameGrid.maxCanvasX() + ", " + GameGrid.maxCanvasY() + ")");
 		
 		Iterator<ViewObject> it = voAr.iterator();
 		while(it.hasNext()) {

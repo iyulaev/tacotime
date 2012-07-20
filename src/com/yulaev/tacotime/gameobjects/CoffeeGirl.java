@@ -54,6 +54,7 @@ public class CoffeeGirl implements ViewObject {
 		this.addState("carrying_coffee", R.drawable.coffeegirl_w_coffee);
 	}
 	
+	//TODO: Update for GameGrid, document!
 	public void handleTap(int new_x, int new_y) {
 		setLocked();
 		target_x = new_x;
@@ -61,6 +62,7 @@ public class CoffeeGirl implements ViewObject {
 		unLock();
 	}
 	
+	//TODO: Update for GameGrid, document!
 	public void draw(Canvas canvas) {
 		canvas.drawBitmap(bitmap, x - (bitmap.getWidth() / 2), y - (bitmap.getHeight() / 2), null);
 	}

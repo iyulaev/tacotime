@@ -6,8 +6,11 @@
 
 package com.yulaev.tacotime;
 
+import com.yulaev.tacotime.gamelogic.GameGrid;
+
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
@@ -26,6 +29,12 @@ public class TacoTimeActivity extends Activity {
         
         // making it full screen
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        
+        // Setup game grid, by giving it window dimensions
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        GameGrid.setupGameGrid(dm.widthPixels, dm.heightPixels);
+        
         
         // Change content view so that 
         setContentView(new MainGamePanel(this));

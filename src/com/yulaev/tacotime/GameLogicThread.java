@@ -52,7 +52,7 @@ public class GameLogicThread extends Thread {
 					//Attempt interaction and see if interactee changed state
 					int interactee_state = gameItems.get(interactee).onInteraction();
 					
-					//If the interaction resulted in a state change for CoffeeGirl!
+					//If the interaction resulted in a state change, change coffeegirl state
 					if(interactee_state != -1) {
 						int coffee_girl_prev_state = coffeeGirl.getState();
 						coffeeGirl.setState(coffeeGirlNextState(coffee_girl_prev_state, interactee, interactee_state));
@@ -82,6 +82,10 @@ public class GameLogicThread extends Thread {
 		if(old_state == CoffeeGirl.STATE_NORMAL && 
 				interactedWith.equals("CoffeeMachine") && 
 				interactee_state == CoffeeMachine.STATE_DONE) return(CoffeeGirl.STATE_CARRYING_COFFEE);
+		
+		//CoffeeGirl's hands are NOT empty, she interacts with trashcan -> hands now empty
+		if(old_state != CoffeeGirl.STATE_NORMAL && 
+				interactedWith.equals("TrashCan")) return(CoffeeGirl.STATE_NORMAL);
 		
 		//Default case - don't change state!
 		return(old_state);

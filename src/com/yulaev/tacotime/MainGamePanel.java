@@ -12,6 +12,7 @@ import java.util.Iterator;
 import com.yulaev.tacotime.gameobjects.CoffeeGirl;
 import com.yulaev.tacotime.gameobjects.CoffeeMachine;
 import com.yulaev.tacotime.gameobjects.GameItem;
+import com.yulaev.tacotime.gameobjects.TrashCan;
 import com.yulaev.tacotime.gameobjects.ViewObject;
 
 import android.app.Activity;
@@ -68,19 +69,25 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		timerThread.setRunning(true);
 		viewThread.setRunning(true);
 		
+		//Create and add objects to viewThread containers
 		CoffeeMachine coffeeMachine = new CoffeeMachine(this.getContext(), R.drawable.coffeemachine, 100, 50, GameItem.ORIENTATION_NORTH);
 		//GameItem coffeeMachine = new GameItem(this.getContext(), "CoffeeMachine", R.drawable.coffeemachine, 100, 50, GameItem.ORIENTATION_NORTH);
 		viewThread.addViewObject(coffeeMachine);
 		viewThread.addGameItem(coffeeMachine);
 		inputThread.addViewObject(coffeeMachine);
 		gameLogicThread.addGameItem(coffeeMachine);
-		
-		//Create and add objects to viewThread containers
+				
 		CoffeeGirl coffeegirl = new CoffeeGirl(this.getContext(), holder.getSurfaceFrame());
 		viewThread.addViewObject(coffeegirl);
 		viewThread.setActor(coffeegirl);
 		inputThread.addViewObject(coffeegirl);
 		gameLogicThread.setActor(coffeegirl);
+		
+		TrashCan trashCan = new TrashCan(this.getContext(), R.drawable.trashcan, 200, 200, GameItem.ORIENTATION_EAST);
+		viewThread.addViewObject(trashCan);
+		viewThread.addGameItem(trashCan);
+		inputThread.addViewObject(trashCan);
+		gameLogicThread.addGameItem(trashCan);
 		
 		//Kick off all of the threads
 		gameLogicThread.start();

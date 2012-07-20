@@ -232,8 +232,9 @@ public class GameItem implements ViewObject {
 	 * @return The previous state if state changed, otherwise (-1)
 	 */
 	private synchronized int tryChangeState(boolean has_interacted) {
-		//If we haven't even added any states then die
-		if(validStates == null) return(-1);
+		//If we haven't even added any states, return that state changed from 0 to 0
+		//This is for "stateless" things like TrashCan
+		if(validStates == null) return(0);
 		//by default we do not change state; we first check to see if all conditions for changing state were met
 		
 		if(currentState.input_sensitive && !has_interacted) return(-1);

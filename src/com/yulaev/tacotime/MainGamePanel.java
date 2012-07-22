@@ -12,6 +12,8 @@ import java.util.Iterator;
 import com.yulaev.tacotime.gamelogic.GameGrid;
 import com.yulaev.tacotime.gameobjects.CoffeeGirl;
 import com.yulaev.tacotime.gameobjects.CoffeeMachine;
+import com.yulaev.tacotime.gameobjects.FoodItemCoffee;
+import com.yulaev.tacotime.gameobjects.FoodItemNothing;
 import com.yulaev.tacotime.gameobjects.GameItem;
 import com.yulaev.tacotime.gameobjects.TrashCan;
 import com.yulaev.tacotime.gameobjects.ViewObject;
@@ -72,25 +74,30 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		timerThread.setRunning(true);
 		viewThread.setRunning(true);
 		
-		//Create and add objects to viewThread containers
-		CoffeeMachine coffeeMachine = new CoffeeMachine(this.getContext(), R.drawable.coffeemachine, 20, 20, GameItem.ORIENTATION_NORTH);
-		//GameItem coffeeMachine = new GameItem(this.getContext(), "CoffeeMachine", R.drawable.coffeemachine, 100, 50, GameItem.ORIENTATION_NORTH);
-		viewThread.addViewObject(coffeeMachine);
-		viewThread.addGameItem(coffeeMachine);
-		inputThread.addViewObject(coffeeMachine);
-		gameLogicThread.addGameItem(coffeeMachine);
-				
+		//Setup coffeegirl (actor)
 		CoffeeGirl coffeegirl = new CoffeeGirl(this.getContext(), holder.getSurfaceFrame());
 		viewThread.addViewObject(coffeegirl);
 		viewThread.setActor(coffeegirl);
 		inputThread.addViewObject(coffeegirl);
 		gameLogicThread.setActor(coffeegirl);
 		
+		//Create and add objects to viewThread containers (UPDATE FOR NEW GAMEITEM)
+		CoffeeMachine coffeeMachine = new CoffeeMachine(this.getContext(), R.drawable.coffeemachine, 20, 20, GameItem.ORIENTATION_NORTH);
+		//GameItem coffeeMachine = new GameItem(this.getContext(), "CoffeeMachine", R.drawable.coffeemachine, 100, 50, GameItem.ORIENTATION_NORTH);
+		viewThread.addViewObject(coffeeMachine);
+		viewThread.addGameItem(coffeeMachine);
+		inputThread.addViewObject(coffeeMachine);
+		gameLogicThread.addGameItem(coffeeMachine);		
+		
 		TrashCan trashCan = new TrashCan(this.getContext(), R.drawable.trashcan, 100, 20, GameItem.ORIENTATION_EAST);
 		viewThread.addViewObject(trashCan);
 		viewThread.addGameItem(trashCan);
 		inputThread.addViewObject(trashCan);
 		gameLogicThread.addGameItem(trashCan);
+		
+		//Set up all Food Items (UPDATE FOR NEW FOODITEM)
+		gameLogicThread.addNewFoodItem(new FoodItemNothing(), CoffeeGirl.STATE_NORMAL);
+		gameLogicThread.addNewFoodItem(new FoodItemCoffee(), CoffeeGirl.STATE_CARRYING_COFFEE);
 		
 		//Kick off all of the threads
 		gameLogicThread.start();

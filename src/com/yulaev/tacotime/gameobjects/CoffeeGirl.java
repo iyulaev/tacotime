@@ -1,6 +1,7 @@
 package com.yulaev.tacotime.gameobjects;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.yulaev.tacotime.R;
 import com.yulaev.tacotime.gamelogic.GameGrid;
@@ -135,8 +136,25 @@ public class CoffeeGirl implements ViewObject {
 	
 	//represents the state of coffeegirl
 	private ArrayList<State> validStates;
+	private HashMap<String, State> itemToStateMap;
 	private int current_state_idx;
 	private State currentState;
+	private String itemHolding; //the item that CoffeeGirl holds
+	
+	public synchronized void setItemHoldingToStateAssoc(String item, int state) {
+		if(itemToStateMap == null) itemToStateMap = new HashMap<String, State>();
+		
+		itemToStateMap.put(item, validStates.get(state));
+	}
+	
+	public synchronized void setItemHolding(String newItem) {
+		itemHolding = newItem;
+		setState(itemToStateMap.get(newItem).state_idx);
+	}
+	
+	public synchronized String getItemHolding() {
+		return(itemHolding);
+	}
 	
 	/** Used when this GameItem is constructed, to add states to this GameItem 
 	 * Assumption is that this is called during construction not from all of the various threads*/
@@ -145,22 +163,22 @@ public class CoffeeGirl implements ViewObject {
 		
 		State newState = new State();
 		newState.stateName = stateName;
-		newState.bitmap = BitmapFactory.decodeResource(caller.getResources(), r_bitmap);;
+		newState.bitmap = BitmapFactory.decodeResource(caller.getResources(), r_bitmap);
 		newState.state_delay_ms = 0; //all coffeegirl states are interaction-sensitive only
 		newState.input_sensitive = true; //all states are input sensitive only for coffeegirl
 		newState.time_sensitive = false; //all coffeegirl states are interaction-sensitive only
+		newState.state_idx = validStates.size();
 		
 		validStates.add(newState);
 		
 		if(currentState == null) setState(0);	
 	}
 	
-	/** Change the state to something else. Unlike Gameitem, CoffeeGirl's state is controlled directly
-	 * by the GameLogicThread (since the state machine is difficult to describe!)
+	/** Change the state to something else. CoffeeGirl's state is controlled through setItemHolding().
 	 * 
 	 * @param new_state The index of the new state to set this GameItem's State to.
 	 */
-	public synchronized void setState(int new_state) {
+	private synchronized void setState(int new_state) {
 		setLocked(); 
 		
 		currentState = validStates.get(new_state);

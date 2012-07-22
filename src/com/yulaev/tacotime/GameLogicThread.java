@@ -13,6 +13,7 @@ import android.view.SurfaceHolder;
 import com.yulaev.tacotime.gamelogic.GameInfo;
 import com.yulaev.tacotime.gameobjects.CoffeeGirl;
 import com.yulaev.tacotime.gameobjects.CoffeeMachine;
+import com.yulaev.tacotime.gameobjects.GameFoodItem;
 import com.yulaev.tacotime.gameobjects.ViewObject;
 import com.yulaev.tacotime.gameobjects.GameItem;
 
@@ -38,6 +39,12 @@ public class GameLogicThread extends Thread {
 	
 	public CoffeeGirl coffeeGirl;
 	public HashMap<String, GameItem> gameItems;
+	public HashMap<String, GameFoodItem> foodItems;
+	
+	public void addNewFoodItem(GameFoodItem foodItem, int associated_coffeegirl_state) {
+		foodItems.put(foodItem.getName(), foodItem);
+		coffeeGirl.setItemHoldingToStateAssoc(foodItem.getName(), associated_coffeegirl_state);
+	}
 
 	public GameLogicThread() {
 		super();
@@ -47,6 +54,7 @@ public class GameLogicThread extends Thread {
 		GameInfo.points = 0;
 		
 		gameItems = new HashMap<String, GameItem>();
+		foodItems = new HashMap<String, GameFoodItem>();
 		
 		handler = new Handler() {
 			@Override
@@ -60,8 +68,8 @@ public class GameLogicThread extends Thread {
 					
 					//If the interaction resulted in a state change, change coffeegirl state
 					if(interactee_state != -1) {
-						int coffee_girl_prev_state = coffeeGirl.getState();
-						coffeeGirl.setState(coffeeGirlNextState(coffee_girl_prev_state, interactee, interactee_state));
+						//coffeeGirl.setState(coffeeGirlNextState(coffee_girl_prev_state, interactee, interactee_state));
+						coffeeGirlNextState(coffeeGirl.getState(), interactee, interactee_state);
 					}
 				}
 			}
@@ -84,21 +92,22 @@ public class GameLogicThread extends Thread {
 	 * @param interactee_state The state of the GameItem that CoffeeGirl interacted with
 	 * @return What the next state should be, (if any change occurs)
 	 */
-	public int coffeeGirlNextState(int old_state, String interactedWith, int interactee_state) {
+	public void coffeeGirlNextState(int old_state, String interactedWith, int interactee_state) {
 		//CoffeeGirl's hands are empty, she interacts with a coffeemachine that is done -> she is now carrying coffee
 		if(old_state == CoffeeGirl.STATE_NORMAL && 
 				interactedWith.equals("CoffeeMachine") && 
-				interactee_state == CoffeeMachine.STATE_DONE) return(CoffeeGirl.STATE_CARRYING_COFFEE);
+				interactee_state == CoffeeMachine.STATE_DONE) coffeeGirl.setItemHolding("coffee");
 		
-		//CoffeeGirl's hands are NOT empty, she interacts with trashcan -> hands now empty
+		//CoffeeGirl's hands are NOT empty, she interacts with trashcan -> hands now empty, increment money and/or points
 		if(old_state != CoffeeGirl.STATE_NORMAL && 
 				interactedWith.equals("TrashCan")) {
-			GameInfo.setAndReturnPoints(-5); //when something is thrown out reduce points by 5
-			return(CoffeeGirl.STATE_NORMAL);
+			GameInfo.setAndReturnPoints(foodItems.get(coffeeGirl.getItemHolding()).pointsOnInteraction(interactedWith, 0));
+			GameInfo.setAndReturnMoney(foodItems.get(coffeeGirl.getItemHolding()).moneyOnInteraction(interactedWith, 0)); 
+			coffeeGirl.setItemHolding("nothing");
 		}
 		
 		//Default case - don't change state!
-		return(old_state);
+		//return(old_state);
 	}
 	
 	@Override

@@ -15,6 +15,7 @@ public class State {
 	public int state_delay_ms;
 	public Bitmap bitmap;
 	public boolean input_sensitive, time_sensitive;
+	public int state_idx;
 	
 	//No methods or constructor - this is purely a data storage class! Like a C struct
 }

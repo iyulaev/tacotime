@@ -9,6 +9,7 @@ package com.yulaev.tacotime.gamelogic;
 public class GameInfo {
 	public static int money;
 	public static int points;
+	public static int level;
 	
 	/** Increment money and return the new value. Can be used to simply get the value of money
 	 * if increment is set to zero.
@@ -29,4 +30,11 @@ public class GameInfo {
 		points += increment;
 		return points;
 	}
+	
+	public static int setLevel(int new_level) {
+		level = new_level;
+		return(level);
+	}
+	
+	public static int getLevel() { return level; }
 }

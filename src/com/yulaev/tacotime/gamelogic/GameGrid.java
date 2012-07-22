@@ -39,11 +39,19 @@ public class GameGrid {
 	}
 	
 	public static int gameGridX(int canvas_x) {
-		return( (int) (((float)canvas_x) / scaling_factor) );
+		int retval = ( (int) (((float)canvas_x) / scaling_factor) );
+		
+		if(retval > GAMEGRID_WIDTH) return GAMEGRID_WIDTH;
+		if(retval < 0) return(0);
+		return(retval);
 	}
 	
 	public static int gameGridY(int canvas_y) {
-		return( (int) (((float)canvas_y) / scaling_factor) );
+		int retval = ( (int) (((float)canvas_y) / scaling_factor) );
+		
+		if(retval > GAMEGRID_HEIGHT) return GAMEGRID_HEIGHT;
+		if(retval < 0) return(0);
+		return(retval);
 	}
 	
 	public static int canvasX(int gamegrid_x) {

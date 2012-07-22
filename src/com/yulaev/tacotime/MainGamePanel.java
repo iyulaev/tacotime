@@ -73,7 +73,7 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		viewThread.setRunning(true);
 		
 		//Create and add objects to viewThread containers
-		CoffeeMachine coffeeMachine = new CoffeeMachine(this.getContext(), R.drawable.coffeemachine, 100, 50, GameItem.ORIENTATION_NORTH);
+		CoffeeMachine coffeeMachine = new CoffeeMachine(this.getContext(), R.drawable.coffeemachine, 20, 20, GameItem.ORIENTATION_NORTH);
 		//GameItem coffeeMachine = new GameItem(this.getContext(), "CoffeeMachine", R.drawable.coffeemachine, 100, 50, GameItem.ORIENTATION_NORTH);
 		viewThread.addViewObject(coffeeMachine);
 		viewThread.addGameItem(coffeeMachine);
@@ -86,7 +86,7 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		inputThread.addViewObject(coffeegirl);
 		gameLogicThread.setActor(coffeegirl);
 		
-		TrashCan trashCan = new TrashCan(this.getContext(), R.drawable.trashcan, 200, 200, GameItem.ORIENTATION_EAST);
+		TrashCan trashCan = new TrashCan(this.getContext(), R.drawable.trashcan, 100, 20, GameItem.ORIENTATION_EAST);
 		viewThread.addViewObject(trashCan);
 		viewThread.addGameItem(trashCan);
 		inputThread.addViewObject(trashCan);

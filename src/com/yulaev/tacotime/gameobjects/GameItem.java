@@ -2,6 +2,7 @@ package com.yulaev.tacotime.gameobjects;
 
 import java.util.ArrayList;
 
+import com.yulaev.tacotime.gamelogic.GameGrid;
 import com.yulaev.tacotime.gamelogic.State;
 
 import android.content.Context;
@@ -54,7 +55,7 @@ public class GameItem implements ViewObject {
 	/** This constructor builds a new gameitem with a provided name and an int representing
 	 * a bitmap resource.
 	 */
-	public GameItem(Context caller, String name, int r_bitmap, int x_pos, int y_pos, int orientation) {
+	public GameItem(Context caller, String name, int r_bitmap, int x_pos, int y_pos, int orientation, int gg_width, int gg_height) {
 		//Initialize variables to some values
 		current_state_idx = 0;
 		//Default bitmap is the one provided
@@ -69,8 +70,8 @@ public class GameItem implements ViewObject {
 		
 		Log.v(activitynametag, "Got to here 1");
 		
-		width = bitmap.getWidth();
-		height = bitmap.getHeight();
+		width = gg_width;
+		height = gg_height;
 		
 		Log.v(activitynametag, "Bitmap width = " + width + ", height = " + height);
 		
@@ -124,10 +125,16 @@ public class GameItem implements ViewObject {
 	private void setOrientation(int n_orientation) { orientation = n_orientation; }	
 	
 	public void draw(Canvas canvas) {
-		canvas.drawBitmap(bitmap, x - (bitmap.getWidth() / 2), y - (bitmap.getHeight() / 2), null);
+		int draw_x = GameGrid.canvasX(x);
+		int draw_y = GameGrid.canvasY(y);
+		
+		canvas.drawBitmap(bitmap, draw_x - (bitmap.getWidth() / 2), draw_y - (bitmap.getHeight() / 2), null);
 	}
 	
-	public void handleTap(int new_x, int new_y) {		
+	public void handleTap(int new_x_canvas, int new_y_canvas) {	
+		int new_x = GameGrid.gameGridX(new_x_canvas);
+		int new_y = GameGrid.gameGridY(new_y_canvas);
+		
 		setLocked();
 		
 		/*if(inSensitivityArea(new_x, new_y)) 

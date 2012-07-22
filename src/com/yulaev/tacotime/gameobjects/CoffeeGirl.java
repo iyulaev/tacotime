@@ -3,6 +3,7 @@ package com.yulaev.tacotime.gameobjects;
 import java.util.ArrayList;
 
 import com.yulaev.tacotime.R;
+import com.yulaev.tacotime.gamelogic.GameGrid;
 import com.yulaev.tacotime.gamelogic.State;
 
 import android.content.Context;
@@ -56,15 +57,28 @@ public class CoffeeGirl implements ViewObject {
 	
 	//TODO: Update for GameGrid, document!
 	public void handleTap(int new_x, int new_y) {
+		int new_x_gg = GameGrid.gameGridX(new_x);
+		int new_y_gg = GameGrid.gameGridY(new_y);
+		
+		if(new_x_gg > GameGrid.GAMEGRID_WIDTH-GameGrid.GAMEGRID_PADDING)
+			new_x_gg = (GameGrid.GAMEGRID_WIDTH-GameGrid.GAMEGRID_PADDING);
+		if(new_x_gg < GameGrid.GAMEGRID_PADDING) new_x_gg = GameGrid.GAMEGRID_PADDING;
+		
+		if(new_y_gg > GameGrid.GAMEGRID_HEIGHT-GameGrid.GAMEGRID_PADDING)
+			new_y_gg = (GameGrid.GAMEGRID_HEIGHT-GameGrid.GAMEGRID_PADDING);
+		if(new_y_gg < GameGrid.GAMEGRID_PADDING) new_y_gg = GameGrid.GAMEGRID_PADDING;
+		
 		setLocked();
-		target_x = new_x;
-		target_y = new_y;
+		target_x = new_x_gg;
+		target_y = new_y_gg;
 		unLock();
 	}
 	
 	//TODO: Update for GameGrid, document!
 	public void draw(Canvas canvas) {
-		canvas.drawBitmap(bitmap, x - (bitmap.getWidth() / 2), y - (bitmap.getHeight() / 2), null);
+		int drawn_x = GameGrid.canvasX(x);
+		int drawn_y = GameGrid.canvasY(y);
+		canvas.drawBitmap(bitmap, drawn_x - (bitmap.getWidth() / 2), drawn_y - (bitmap.getHeight() / 2), null);
 	}
 	
 	/** These methods are used to lock and unlock the CoffeeGirl's internal variables, like position */
@@ -74,7 +88,7 @@ public class CoffeeGirl implements ViewObject {
 	public void onUpdate() {
 		
 		setLocked();
-		int target_x = this.target_x;
+		int target_x = this.target_x;			
 		int target_y = this.target_y;
 		unLock();
 		

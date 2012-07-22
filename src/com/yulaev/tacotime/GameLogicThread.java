@@ -10,6 +10,7 @@ import android.os.Message;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
+import com.yulaev.tacotime.gamelogic.GameInfo;
 import com.yulaev.tacotime.gameobjects.CoffeeGirl;
 import com.yulaev.tacotime.gameobjects.CoffeeMachine;
 import com.yulaev.tacotime.gameobjects.ViewObject;
@@ -40,6 +41,11 @@ public class GameLogicThread extends Thread {
 
 	public GameLogicThread() {
 		super();
+		
+		//"initialize" GameInfo
+		GameInfo.money = 0;
+		GameInfo.points = 0;
+		
 		gameItems = new HashMap<String, GameItem>();
 		
 		handler = new Handler() {
@@ -71,7 +77,8 @@ public class GameLogicThread extends Thread {
 	}
 	
 	/** Since CoffeeGirl interacts with all other game items, describing the CoffeeGirl state machine is done on the global level
-	 * rather than within CoffeeGirl itself.
+	 * rather than within CoffeeGirl itself. As a side effect GameInfo money and/or points may change depending on how
+	 * CoffeeGirl's state has changed
 	 * @param old_state The previous state of coffee girl
 	 * @param interactedWith The ID of the GameItem CoffeeGirl interacted with
 	 * @param interactee_state The state of the GameItem that CoffeeGirl interacted with
@@ -85,7 +92,10 @@ public class GameLogicThread extends Thread {
 		
 		//CoffeeGirl's hands are NOT empty, she interacts with trashcan -> hands now empty
 		if(old_state != CoffeeGirl.STATE_NORMAL && 
-				interactedWith.equals("TrashCan")) return(CoffeeGirl.STATE_NORMAL);
+				interactedWith.equals("TrashCan")) {
+			GameInfo.setAndReturnPoints(-5); //when something is thrown out reduce points by 5
+			return(CoffeeGirl.STATE_NORMAL);
+		}
 		
 		//Default case - don't change state!
 		return(old_state);

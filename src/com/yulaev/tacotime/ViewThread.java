@@ -10,6 +10,7 @@ import android.os.Message;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
+import com.yulaev.tacotime.gamelogic.GameInfo;
 import com.yulaev.tacotime.gameobjects.CoffeeGirl;
 import com.yulaev.tacotime.gameobjects.GameItem;
 import com.yulaev.tacotime.gameobjects.ViewObject;
@@ -120,7 +121,7 @@ public class ViewThread extends Thread {
 		Canvas canvas = null;
 		try { 
 			canvas = this.surfaceHolder.lockCanvas();
-			this.gamePanel.onDraw(canvas, viewObjects);
+			this.gamePanel.onDraw(canvas, viewObjects, GameInfo.setAndReturnMoney(0), GameInfo.setAndReturnPoints(0));
 
 		} catch(Exception e) {;} 
 		finally {

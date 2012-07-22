@@ -132,7 +132,10 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		return super.onTouchEvent(event);
 	}
 	
+	//Paint that we use in onDraw(); these are class variables so that we don't keep creating new ones
 	Paint gridPaint;
+	Paint moneyPaint;
+	Paint pointsPaint;
 	
 	@Override
 	protected void onDraw(Canvas canvas) {
@@ -143,8 +146,10 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 	 * 
 	 * @param canvas The Canvas to draw everything onto
 	 * @param voAr An ArrayList of ViewObjects that will be drawn
+	 * @param money The amount of money the player has so that we can draw it
+	 * @param points The number of points the player has so that we can draw it
 	 */
-	protected void onDraw(Canvas canvas, ArrayList<ViewObject> voAr) {
+	protected void onDraw(Canvas canvas, ArrayList<ViewObject> voAr, int money, int points) {
 		if(gridPaint == null) {
 			gridPaint = new Paint();
 			gridPaint.setColor(Color.GRAY);
@@ -159,6 +164,19 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		while(it.hasNext()) {
 			it.next().draw(canvas);
 		}
+		
+		if(moneyPaint == null || pointsPaint == null) {
+			moneyPaint = new Paint();
+			moneyPaint.setColor(Color.BLUE);
+			moneyPaint.setTextSize(12);
+			pointsPaint = new Paint();
+			pointsPaint.setColor(Color.GREEN);
+			pointsPaint.setTextSize(12);
+		}
+		
+		canvas.drawText(Integer.toString(money), 10, canvas.getHeight()-30, moneyPaint);
+		canvas.drawText(Integer.toString(points), 10, canvas.getHeight()-15, pointsPaint);
+		
 	}
 
 }

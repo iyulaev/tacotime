@@ -10,9 +10,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.yulaev.tacotime.gamelogic.GameGrid;
+import com.yulaev.tacotime.gameobjects.Blender;
 import com.yulaev.tacotime.gameobjects.CoffeeGirl;
 import com.yulaev.tacotime.gameobjects.CoffeeMachine;
+import com.yulaev.tacotime.gameobjects.CupCakeTray;
+import com.yulaev.tacotime.gameobjects.FoodItemBlendedDrink;
 import com.yulaev.tacotime.gameobjects.FoodItemCoffee;
+import com.yulaev.tacotime.gameobjects.FoodItemCupcake;
 import com.yulaev.tacotime.gameobjects.FoodItemNothing;
 import com.yulaev.tacotime.gameobjects.GameItem;
 import com.yulaev.tacotime.gameobjects.TrashCan;
@@ -68,6 +72,10 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 			int height) {
 	}
 
+	/** In this method we perform pretty much all of the initialization and placement of in-game items.
+	 * We add all of the item's to the various thread's sensitivity lists, and kick off all of the threads
+	 * once this is done.
+	 */
 	public void surfaceCreated(SurfaceHolder holder) {
 		// at this point the surface is created and
 		// we can safely start the game loop
@@ -82,22 +90,37 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		gameLogicThread.setActor(coffeegirl);
 		
 		//Create and add objects to viewThread containers (UPDATE FOR NEW GAMEITEM)
-		CoffeeMachine coffeeMachine = new CoffeeMachine(this.getContext(), R.drawable.coffeemachine, 20, 20, GameItem.ORIENTATION_NORTH);
+		CoffeeMachine coffeeMachine = new CoffeeMachine(this.getContext(), R.drawable.coffeemachine, 16, 40, GameItem.ORIENTATION_WEST);
 		//GameItem coffeeMachine = new GameItem(this.getContext(), "CoffeeMachine", R.drawable.coffeemachine, 100, 50, GameItem.ORIENTATION_NORTH);
 		viewThread.addViewObject(coffeeMachine);
 		viewThread.addGameItem(coffeeMachine);
 		inputThread.addViewObject(coffeeMachine);
 		gameLogicThread.addGameItem(coffeeMachine);		
 		
-		TrashCan trashCan = new TrashCan(this.getContext(), R.drawable.trashcan, 100, 20, GameItem.ORIENTATION_EAST);
+		TrashCan trashCan = new TrashCan(this.getContext(), R.drawable.trashcan, 110, 40, GameItem.ORIENTATION_EAST);
 		viewThread.addViewObject(trashCan);
 		viewThread.addGameItem(trashCan);
 		inputThread.addViewObject(trashCan);
 		gameLogicThread.addGameItem(trashCan);
 		
+		CupCakeTray cupcakeTray = new CupCakeTray(this.getContext(), R.drawable.cupcake_tray, 113, 60, GameItem.ORIENTATION_EAST);
+		viewThread.addViewObject(cupcakeTray);
+		viewThread.addGameItem(cupcakeTray);
+		inputThread.addViewObject(cupcakeTray);
+		gameLogicThread.addGameItem(cupcakeTray);
+		
+		Blender blender = new Blender(this.getContext(), R.drawable.blender_idle, 16, 60, GameItem.ORIENTATION_WEST);
+		viewThread.addViewObject(blender);
+		viewThread.addGameItem(blender);
+		inputThread.addViewObject(blender);
+		gameLogicThread.addGameItem(blender);
+		
 		//Set up all Food Items (UPDATE FOR NEW FOODITEM)
 		gameLogicThread.addNewFoodItem(new FoodItemNothing(), CoffeeGirl.STATE_NORMAL);
 		gameLogicThread.addNewFoodItem(new FoodItemCoffee(), CoffeeGirl.STATE_CARRYING_COFFEE);
+		gameLogicThread.addNewFoodItem(new FoodItemCupcake(), CoffeeGirl.STATE_CARRYING_CUPCAKE);
+		gameLogicThread.addNewFoodItem(new FoodItemBlendedDrink(), CoffeeGirl.STATE_CARRYING_BLENDEDDRINK);
+		
 		
 		//Kick off all of the threads
 		gameLogicThread.start();
@@ -106,6 +129,7 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		inputThread.start();
 	}
 
+	/** This method winds down all of the threads. */
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		Log.d(activitynametag, "Surface is being destroyed");
 		
@@ -130,6 +154,8 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		Log.d(activitynametag, "Threads were shut down cleanly");
 	}
 	
+	/** Responds to a touch event; mostly just sends the tap event to the InputThread via MessageRouter. 
+	 */
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -165,7 +191,6 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		canvas.drawColor(Color.BLACK);
 		
 		canvas.drawRect(0,0, GameGrid.maxCanvasX(), GameGrid.maxCanvasY(), gridPaint);
-		Log.v(activitynametag, "onDraw() drawing a grey rectangle around (" + GameGrid.maxCanvasX() + ", " + GameGrid.maxCanvasY() + ")");
 		
 		Iterator<ViewObject> it = voAr.iterator();
 		while(it.hasNext()) {

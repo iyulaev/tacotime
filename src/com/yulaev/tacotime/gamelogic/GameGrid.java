@@ -9,9 +9,9 @@ import android.util.Log;
  */
 
 public class GameGrid {
-	public static final int GAMEGRID_PADDING = 20;
-	public static final int GAMEGRID_WIDTH = 100+(2*GAMEGRID_PADDING);
-	public static final int GAMEGRID_HEIGHT = 120+(2*GAMEGRID_PADDING);
+	public static final int GAMEGRID_PADDING = 30;
+	public static final int GAMEGRID_WIDTH = 80+(2*GAMEGRID_PADDING);
+	public static final int GAMEGRID_HEIGHT = 100+(2*GAMEGRID_PADDING);
 	
 	
 	private static int canvas_width, canvas_height;

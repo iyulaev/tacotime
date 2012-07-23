@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 
 import com.yulaev.tacotime.gamelogic.GameInfo;
+import com.yulaev.tacotime.gameobjects.Blender;
 import com.yulaev.tacotime.gameobjects.CoffeeGirl;
 import com.yulaev.tacotime.gameobjects.CoffeeMachine;
 import com.yulaev.tacotime.gameobjects.GameFoodItem;
@@ -42,8 +43,15 @@ public class GameLogicThread extends Thread {
 	public HashMap<String, GameFoodItem> foodItems;
 	
 	public void addNewFoodItem(GameFoodItem foodItem, int associated_coffeegirl_state) {
+		boolean doSetItemHolding = false;
+		if(foodItems.isEmpty()) doSetItemHolding = true;
+		
 		foodItems.put(foodItem.getName(), foodItem);
 		coffeeGirl.setItemHoldingToStateAssoc(foodItem.getName(), associated_coffeegirl_state);
+		
+		//If CoffeeGirl's "held item" hasn't been set up yet then set it to the first foodItem that we add
+		//better hope that the first one we add is "nothing"!
+		if(doSetItemHolding) coffeeGirl.setItemHolding(foodItem.getName());
 	}
 
 	public GameLogicThread() {
@@ -64,7 +72,7 @@ public class GameLogicThread extends Thread {
 					Log.d(activitynametag, "Got interaction event message! Actor interacted with " + interactee);
 					
 					//Attempt interaction and see if interactee changed state
-					int interactee_state = gameItems.get(interactee).onInteraction();
+					int interactee_state = gameItems.get(interactee).onInteraction(coffeeGirl.getItemHolding());
 					
 					//If the interaction resulted in a state change, change coffeegirl state
 					if(interactee_state != -1) {
@@ -97,6 +105,18 @@ public class GameLogicThread extends Thread {
 		if(old_state == CoffeeGirl.STATE_NORMAL && 
 				interactedWith.equals("CoffeeMachine") && 
 				interactee_state == CoffeeMachine.STATE_DONE) coffeeGirl.setItemHolding("coffee");
+		
+		//CoffeeGirl's hands are empty, she interacts with a cupcake tray -> she is now carrying a cupcake
+		if(old_state == CoffeeGirl.STATE_NORMAL && 
+				interactedWith.equals("CupCakeTray")) coffeeGirl.setItemHolding("cupcake");
+		
+		//CoffeeGirl has a coffee, she interacts with blender -> she now has nothing
+		if(old_state == CoffeeGirl.STATE_CARRYING_COFFEE && 
+				interactedWith.equals("Blender")) coffeeGirl.setItemHolding("nothing");
+		//CoffeeGirl's hands are empty, she interacts with a blender that is done -> she is now carrying blended drink
+		if(old_state == CoffeeGirl.STATE_NORMAL && 
+				interactedWith.equals("Blender") && 
+				interactee_state == Blender.STATE_DONE) coffeeGirl.setItemHolding("blended_drink");
 		
 		//CoffeeGirl's hands are NOT empty, she interacts with trashcan -> hands now empty, increment money and/or points
 		if(old_state != CoffeeGirl.STATE_NORMAL && 

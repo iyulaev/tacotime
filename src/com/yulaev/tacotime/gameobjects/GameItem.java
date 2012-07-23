@@ -208,7 +208,8 @@ public class GameItem implements ViewObject {
 	/** Called when we determine that an interaction between the Actor and this GameItem 
 	 * has occured (by GameLogicThread) 
 	 * @return The previous state IF we transitioned to a new state, else (-1). */
-	public int onInteraction() { return tryChangeState(true); }
+	public int onInteraction() { return tryChangeState(true, "nothing"); }
+	public int onInteraction(String coffeeGirlHeldItem) { return tryChangeState(true, coffeeGirlHeldItem); }
 	
 	//represents the state transition times
 	private ArrayList<State> validStates;
@@ -219,6 +220,10 @@ public class GameItem implements ViewObject {
 	/** Used when this GameItem is constructed, to add states to this GameItem 
 	 * Assumption is that this is called during construction not from all of the various threads*/
 	protected void addState(String stateName, int state_delay_ms, int r_bitmap, boolean input_sensitive, boolean time_sensitive) {
+		addState(stateName, state_delay_ms, r_bitmap, input_sensitive, "null", time_sensitive);
+	}
+	
+	protected void addState(String stateName, int state_delay_ms, int r_bitmap, boolean input_sensitive, String requiredInput, boolean time_sensitive) {
 		if(validStates == null) validStates = new ArrayList<State>();
 		
 		State newState = new State();
@@ -227,6 +232,7 @@ public class GameItem implements ViewObject {
 		newState.state_delay_ms = state_delay_ms;
 		newState.input_sensitive = input_sensitive;
 		newState.time_sensitive = time_sensitive;
+		newState.requiredInput = requiredInput;
 		
 		validStates.add(newState);
 		
@@ -236,9 +242,13 @@ public class GameItem implements ViewObject {
 	/** Called by onInteraction only. Used to (try) to transition states. If enough time has passed and/or an interaction has occured 
 	 * the state may change.
 	 * @param has_interacted true if tryChangeState() was called as a response to a user interaction else false
+	 * @param input A String representing the name of the current GameFoodItem that CoffeeGirl is holding
 	 * @return The previous state if state changed, otherwise (-1)
 	 */
 	private synchronized int tryChangeState(boolean has_interacted) {
+		return(tryChangeState(has_interacted, "null"));
+	}
+	private synchronized int tryChangeState(boolean has_interacted, String input) {
 		//If we haven't even added any states, return that state changed from 0 to 0
 		//This is for "stateless" things like TrashCan
 		if(validStates == null) return(0);
@@ -248,6 +258,12 @@ public class GameItem implements ViewObject {
 		
 		long time_since_state_transition = System.currentTimeMillis()-time_of_state_transition;
 		if(currentState.time_sensitive && (time_since_state_transition < currentState.state_delay_ms)) return(-1);
+		
+		//If the current state requires an input item, the required input isn't "null", and the required input isn't what's provided
+		//then we do not change state
+		if(currentState.input_sensitive && 
+				(!currentState.requiredInput.equals("null")) && 
+				(!currentState.requiredInput.equals(input))) return(-1);
 		
 		//At this point we've determined that a state change can occur
 		int next_state = (current_state_idx+1 < validStates.size()) ? current_state_idx+1 : 0;

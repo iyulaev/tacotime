@@ -38,6 +38,8 @@ public class CoffeeGirl implements ViewObject {
 	//Defines for states that CoffeeGirl can be in
 	public static final int STATE_NORMAL = 0;
 	public static final int STATE_CARRYING_COFFEE = 1;
+	public static final int STATE_CARRYING_CUPCAKE = 2;
+	public static final int STATE_CARRYING_BLENDEDDRINK = 3;
 	
 	public CoffeeGirl(Context caller, Rect canvas) {
 		//Set starting position to middle of canvas
@@ -54,6 +56,8 @@ public class CoffeeGirl implements ViewObject {
 		
 		this.addState("default", R.drawable.coffeegirl);
 		this.addState("carrying_coffee", R.drawable.coffeegirl_w_coffee);
+		this.addState("carrying_cupcake", R.drawable.coffeegirl_w_cupcake);
+		this.addState("carrying_blended_drink", R.drawable.coffeegirl_w_blended_drink);
 	}
 	
 	//TODO: Update for GameGrid, document!
@@ -143,7 +147,6 @@ public class CoffeeGirl implements ViewObject {
 	
 	public synchronized void setItemHoldingToStateAssoc(String item, int state) {
 		if(itemToStateMap == null) itemToStateMap = new HashMap<String, State>();
-		
 		itemToStateMap.put(item, validStates.get(state));
 	}
 	

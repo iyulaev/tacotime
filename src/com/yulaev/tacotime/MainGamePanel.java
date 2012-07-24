@@ -73,8 +73,9 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 	}
 
 	/** In this method we perform pretty much all of the initialization and placement of in-game items.
-	 * We add all of the item's to the various thread's sensitivity lists, and kick off all of the threads
-	 * once this is done.
+	 * We create Objects for all of the in-game items, set up the game character (CoffeeGirl), add all
+	 *  of the item's to the various thread's sensitivity lists, and kick off all of the threads once 
+	 *  this is done.
 	 */
 	public void surfaceCreated(SurfaceHolder holder) {
 		// at this point the surface is created and
@@ -175,7 +176,8 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		canvas.drawColor(Color.BLACK);
 	}
 
-	/** This onDraw() method will draw all of the ViewObjects in the game
+	/** This onDraw() method will draw all of the ViewObjects in the game; it is the main onDraw() method
+	 * that gets called by the ViewThread.
 	 * 
 	 * @param canvas The Canvas to draw everything onto
 	 * @param voAr An ArrayList of ViewObjects that will be drawn

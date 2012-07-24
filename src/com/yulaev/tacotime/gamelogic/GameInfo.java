@@ -31,10 +31,20 @@ public class GameInfo {
 		return points;
 	}
 	
+	/** Set the current level of the game; each level gives a different set of machines and a different 
+	 * array of customers.
+	 * 
+	 * @param new_level The new level that we will be on.
+	 * @return The new level that the game is set to.
+	 */
 	public static int setLevel(int new_level) {
 		level = new_level;
 		return(level);
 	}
 	
+	/** Get the current level of this game.
+	 * 
+	 * @return The game level that this game is currently in.
+	 */
 	public static int getLevel() { return level; }
 }

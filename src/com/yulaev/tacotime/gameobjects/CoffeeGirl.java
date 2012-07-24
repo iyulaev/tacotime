@@ -14,14 +14,21 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.util.Log;
 
+/** CoffeeGirl is the main actor in TacoTime. She is the character controlled by the player. CoffeeGirl has 
+ * state managed by GameLogicThread and may interact with all of the GameItems.
+ * @author ivany
+ *
+ */
 public class CoffeeGirl implements ViewObject {
 	private static final String activitynametag = "CoffeeGirl";
 	
+	//Bitmap of this CoffeeGirl
 	private Bitmap bitmap;
 	
+	/*The default moverate, in terms of the GameGrid vector length that may be traversed during each 100ms */  
 	private static int DEFAULT_COFFEEGIRL_MOVERATE = 10;
 	
-	//represents current position
+	//represents current position (on the GameGrid)
 	private int x;
 	private int y;
 	//represents the position we move towards
@@ -54,13 +61,22 @@ public class CoffeeGirl implements ViewObject {
 		
 		bitmap = BitmapFactory.decodeResource(caller.getResources(), R.drawable.coffeegirl);
 		
+		//Add a state for each thing that CoffeeGirl may carry
+		//Annoyingly a line must be added to MainGamePanel for each GameFoodItem that we add into
+		//this game.
 		this.addState("default", R.drawable.coffeegirl);
 		this.addState("carrying_coffee", R.drawable.coffeegirl_w_coffee);
 		this.addState("carrying_cupcake", R.drawable.coffeegirl_w_cupcake);
 		this.addState("carrying_blended_drink", R.drawable.coffeegirl_w_blended_drink);
 	}
 	
-	//TODO: Update for GameGrid, document!
+	/** This method is called by the InputThread when a user input (a tap) occurs somewhere on the screen. We convert
+	 * the tap coordinates into GameGrid coordinates and then set that as this CoffeeGirl's target location for 
+	 * motion
+	 * 
+	 * @param new_x The x co-ordinate, on the screen canvas, where the tap has occured.
+	 * @param new_y The y co-ordinate, on the screen canvas, where the tap has occured.
+	 */
 	public void handleTap(int new_x, int new_y) {
 		int new_x_gg = GameGrid.gameGridX(new_x);
 		int new_y_gg = GameGrid.gameGridY(new_y);
@@ -79,17 +95,23 @@ public class CoffeeGirl implements ViewObject {
 		unLock();
 	}
 	
-	//TODO: Update for GameGrid, document!
+	/** Called by the ViewThread when the CoffeeGirl is to be drawn on the canvas 
+	 * @param canvas The canvas that this CoffeeGirl is to be drawn.
+	 * */
 	public void draw(Canvas canvas) {
 		int drawn_x = GameGrid.canvasX(x);
 		int drawn_y = GameGrid.canvasY(y);
 		canvas.drawBitmap(bitmap, drawn_x - (bitmap.getWidth() / 2), drawn_y - (bitmap.getHeight() / 2), null);
 	}
 	
-	/** These methods are used to lock and unlock the CoffeeGirl's internal variables, like position */
+	/** These methods are used to lock and unlock the CoffeeGirl's internal variables, like position 
+	 * TODO Should be done using wait() and notifyAll() */
 	public synchronized boolean setLocked(){ while(locked); locked = true; return(locked); }	
 	public synchronized void unLock() { locked = false; }
 	
+	/** Called by ViewThread when this CoffeeGirl needs to be updated. Mostly calculates and executes the
+	 * motion vector.
+	 */
 	public void onUpdate() {
 		
 		setLocked();
@@ -139,28 +161,47 @@ public class CoffeeGirl implements ViewObject {
 	public int getPositionY() { return y; }
 	
 	//represents the state of coffeegirl
-	private ArrayList<State> validStates;
-	private HashMap<String, State> itemToStateMap;
-	private int current_state_idx;
-	private State currentState;
+	private ArrayList<State> validStates; //An ArrayList of valid states for CoffeeGirl
+	private HashMap<String, State> itemToStateMap; //A map between GameFoodItems that CoffeeGirl may hold and
+		//the relevant CoffeeGirl states
+	private int current_state_idx; //the index of the current state
+	private State currentState; //The actual State object
 	private String itemHolding; //the item that CoffeeGirl holds
 	
+	/** Set an association between a particular GameFoodItem and a CoffeeGirl state
+	 * 
+	 * @param item The GameFoodItem's name that we will associate state with
+	 * @param state The index of the state to be associated with item.
+	 */
 	public synchronized void setItemHoldingToStateAssoc(String item, int state) {
 		if(itemToStateMap == null) itemToStateMap = new HashMap<String, State>();
 		itemToStateMap.put(item, validStates.get(state));
 	}
 	
+	/** Set this CoffeeGirl to be holding the GameFoodItem named newItem. As a side effect CoffeeGirl's 
+	 * state gets set to the state that is assocated with this GameFoodItem (in itemToStateMap).
+	 * @param newItem
+	 */
 	public synchronized void setItemHolding(String newItem) {
 		itemHolding = newItem;
 		setState(itemToStateMap.get(newItem).state_idx);
 	}
 	
+	/** Return the name of the GameFoodItem that CoffeeGirl is holding 
+	 * 
+	 * @return String representing the GameFoodItem that CoffeeGirl currently holds.
+	 */
 	public synchronized String getItemHolding() {
 		return(itemHolding);
 	}
 	
 	/** Used when this GameItem is constructed, to add states to this GameItem 
-	 * Assumption is that this is called during construction not from all of the various threads*/
+	 * Assumption is that this is called during construction not from all of the various threads
+	 * 
+	 * @param stateName the name of the state to add
+	 * @param r_bitmap the resource representing the Bitmap that is to be drawn to represent CoffeeGirl 
+	 * when she is in the state named stateName.
+	 * */
 	public void addState(String stateName, int r_bitmap) {
 		if(validStates == null) validStates = new ArrayList<State>();
 		

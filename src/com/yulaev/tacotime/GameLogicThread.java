@@ -22,9 +22,9 @@ import com.yulaev.tacotime.gameobjects.GameItem;
 /**
  * @author iyulaev
  * 
- * This thread handles user input. It receives messages, mostly from MessageRouter, and handles 
- * them appropriately. For example, on user taps, we call handleTap() on all ViewObjects that have
- * been put into this GameLogicThread's viewObjects array.
+ * This thread handles all of the game logic. That is, whenever some two objects, usually the CoffeeGirl
+ * and another GameItem, interact, this thread determines the result of the interaction. It also controls
+ * the state of CoffeeGirl and increments points based on the result of in-game interactions.
  */
 public class GameLogicThread extends Thread {
 	
@@ -42,18 +42,7 @@ public class GameLogicThread extends Thread {
 	public HashMap<String, GameItem> gameItems;
 	public HashMap<String, GameFoodItem> foodItems;
 	
-	public void addNewFoodItem(GameFoodItem foodItem, int associated_coffeegirl_state) {
-		boolean doSetItemHolding = false;
-		if(foodItems.isEmpty()) doSetItemHolding = true;
-		
-		foodItems.put(foodItem.getName(), foodItem);
-		coffeeGirl.setItemHoldingToStateAssoc(foodItem.getName(), associated_coffeegirl_state);
-		
-		//If CoffeeGirl's "held item" hasn't been set up yet then set it to the first foodItem that we add
-		//better hope that the first one we add is "nothing"!
-		if(doSetItemHolding) coffeeGirl.setItemHolding(foodItem.getName());
-	}
-
+	/** Mostly just initializes the Handler that receives and acts on in-game interactions that occur */
 	public GameLogicThread() {
 		super();
 		
@@ -84,12 +73,38 @@ public class GameLogicThread extends Thread {
 		};		
 	}
 	
+	/** Sets the actor associated with this GameLogicThread
+	 * 
+	 * @param n_actor The CoffeeGirl Object that will be this game's Actor, i.e. the player-controlled character
+	 */
 	public void setActor(CoffeeGirl n_actor) {
 		coffeeGirl = n_actor;
 	}
 	
+	 /** Adds a GameItem to this TacoTime game. The GameItem will be put into the gameItems data structure 
+	  * so that it's state can be updated when an interaction occurs. 
+	  * @param n_gameItem The GameItem to put into the gameItems map.
+	  */
 	public void addGameItem(GameItem n_gameItem) {
 		gameItems.put(n_gameItem.getName(), n_gameItem);
+	}
+	
+	/** This method is typically called by MainGamePanel when adding new GameFoodItems into the game. Basically 
+	 * we add a new type of food item and an associated CoffeeGirl state.
+	 * @param foodItem The GameFoodItem to add to this game.
+	 * @param associated_coffeegirl_state The associated state that CoffeeGirl will be put into when she 
+	 * receives the FoodItem.
+	 */
+	public void addNewFoodItem(GameFoodItem foodItem, int associated_coffeegirl_state) {
+		boolean doSetItemHolding = false;
+		if(foodItems.isEmpty()) doSetItemHolding = true;
+		
+		foodItems.put(foodItem.getName(), foodItem);
+		coffeeGirl.setItemHoldingToStateAssoc(foodItem.getName(), associated_coffeegirl_state);
+		
+		//If CoffeeGirl's "held item" hasn't been set up yet then set it to the first foodItem that we add
+		//better hope that the first one we add is "nothing"!
+		if(doSetItemHolding) coffeeGirl.setItemHolding(foodItem.getName());
 	}
 	
 	/** Since CoffeeGirl interacts with all other game items, describing the CoffeeGirl state machine is done on the global level

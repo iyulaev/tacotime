@@ -27,6 +27,8 @@ public class TimerThread extends Thread {
 		super();
 	}
 
+	/** The run() methods does nothing every TIMER_GRANULARITY milliseconds.
+	 */
 	@Override
 	public void run() {
 		long tickCount = 0L;

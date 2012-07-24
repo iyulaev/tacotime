@@ -11,6 +11,12 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.util.Log;
 
+/** GameItems in general are non-player interactive items, like CoffeeMachine. They are ViewObjects so
+ * they inhabit the GameGrid and are rendered onto the game canvas separately. They are also stateful 
+ * although their state machines only allow them to advance from state n to (n+1) (or to wrap).
+ * @author ivany
+ *
+ */
 public class GameItem implements ViewObject {
 	//Enum for the orientations
 	public static final int ORIENTATION_NORTH = 0;
@@ -52,8 +58,20 @@ public class GameItem implements ViewObject {
 	//lock
 	boolean locked;
 	
-	/** This constructor builds a new gameitem with a provided name and an int representing
+	/** This constructor builds a new GameItem with a provided name and an int representing
 	 * a bitmap resource.
+	 * 
+	 * @param caller The calling Context; mostly used for fetching Bitmaps in a totally uncool way.
+	 * @param name The name of this GameItem
+	 * @param r_bitmap The resource identifier of the bitmap representing this GameItem; note that this will 
+	 * be replaced by whatever bitmaps are associated with the state that this GameItem is in, if this 
+	 * GameItem is given more than zero states.
+	 * @param x_pos The starting x position (on the GameGrid) of this GameItem
+	 * @param y_pos The starting y position (on the GameGrid) of this GameItem
+	 * @param orientation The orientation of the sensitivity area relative to where this GameItem is placed; valid 
+	 * entries are GAMEITEM_ORIENTATION*
+	 * @param gg_width The width of this item on the GameGrid. Also dictates the width of the GameGrid
+	 * @param gg_height The height of this item on the GameGrid. Also dictates the height of the GameGrid
 	 */
 	public GameItem(Context caller, String name, int r_bitmap, int x_pos, int y_pos, int orientation, int gg_width, int gg_height) {
 		//Initialize variables to some values
@@ -76,7 +94,8 @@ public class GameItem implements ViewObject {
 		Log.v(activitynametag, "Bitmap width = " + width + ", height = " + height);
 		
 		this.setOrientation(orientation);
-		//Calculate sensitivity area
+		//Calculate sensitivity area (using orientation to determine where it is placed relative to the 
+		//position of this GameItem)
 		sensitivity_xmin = x - width/2;
 		sensitivity_ymin = y - height/2;
 		sensitivity_xmax = x + width/2;
@@ -131,6 +150,12 @@ public class GameItem implements ViewObject {
 		canvas.drawBitmap(bitmap, draw_x - (bitmap.getWidth() / 2), draw_y - (bitmap.getHeight() / 2), null);
 	}
 	
+	/** called when a tap (user input) occurs somewhere on the canvas. Note that the coordinates provided as 
+	 * arguments are canvas, not GameGrid, coordinates.
+	 * 
+	 * @param new_x_canvas the X coordinate of the user input tap
+	 * @param new_y_canvas the Y coordinate of the user input tap
+	 */
 	public void handleTap(int new_x_canvas, int new_y_canvas) {	
 		int new_x = GameGrid.gameGridX(new_x_canvas);
 		int new_y = GameGrid.gameGridY(new_y_canvas);
@@ -147,7 +172,9 @@ public class GameItem implements ViewObject {
 		unLock();
 	}
 	
-	/** Called when an interaction event is inserted into this GameItem's event queue */
+	/** Called when an interaction event is inserted into this GameItem's event queue. This generally occurs when the
+	 * GameItem or its sensitivity area is tapped. When CoffeeGirl enters a GameItem's sensitivity area the 
+	 * queue is checked for pending interactions; an interaction only occurs if a pending interaction is in the queue. */
 	private void queueEvent() {
 		interactionQueue[interactionQueueLength] = EVENT_DEFAULT;
 		interactionQueueLength++;
@@ -156,7 +183,8 @@ public class GameItem implements ViewObject {
 	}
 	
 	/** Clears the events in this GameItem's event queue; typically occurs when the user taps 
-	 * somewhere else in the screen causing the Actor to go elsewhere
+	 * somewhere else in the screen causing the Actor to go elsewhere. When there are no interactions queued the 
+	 * CoffeeGirl cannot interact with a GameItem even if the sensitivity area is entered.
 	 */
 	private void clearEvents() {
 		interactionQueueLength = 0;
@@ -182,7 +210,8 @@ public class GameItem implements ViewObject {
 		else return EVENT_NULL;
 	}
 	
-	/** These methods are used to lock and unlock the GameItem's internal variables, like position */
+	/** These methods are used to lock and unlock the GameItem's internal variables, like position 
+	 * TODO use wait() and notifyAll() to do this properly*/
 	public synchronized boolean setLocked(){ while(locked); locked = true; return(locked); }	
 	public synchronized void unLock() { locked = false; }
 	
@@ -207,22 +236,33 @@ public class GameItem implements ViewObject {
 	
 	/** Called when we determine that an interaction between the Actor and this GameItem 
 	 * has occured (by GameLogicThread) 
+	 * @param coffeeGirlHendItem The name of the GameFoodItem that CoffeeGirl currently holds
 	 * @return The previous state IF we transitioned to a new state, else (-1). */
-	public int onInteraction() { return tryChangeState(true, "nothing"); }
 	public int onInteraction(String coffeeGirlHeldItem) { return tryChangeState(true, coffeeGirlHeldItem); }
+	public int onInteraction() { return tryChangeState(true, "nothing"); }
 	
-	//represents the state transition times
+	//Valid states of this GameItem
 	private ArrayList<State> validStates;
+	//The index of the current state of this GameItem
 	private int current_state_idx;
+	//The current State that this game item is in
 	private State currentState;
+	//The time that the current state was entered; mostly used to determine when the State can be transitioned of
+	//of if the State is delay sensitive
 	private long time_of_state_transition;
 	
 	/** Used when this GameItem is constructed, to add states to this GameItem 
-	 * Assumption is that this is called during construction not from all of the various threads*/
-	protected void addState(String stateName, int state_delay_ms, int r_bitmap, boolean input_sensitive, boolean time_sensitive) {
-		addState(stateName, state_delay_ms, r_bitmap, input_sensitive, "null", time_sensitive);
-	}
-	
+	 * Assumption is that this is called during construction not from all of the various threads
+	 * 
+	 * @param stateName The name of the state
+	 * @param state_delay_ms The delay until this state may be exited, ignored unless time_sensitive is set to true
+	 * @param r_bitmap the resource identifier of the Bitmap representing the GameItem when it is in this State
+	 * @param input_sensitive Whether interactions with CoffeeGirl must occur to exit this state
+	 * @param requiredInput The required GameFoodItem that CoffeeGirl must be holding when she interacts with this state, 
+	 * if any
+	 * @param time_sensitive Whether this State requires that some amount of time elapse before we can exit it
+	 * 
+	 * */
 	protected void addState(String stateName, int state_delay_ms, int r_bitmap, boolean input_sensitive, String requiredInput, boolean time_sensitive) {
 		if(validStates == null) validStates = new ArrayList<State>();
 		
@@ -238,16 +278,16 @@ public class GameItem implements ViewObject {
 		
 		if(currentState == null) setState(0);		
 	}
+	protected void addState(String stateName, int state_delay_ms, int r_bitmap, boolean input_sensitive, boolean time_sensitive) {
+		addState(stateName, state_delay_ms, r_bitmap, input_sensitive, "null", time_sensitive);
+	}
 	
 	/** Called by onInteraction only. Used to (try) to transition states. If enough time has passed and/or an interaction has occured 
 	 * the state may change.
 	 * @param has_interacted true if tryChangeState() was called as a response to a user interaction else false
-	 * @param input A String representing the name of the current GameFoodItem that CoffeeGirl is holding
+	 * @param input A String representing the name of the current GameFoodItem that CoffeeGirl is holding (if any)
 	 * @return The previous state if state changed, otherwise (-1)
 	 */
-	private synchronized int tryChangeState(boolean has_interacted) {
-		return(tryChangeState(has_interacted, "null"));
-	}
 	private synchronized int tryChangeState(boolean has_interacted, String input) {
 		//If we haven't even added any states, return that state changed from 0 to 0
 		//This is for "stateless" things like TrashCan
@@ -271,6 +311,9 @@ public class GameItem implements ViewObject {
 		setState(next_state);
 		return(old_state);
 	}
+	private synchronized int tryChangeState(boolean has_interacted) {
+		return(tryChangeState(has_interacted, "null"));
+	}
 	
 	/** Change the state to something else.
 	 * 
@@ -287,8 +330,10 @@ public class GameItem implements ViewObject {
 		unLock();
 	}
 	
-	public synchronized int getStateIdx() { 
+	/** Get the index of the state that this GameItem is in 
+	 * UNUSED, MARK FOR DELETION*/
+	/*public synchronized int getStateIdx() { 
 		return current_state_idx;
-	}
+	}*/
 	
 }

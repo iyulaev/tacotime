@@ -8,6 +8,12 @@ package com.yulaev.tacotime.gameobjects;
 
 import android.graphics.Canvas;
 
+/** ViewObject in TacoTime is any object that can be drawn to the screen somehow. Generally 
+ * ViewObjects must also inhabit the GameGrid. Otherwise ViewObjects are generally actors 
+ * like CoffeeGirl and also GameItems (like CoffeeMachine, CupCakeTray, etc. )
+ * @author ivany
+ *
+ */
 public interface ViewObject {
 	/** Any ViewObject should implement onUpdate. When onUpdate() gets called the ViewObject
 	 * shoud do things like calculate its new position, update it's sprite, etc

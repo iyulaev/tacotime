@@ -35,6 +35,8 @@ public class InputThread extends Thread {
 	//Here we hold all of the objects that the ViewThread must update
 	ArrayList<ViewObject> viewObjects;
 
+	/** Mostly just sets up a Handler that receives messages from the main game Activity 
+	 * and calls the handleTap() methods for all of the ViewObjects in the game screen */
 	public InputThread() {
 		super();
 		this.viewObjects = new ArrayList<ViewObject>();
@@ -55,12 +57,13 @@ public class InputThread extends Thread {
 	 * such methods.
 	 * @param nVO The new ViewObject to add to this InputThread's ViewObject sensitivity list.
 	 */
-	
 	public void addViewObject(ViewObject nVO) {
 		viewObjects.add(nVO);
 	}
 	
-	/** This method is called when a HANDLE_ONTAP message is received by this InputThread.
+	/** This method is called when a HANDLE_ONTAP message is received by this InputThread. It calls 
+	 * handleTap() for all ViewObjects present in the game so that they are aware that user input 
+	 * has occured.
 	 * 
 	 * @param x The x co-ordinate of the user tap
 	 * @param y The y co-ordinate of the user tap

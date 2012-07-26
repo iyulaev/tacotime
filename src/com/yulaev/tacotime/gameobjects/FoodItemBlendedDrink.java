@@ -24,4 +24,8 @@ public class FoodItemBlendedDrink extends GameFoodItem {
 		Log.e("FoodItemCoffee", "Tried to do moneyOnInteraction but interactedWith not recognized => " + interactedWith);
 		return(0);
 	}
+	
+	public FoodItemBlendedDrink clone() {
+		return new FoodItemBlendedDrink();
+	}
 }

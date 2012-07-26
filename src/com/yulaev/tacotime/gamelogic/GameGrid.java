@@ -10,9 +10,14 @@ import android.util.Log;
  */
 
 public class GameGrid {
-	public static final int GAMEGRID_PADDING = 30;
-	public static final int GAMEGRID_WIDTH = 80+(2*GAMEGRID_PADDING);
-	public static final int GAMEGRID_HEIGHT = 100+(2*GAMEGRID_PADDING);
+	public static final int GAMEGRID_PADDING_LEFT = 30;
+	public static final int GAMEGRID_PADDING_RIGHT = 30;
+	public static final int GAMEGRID_PADDING_TOP = 30;
+	public static final int GAMEGRID_PADDING_BOTTOM = 40;
+		
+	
+	public static final int GAMEGRID_WIDTH = 80+(GAMEGRID_PADDING_LEFT+GAMEGRID_PADDING_RIGHT);
+	public static final int GAMEGRID_HEIGHT = 100+(GAMEGRID_PADDING_TOP+GAMEGRID_PADDING_BOTTOM);
 	
 	
 	private static int canvas_width, canvas_height;
@@ -105,5 +110,23 @@ public class GameGrid {
 	 */
 	public static int maxCanvasY() {
 		return(canvas_anchor_y * 2);
+	}
+	
+	public static int constrainX(int x) {
+		if(x > GameGrid.GAMEGRID_WIDTH-GameGrid.GAMEGRID_PADDING_RIGHT)
+			x = (GameGrid.GAMEGRID_WIDTH-GameGrid.GAMEGRID_PADDING_RIGHT);
+		if(x < GameGrid.GAMEGRID_PADDING_LEFT) 
+			x = GameGrid.GAMEGRID_PADDING_LEFT;
+		
+		return(x);
+	}
+	
+	public static int constrainY(int y) {
+		if(y > GameGrid.GAMEGRID_HEIGHT-GameGrid.GAMEGRID_PADDING_TOP)
+			y = (GameGrid.GAMEGRID_HEIGHT-GameGrid.GAMEGRID_PADDING_TOP);
+		if(y < GameGrid.GAMEGRID_PADDING_BOTTOM) 
+			y = GameGrid.GAMEGRID_PADDING_BOTTOM;
+		
+		return(y);
 	}
 }

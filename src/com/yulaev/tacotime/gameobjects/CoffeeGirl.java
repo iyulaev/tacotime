@@ -1,6 +1,5 @@
 package com.yulaev.tacotime.gameobjects;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.yulaev.tacotime.R;
@@ -8,39 +7,18 @@ import com.yulaev.tacotime.gamelogic.GameGrid;
 import com.yulaev.tacotime.gamelogic.State;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Rect;
-import android.util.Log;
 
 /** CoffeeGirl is the main actor in TacoTime. She is the character controlled by the player. CoffeeGirl has 
  * state managed by GameLogicThread and may interact with all of the GameItems.
  * @author ivany
  *
  */
-public class CoffeeGirl implements ViewObject {
+public class CoffeeGirl extends GameActor {
 	private static final String activitynametag = "CoffeeGirl";
-	
-	//Bitmap of this CoffeeGirl
-	private Bitmap bitmap;
 	
 	/*The default moverate, in terms of the GameGrid vector length that may be traversed during each 100ms */  
 	private static int DEFAULT_COFFEEGIRL_MOVERATE = 10;
-	
-	//represents current position (on the GameGrid)
-	private int x;
-	private int y;
-	//represents the position we move towards
-	private int target_x, target_y;
-	//Define the move rate, in pixels per 100ms
-	private int move_rate;
-	//Represents the last time we performed an onUpdate() operation
-	private long time_of_last_update;
-	//lock
-	boolean locked;
-	//Calling context, for getting resources later on
-	Context caller;
 	
 	//Defines for states that CoffeeGirl can be in
 	public static final int STATE_NORMAL = 0;
@@ -49,17 +27,7 @@ public class CoffeeGirl implements ViewObject {
 	public static final int STATE_CARRYING_BLENDEDDRINK = 3;
 	
 	public CoffeeGirl(Context caller, Rect canvas) {
-		//Set starting position to middle of canvas
-		x = canvas.width()/2;
-		y = canvas.height()/2;
-		target_x=x; target_y=y;
-		time_of_last_update = -1;
-		locked = false;
-		this.caller = caller;
-		
-		move_rate = DEFAULT_COFFEEGIRL_MOVERATE;
-		
-		bitmap = BitmapFactory.decodeResource(caller.getResources(), R.drawable.coffeegirl);
+		super(caller, canvas, DEFAULT_COFFEEGIRL_MOVERATE);
 		
 		//Add a state for each thing that CoffeeGirl may carry
 		//Annoyingly a line must be added to MainGamePanel for each GameFoodItem that we add into
@@ -81,13 +49,8 @@ public class CoffeeGirl implements ViewObject {
 		int new_x_gg = GameGrid.gameGridX(new_x);
 		int new_y_gg = GameGrid.gameGridY(new_y);
 		
-		if(new_x_gg > GameGrid.GAMEGRID_WIDTH-GameGrid.GAMEGRID_PADDING)
-			new_x_gg = (GameGrid.GAMEGRID_WIDTH-GameGrid.GAMEGRID_PADDING);
-		if(new_x_gg < GameGrid.GAMEGRID_PADDING) new_x_gg = GameGrid.GAMEGRID_PADDING;
-		
-		if(new_y_gg > GameGrid.GAMEGRID_HEIGHT-GameGrid.GAMEGRID_PADDING)
-			new_y_gg = (GameGrid.GAMEGRID_HEIGHT-GameGrid.GAMEGRID_PADDING);
-		if(new_y_gg < GameGrid.GAMEGRID_PADDING) new_y_gg = GameGrid.GAMEGRID_PADDING;
+		new_x_gg = GameGrid.constrainX(new_x_gg);
+		new_y_gg = GameGrid.constrainY(new_y_gg);
 		
 		setLocked();
 		target_x = new_x_gg;
@@ -95,78 +58,25 @@ public class CoffeeGirl implements ViewObject {
 		unLock();
 	}
 	
-	/** Called by the ViewThread when the CoffeeGirl is to be drawn on the canvas 
-	 * @param canvas The canvas that this CoffeeGirl is to be drawn.
-	 * */
-	public void draw(Canvas canvas) {
-		int drawn_x = GameGrid.canvasX(x);
-		int drawn_y = GameGrid.canvasY(y);
-		canvas.drawBitmap(bitmap, drawn_x - (bitmap.getWidth() / 2), drawn_y - (bitmap.getHeight() / 2), null);
-	}
 	
-	/** These methods are used to lock and unlock the CoffeeGirl's internal variables, like position 
-	 * TODO Should be done using wait() and notifyAll() */
-	public synchronized boolean setLocked(){ while(locked); locked = true; return(locked); }	
-	public synchronized void unLock() { locked = false; }
 	
 	/** Called by ViewThread when this CoffeeGirl needs to be updated. Mostly calculates and executes the
 	 * motion vector.
 	 */
-	public void onUpdate() {
-		
-		setLocked();
-		int target_x = this.target_x;			
-		int target_y = this.target_y;
-		unLock();
-		
-		int max_dist_moved; //the maximum distance we can move this onUpdate()
-		
-		//If we haven't even moved yet then just assume we can only move move_rate pixels
-		if(time_of_last_update < 0)	max_dist_moved = move_rate;
-		//Otherwise, assume we can move move_rate * (time since last update / 100ms) pixels
-		else {
-			double unit_intervals_since_moved = ( (double)System.currentTimeMillis() - time_of_last_update ) / 100.0;
-			max_dist_moved = (int) ( unit_intervals_since_moved * ((double)move_rate) );
-		}
-		time_of_last_update = System.currentTimeMillis();
-		
-		//If we're not at our target position move towards it at move_rate
-		if(target_x != x || target_y != y) {
-			//Calculate distance to target
-			int distance = (int) Math.sqrt((target_x - x)*(target_x - x) + (target_y - y)*(target_y - y));
-			
-			//Calculate the length of our vector motion
-			int vector_length = Math.min( max_dist_moved, distance );
-			
-			if(vector_length < max_dist_moved) {
-				x = target_x;
-				y = target_y;
-			} else {
-				int vector_x, vector_y;
-				//Scale vectors by the distance that we are to traverse
-				vector_x = (target_x - x) * vector_length/distance;
-				vector_y = (target_y - y) * vector_length/distance;
-				
-				x+=vector_x;
-				y+=vector_y;
-			}
-		}
-	}
+	public void onUpdate() { super.onUpdate(); }
 	
 	/** For documentation see ViewObject interface */
-	public boolean isActor() {return true;}
-	public boolean isItem() {return false;}
 	public String getName() {return "CoffeeGirl";}
-	public int getPositionX() { return x; }
-	public int getPositionY() { return y; }
 	
-	//represents the state of coffeegirl
-	private ArrayList<State> validStates; //An ArrayList of valid states for CoffeeGirl
-	private HashMap<String, State> itemToStateMap; //A map between GameFoodItems that CoffeeGirl may hold and
-		//the relevant CoffeeGirl states
-	private int current_state_idx; //the index of the current state
-	private State currentState; //The actual State object
+	
+	
+	
+	
+	
+	// Since CoffeeGirl's state is coupled to what items she is holding, we define these associations below
 	private String itemHolding; //the item that CoffeeGirl holds
+	private HashMap<String, State> itemToStateMap; //A map between GameFoodItems that CoffeeGirl may hold and
+	//the relevant CoffeeGirl states
 	
 	/** Set an association between a particular GameFoodItem and a CoffeeGirl state
 	 * 
@@ -195,49 +105,6 @@ public class CoffeeGirl implements ViewObject {
 		return(itemHolding);
 	}
 	
-	/** Used when this GameItem is constructed, to add states to this GameItem 
-	 * Assumption is that this is called during construction not from all of the various threads
-	 * 
-	 * @param stateName the name of the state to add
-	 * @param r_bitmap the resource representing the Bitmap that is to be drawn to represent CoffeeGirl 
-	 * when she is in the state named stateName.
-	 * */
-	public void addState(String stateName, int r_bitmap) {
-		if(validStates == null) validStates = new ArrayList<State>();
-		
-		State newState = new State();
-		newState.stateName = stateName;
-		newState.bitmap = BitmapFactory.decodeResource(caller.getResources(), r_bitmap);
-		newState.state_delay_ms = 0; //all coffeegirl states are interaction-sensitive only
-		newState.input_sensitive = true; //all states are input sensitive only for coffeegirl
-		newState.time_sensitive = false; //all coffeegirl states are interaction-sensitive only
-		newState.state_idx = validStates.size();
-		
-		validStates.add(newState);
-		
-		if(currentState == null) setState(0);	
-	}
 	
-	/** Change the state to something else. CoffeeGirl's state is controlled through setItemHolding().
-	 * 
-	 * @param new_state The index of the new state to set this GameItem's State to.
-	 */
-	private synchronized void setState(int new_state) {
-		setLocked(); 
-		
-		currentState = validStates.get(new_state);
-		current_state_idx = new_state;
-		this.bitmap = currentState.bitmap;
-		
-		unLock();
-	}
-	
-	/** Accessor method for current_state_idx; return index of the current state.
-	 * 
-	 * @return Index of the current CoffeeGirl State
-	 */
-	public int getState() {
-		return(current_state_idx);
-	}
 	
 }

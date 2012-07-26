@@ -18,4 +18,5 @@ public class FoodItemNothing extends GameFoodItem {
 		return 0;
 	}
 
+	public FoodItemNothing clone() { return (new FoodItemNothing()); }
 }

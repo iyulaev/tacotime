@@ -25,4 +25,6 @@ public class FoodItemCoffee extends GameFoodItem {
 		Log.e("FoodItemCoffee", "Tried to do moneyOnInteraction but interactedWith not recognized => " + interactedWith);
 		return(0);
 	}
+	
+	public FoodItemCoffee clone() { return new FoodItemCoffee(); }
 }

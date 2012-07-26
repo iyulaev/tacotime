@@ -15,6 +15,11 @@ public abstract class GameFoodItem {
 	 */
 	public GameFoodItem(String name) {
 		foodItemName = name;
+		is_satisfied = false;
+	}
+	public GameFoodItem(String name, boolean n_is_satisfied) {
+		foodItemName = name;
+		is_satisfied = n_is_satisfied;
 	}
 	
 	/** Return the name of this GameFoodItem */
@@ -37,4 +42,11 @@ public abstract class GameFoodItem {
 	 * @return The number of moneys resulting from this interaction.
 	 */
 	public abstract int moneyOnInteraction(String interactedWith, int waitTime);
+	
+	//The below variables are used when this GameFoodItem is part of a customer's order
+	private boolean is_satisfied;
+	public void setSatisfied() { is_satisfied = true; }
+	public boolean isSatisfied() { return is_satisfied; }
+	
+	public abstract GameFoodItem clone() ;
 }

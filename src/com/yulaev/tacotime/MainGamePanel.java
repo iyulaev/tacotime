@@ -8,16 +8,19 @@ package com.yulaev.tacotime;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import com.yulaev.tacotime.gamelogic.GameGrid;
 import com.yulaev.tacotime.gameobjects.Blender;
 import com.yulaev.tacotime.gameobjects.CoffeeGirl;
 import com.yulaev.tacotime.gameobjects.CoffeeMachine;
 import com.yulaev.tacotime.gameobjects.CupCakeTray;
+import com.yulaev.tacotime.gameobjects.CustomerQueue;
 import com.yulaev.tacotime.gameobjects.FoodItemBlendedDrink;
 import com.yulaev.tacotime.gameobjects.FoodItemCoffee;
 import com.yulaev.tacotime.gameobjects.FoodItemCupcake;
 import com.yulaev.tacotime.gameobjects.FoodItemNothing;
+import com.yulaev.tacotime.gameobjects.GameFoodItem;
 import com.yulaev.tacotime.gameobjects.GameItem;
 import com.yulaev.tacotime.gameobjects.TrashCan;
 import com.yulaev.tacotime.gameobjects.ViewObject;
@@ -27,6 +30,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -121,6 +125,14 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		gameLogicThread.addNewFoodItem(new FoodItemCoffee(), CoffeeGirl.STATE_CARRYING_COFFEE);
 		gameLogicThread.addNewFoodItem(new FoodItemCupcake(), CoffeeGirl.STATE_CARRYING_CUPCAKE);
 		gameLogicThread.addNewFoodItem(new FoodItemBlendedDrink(), CoffeeGirl.STATE_CARRYING_BLENDEDDRINK);
+		
+		//Magic numbers: 20 - x-position of Customers, 1 - starting customer queue length, 
+		CustomerQueue custQueue = new CustomerQueue(this.getContext(), 40, GameGrid.GAMEGRID_HEIGHT-45, GameItem.ORIENTATION_SOUTH, 
+				1, gameLogicThread.getFoodItems());
+		viewThread.addViewObject(custQueue);
+		viewThread.addGameItem(custQueue);
+		inputThread.addViewObject(custQueue);
+		gameLogicThread.addGameItem(custQueue);
 		
 		
 		//Kick off all of the threads

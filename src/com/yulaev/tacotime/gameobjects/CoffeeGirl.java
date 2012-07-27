@@ -27,7 +27,7 @@ public class CoffeeGirl extends GameActor {
 	public static final int STATE_CARRYING_BLENDEDDRINK = 3;
 	
 	public CoffeeGirl(Context caller, Rect canvas) {
-		super(caller, canvas, DEFAULT_COFFEEGIRL_MOVERATE);
+		super(caller, DEFAULT_COFFEEGIRL_MOVERATE);
 		
 		//Add a state for each thing that CoffeeGirl may carry
 		//Annoyingly a line must be added to MainGamePanel for each GameFoodItem that we add into

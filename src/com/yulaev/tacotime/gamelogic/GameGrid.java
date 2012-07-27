@@ -13,11 +13,11 @@ public class GameGrid {
 	public static final int GAMEGRID_PADDING_LEFT = 30;
 	public static final int GAMEGRID_PADDING_RIGHT = 30;
 	public static final int GAMEGRID_PADDING_TOP = 30;
-	public static final int GAMEGRID_PADDING_BOTTOM = 40;
+	public static final int GAMEGRID_PADDING_BOTTOM = 55;
 		
 	
 	public static final int GAMEGRID_WIDTH = 80+(GAMEGRID_PADDING_LEFT+GAMEGRID_PADDING_RIGHT);
-	public static final int GAMEGRID_HEIGHT = 100+(GAMEGRID_PADDING_TOP+GAMEGRID_PADDING_BOTTOM);
+	public static final int GAMEGRID_HEIGHT = 80+(GAMEGRID_PADDING_TOP+GAMEGRID_PADDING_BOTTOM);
 	
 	
 	private static int canvas_width, canvas_height;
@@ -112,6 +112,13 @@ public class GameGrid {
 		return(canvas_anchor_y * 2);
 	}
 	
+	/** Given an x co-ordinate in the GameGrid, returns another x coordinate that is
+	 * the same but constrained to within the GameGrid (within the padded area). So if x
+	 * is outside the GameGrid we make it equal to a value as close to the input as possible, 
+	 * but still within the padded GameGrid area
+	 * @param x An x coordinate within the GameGrid
+	 * @return An x coordinate within the PADDED GameGrid area, as close to the original coordinate as possible.
+	 */
 	public static int constrainX(int x) {
 		if(x > GameGrid.GAMEGRID_WIDTH-GameGrid.GAMEGRID_PADDING_RIGHT)
 			x = (GameGrid.GAMEGRID_WIDTH-GameGrid.GAMEGRID_PADDING_RIGHT);
@@ -121,11 +128,18 @@ public class GameGrid {
 		return(x);
 	}
 	
+	/** Given an y co-ordinate in the GameGrid, returns another y coordinate that is
+	 * the same but constrained to within the GameGrid (within the padded area). So if y
+	 * is outside the GameGrid we make it equal to a value as close to the input as possible, 
+	 * but still within the padded GameGrid area
+	 * @param y An y coordinate within the GameGrid
+	 * @return An y coordinate within the PADDED GameGrid area, as close to the original coordinate as possible.
+	 */
 	public static int constrainY(int y) {
-		if(y > GameGrid.GAMEGRID_HEIGHT-GameGrid.GAMEGRID_PADDING_TOP)
-			y = (GameGrid.GAMEGRID_HEIGHT-GameGrid.GAMEGRID_PADDING_TOP);
-		if(y < GameGrid.GAMEGRID_PADDING_BOTTOM) 
-			y = GameGrid.GAMEGRID_PADDING_BOTTOM;
+		if(y > GameGrid.GAMEGRID_HEIGHT-GameGrid.GAMEGRID_PADDING_BOTTOM)
+			y = (GameGrid.GAMEGRID_HEIGHT-GameGrid.GAMEGRID_PADDING_BOTTOM);
+		if(y < GameGrid.GAMEGRID_PADDING_TOP) 
+			y = GameGrid.GAMEGRID_PADDING_TOP;
 		
 		return(y);
 	}

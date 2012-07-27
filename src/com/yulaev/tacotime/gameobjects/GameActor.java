@@ -38,10 +38,10 @@ public abstract class GameActor implements ViewObject {
 	public synchronized boolean setLocked(){ while(locked); locked = true; return(locked); }	
 	public synchronized void unLock() { locked = false; }
 	
-	public GameActor(Context caller, Rect canvas, int move_rate) {
+	public GameActor(Context caller, int move_rate) {
 		//Set starting position to middle of canvas
-		x = canvas.width()/2;
-		y = canvas.height()/2;
+		x = GameGrid.GAMEGRID_WIDTH/2;
+		y = GameGrid.GAMEGRID_HEIGHT/2;
 		target_x=x; target_y=y;
 		time_of_last_update = -1;
 		locked = false;

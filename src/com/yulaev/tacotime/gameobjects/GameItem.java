@@ -3,6 +3,7 @@ package com.yulaev.tacotime.gameobjects;
 import java.util.ArrayList;
 
 import com.yulaev.tacotime.gamelogic.GameGrid;
+import com.yulaev.tacotime.gamelogic.Interaction;
 import com.yulaev.tacotime.gamelogic.State;
 
 import android.content.Context;
@@ -143,6 +144,9 @@ public class GameItem implements ViewObject {
 	/**Accessor (setter) method for class variable orientation */
 	private void setOrientation(int n_orientation) { orientation = n_orientation; }	
 	
+	/** Draws this GameItem to the Canvas canvas
+	 * @param canvas The Canvas to draw this GameItem onto
+	 */
 	public void draw(Canvas canvas) {
 		int draw_x = GameGrid.canvasX(x);
 		int draw_y = GameGrid.canvasY(y);
@@ -189,7 +193,7 @@ public class GameItem implements ViewObject {
 	private void clearEvents() {
 		interactionQueueLength = 0;
 		
-		Log.v(activitynametag+"."+this.getName(), "Cleared interaction events.");
+		//Log.v(activitynametag+"."+this.getName(), "Cleared interaction events.");
 	}
 	
 	/** 
@@ -238,8 +242,8 @@ public class GameItem implements ViewObject {
 	 * has occured (by GameLogicThread) 
 	 * @param coffeeGirlHendItem The name of the GameFoodItem that CoffeeGirl currently holds
 	 * @return The previous state IF we transitioned to a new state, else (-1). */
-	public int onInteraction(String coffeeGirlHeldItem) { return tryChangeState(true, coffeeGirlHeldItem); }
-	public int onInteraction() { return tryChangeState(true, "nothing"); }
+	public Interaction onInteraction(String coffeeGirlHeldItem) { return tryChangeState(true, coffeeGirlHeldItem); }
+	public Interaction onInteraction() { return tryChangeState(true, "nothing"); }
 	
 	//Valid states of this GameItem
 	private ArrayList<State> validStates;
@@ -288,30 +292,30 @@ public class GameItem implements ViewObject {
 	 * @param input A String representing the name of the current GameFoodItem that CoffeeGirl is holding (if any)
 	 * @return The previous state if state changed, otherwise (-1)
 	 */
-	private synchronized int tryChangeState(boolean has_interacted, String input) {
+	private synchronized Interaction tryChangeState(boolean has_interacted, String input) {
 		//If we haven't even added any states, return that state changed from 0 to 0
 		//This is for "stateless" things like TrashCan
-		if(validStates == null) return(0);
+		if(validStates == null) return(new Interaction(0));
 		//by default we do not change state; we first check to see if all conditions for changing state were met
 		
-		if(currentState.input_sensitive && !has_interacted) return(-1);
+		if(currentState.input_sensitive && !has_interacted) return(new Interaction(-1));
 		
 		long time_since_state_transition = System.currentTimeMillis()-time_of_state_transition;
-		if(currentState.time_sensitive && (time_since_state_transition < currentState.state_delay_ms)) return(-1);
+		if(currentState.time_sensitive && (time_since_state_transition < currentState.state_delay_ms)) return(new Interaction(-1));
 		
 		//If the current state requires an input item, the required input isn't "null", and the required input isn't what's provided
 		//then we do not change state
 		if(currentState.input_sensitive && 
 				(!currentState.requiredInput.equals("null")) && 
-				(!currentState.requiredInput.equals(input))) return(-1);
+				(!currentState.requiredInput.equals(input))) return(new Interaction(-1));
 		
 		//At this point we've determined that a state change can occur
 		int next_state = (current_state_idx+1 < validStates.size()) ? current_state_idx+1 : 0;
 		int old_state = current_state_idx;
 		setState(next_state);
-		return(old_state);
+		return(new Interaction(old_state));
 	}
-	private synchronized int tryChangeState(boolean has_interacted) {
+	private synchronized Interaction tryChangeState(boolean has_interacted) {
 		return(tryChangeState(has_interacted, "null"));
 	}
 	

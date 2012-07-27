@@ -1,6 +1,7 @@
 package com.yulaev.tacotime.gameobjects;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import com.yulaev.tacotime.R;
@@ -9,10 +10,21 @@ import com.yulaev.tacotime.gamelogic.GameGrid;
 
 import android.content.Context;
 import android.graphics.Rect;
+import android.util.Log;
+
+/** Customer implements a single customer that requests one or more items out of the possible foodItems list.
+ * CoffeeGirl gets these items for Customer and the requirements are marked off. When all requirements are done, 
+ * the customer transitions to finished and the next customer approaches the counter.
+ * 
+ * @author ivany
+ *
+ */
 
 public class Customer extends GameActor {
 	
-	private static int DEFAULT_CUSTOMER_MOVERATE = 10;
+	public static int DEFAULT_CUSTOMER_MOVERATE = 3;
+	
+	public static final String activitynametag = "Customer";
 	
 	//Define states for customer
 	public static int STATE_HIDDEN = 0;
@@ -23,29 +35,40 @@ public class Customer extends GameActor {
 	//Define queue position (customer's position in CustomerQueue)
 	private static int queue_position;
 	
-	public static int MAX_ORDER_SIZE;
+	public static int MAX_ORDER_SIZE = 1;
 
-	public Customer(Context caller, Rect canvas, int move_rate, int starting_queue_position, ArrayList<GameFoodItem> foodItemChoices) {
-		super(caller, canvas, DEFAULT_CUSTOMER_MOVERATE);
+	/** Initialize a new Customer.
+	 * 
+	 * @param caller The calling Context for fetching bitmaps and such.
+	 * @param move_rate The moverate for this customer (default should be Customer.DEFAULT_CUSTOMER_MOVERATE)
+	 * @param starting_queue_position The (initial) queue position of this customer; will be decremented by 
+	 * 	CustomerQueue as the Customer queue is advanced
+	 * @param foodItemChoices The menu of GameFoodItem choices that this customer may select from
+	 */
+	public Customer(Context caller, int move_rate, int starting_queue_position, List<GameFoodItem> foodItemChoices) {
+		super(caller, move_rate);
 		
 		queue_position = starting_queue_position;
 		visible = false;
 		
-		//Generate this customer's "point multiplier" and order
+		//Generate this customer's "point multiplier" and food item order
 		Random random = new Random();
 		customerOrder = new ArrayList<GameFoodItem>();
 		customerOrderSize = 1+random.nextInt(MAX_ORDER_SIZE);
 		for(int i = 0; i <= customerOrderSize; i++) {
-			int item_choice = random.nextInt(foodItemChoices.size());
+			//add 1 at the beginning because "nothing" is not a valid choice ;)
+			int item_choice = 1 + random.nextInt(foodItemChoices.size()-1);
 			customerOrder.add(foodItemChoices.get(item_choice).clone());
 		}
 		moneyMultiplier = random.nextFloat() + 1.0f;
 		pointsMultiplier = random.nextFloat() + 1.0f;
 		
+		//Initialize all of the states that this Customer can have
 		this.addState("hidden", R.drawable.customer_waiting);
 		this.addState("inline", R.drawable.customer_waiting);
 		this.addState("served", R.drawable.customer_happy);
 		this.addState("finished", R.drawable.customer_waiting);
+		setState(STATE_HIDDEN);
 	}
 
 	@Override
@@ -60,13 +83,16 @@ public class Customer extends GameActor {
 	
 	//Define the starting location of customers, the position if they're first, second, of third, 
 	//and the exit location of customers
-	private int location_start_x = 20;
+	private int location_start_x = 40;
 	private int location_start_y = GameGrid.GAMEGRID_HEIGHT - 5;
-	private int locations_queue_x[] = {20,20,20};
+	private int locations_queue_x[] = {40,40,40};
 	private int locations_queue_y[] = {GameGrid.GAMEGRID_HEIGHT - 35, GameGrid.GAMEGRID_HEIGHT - 25, GameGrid.GAMEGRID_HEIGHT - 15};
 	private int locations_exit_x = GameGrid.GAMEGRID_WIDTH - 5;
 	private int locations_exit_y = GameGrid.GAMEGRID_HEIGHT - 35;
 	
+	/** Sets the state of this customer
+	 * @param new_state The State to put this customer into
+	 */
 	protected synchronized void setState(int new_state) {
 		super.setState(new_state);
 		
@@ -83,12 +109,17 @@ public class Customer extends GameActor {
 		}
 	}
 	
+	/** Called when the customer needs to be updated
+	 * Not only does it update the position (through super.onUpdate()) but it also runs the
+	 * state machine for this customer!
+	 */
 	public void onUpdate() {
 		super.onUpdate();
 		
 		if(this.getQueuePosition() < CustomerQueue.QUEUE_VISIBLE_LENGTH && getState() == STATE_HIDDEN) {
 			setState(STATE_INLINE);
 			visible = true;
+			Log.d(activitynametag, "Customer advanced to STATE_INLINE");
 		}
 		
 		//If state is "in line" make sure that we are standing in the appropriate part of the line
@@ -97,6 +128,8 @@ public class Customer extends GameActor {
 			this.target_x = locations_queue_x[getQueuePosition()];			
 			this.target_y = locations_queue_y[getQueuePosition()];
 			unLock();
+			
+			//Log.d(activitynametag, "Customer is STATE_INLINE");
 		}
 		
 		//If we are presently in line and at the front of the queue, check if our dependencies have been met
@@ -144,11 +177,37 @@ public class Customer extends GameActor {
 		return(new Interaction());
 	}
 	
+	/** Checks to see if this Customer's order has been satisfied
+	 * 
+	 * @return true if this Customer's order has been satisfies (and he can GTFO), false otherwise
+	 */
 	public boolean orderSatisfied() {
 		for(int i = 0; i < customerOrderSize; i++) {
 			if(! customerOrder.get(i).isSatisfied()) return(false);
 		}
 		return(true);
+	}
+	
+	/** Returns a simple string representation of this Customer and his/her order.
+	 * @return a simple string representation of this Customer and his/her order
+	 */
+	public String toString() {
+		StringBuilder retvalBuilder = new StringBuilder();
+		
+		retvalBuilder.append("Customer #");
+		retvalBuilder.append(queue_position);
+		retvalBuilder.append(", has ");
+		retvalBuilder.append(customerOrderSize);
+		retvalBuilder.append(" items in order: {");
+		
+		for(int i = 0; i < customerOrderSize; i++) {
+			retvalBuilder.append(customerOrder.get(i).getName());
+			if(i != customerOrderSize-1) retvalBuilder.append(",");
+		}
+		
+		retvalBuilder.append("}");
+		
+		return(retvalBuilder.toString());
 	}
 
 }

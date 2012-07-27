@@ -3,6 +3,7 @@ package com.yulaev.tacotime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import android.graphics.Canvas;
 import android.os.Handler;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 
 import com.yulaev.tacotime.gamelogic.GameInfo;
+import com.yulaev.tacotime.gamelogic.Interaction;
 import com.yulaev.tacotime.gameobjects.Blender;
 import com.yulaev.tacotime.gameobjects.CoffeeGirl;
 import com.yulaev.tacotime.gameobjects.CoffeeMachine;
@@ -61,12 +63,13 @@ public class GameLogicThread extends Thread {
 					Log.d(activitynametag, "Got interaction event message! Actor interacted with " + interactee);
 					
 					//Attempt interaction and see if interactee changed state
-					int interactee_state = gameItems.get(interactee).onInteraction(coffeeGirl.getItemHolding());
+					Interaction interactionResult = gameItems.get(interactee).onInteraction(coffeeGirl.getItemHolding());
 					
-					//If the interaction resulted in a state change, change coffeegirl state
-					if(interactee_state != -1) {
+					//If the interaction resulted in a state change, OR was successful (when interacting with CustomerQueue),
+					//change coffeegirl state
+					if(interactionResult.previous_state != -1 || interactionResult.was_success) {
 						//coffeeGirl.setState(coffeeGirlNextState(coffee_girl_prev_state, interactee, interactee_state));
-						coffeeGirlNextState(coffeeGirl.getState(), interactee, interactee_state);
+						coffeeGirlNextState(coffeeGirl.getState(), interactee, interactionResult);
 					}
 				}
 			}
@@ -107,6 +110,20 @@ public class GameLogicThread extends Thread {
 		if(doSetItemHolding) coffeeGirl.setItemHolding(foodItem.getName());
 	}
 	
+	/** Return a List of the GameFoodItems that have been added to this GameLogicThread. Utility method that
+	 * is a bit out of place but it is convenient since we have to explain the GameFoodItem -> CoffeeGirl State
+	 * mapping to GTL anyway and so it implicitly gets a List of the GameFoodItems that are valid in this game.
+	 * 
+	 * @return A List of GameFoodItems valid for this game/level/whatever.
+	 */
+	public List<GameFoodItem> getFoodItems() {
+		ArrayList<GameFoodItem> retval = new ArrayList<GameFoodItem>();
+		Iterator<String> it = foodItems.keySet().iterator();
+		while(it.hasNext()) retval.add(foodItems.get(it.next()));
+		
+		return(retval);
+	}
+	
 	/** Since CoffeeGirl interacts with all other game items, describing the CoffeeGirl state machine is done on the global level
 	 * rather than within CoffeeGirl itself. As a side effect GameInfo money and/or points may change depending on how
 	 * CoffeeGirl's state has changed
@@ -115,7 +132,9 @@ public class GameLogicThread extends Thread {
 	 * @param interactee_state The state of the GameItem that CoffeeGirl interacted with
 	 * @return What the next state should be, (if any change occurs)
 	 */
-	public void coffeeGirlNextState(int old_state, String interactedWith, int interactee_state) {
+	public void coffeeGirlNextState(int old_state, String interactedWith, Interaction interactionResult) {
+		int interactee_state = interactionResult.previous_state;
+		
 		//CoffeeGirl's hands are empty, she interacts with a coffeemachine that is done -> she is now carrying coffee
 		if(old_state == CoffeeGirl.STATE_NORMAL && 
 				interactedWith.equals("CoffeeMachine") && 
@@ -138,6 +157,16 @@ public class GameLogicThread extends Thread {
 				interactedWith.equals("TrashCan")) {
 			GameInfo.setAndReturnPoints(foodItems.get(coffeeGirl.getItemHolding()).pointsOnInteraction(interactedWith, 0));
 			GameInfo.setAndReturnMoney(foodItems.get(coffeeGirl.getItemHolding()).moneyOnInteraction(interactedWith, 0)); 
+			coffeeGirl.setItemHolding("nothing");
+		}
+		
+		//CoffeeGirl interacts with CustomerQueue - if the interaction is successful then CoffeeGirl loses the
+		//item that she currently holds and gains some points in return
+		if(old_state != CoffeeGirl.STATE_NORMAL && 
+				interactedWith.equals("CustomerQueue") &&
+				interactionResult.was_success) {
+			GameInfo.setAndReturnPoints(interactionResult.point_result);
+			GameInfo.setAndReturnPoints(interactionResult.money_result);
 			coffeeGirl.setItemHolding("nothing");
 		}
 		

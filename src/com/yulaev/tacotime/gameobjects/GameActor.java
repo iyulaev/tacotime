@@ -109,7 +109,7 @@ public abstract class GameActor implements ViewObject {
 	 * @param canvas The canvas that this CoffeeGirl is to be drawn.
 	 * */
 	public void draw(Canvas canvas) {
-		if(visible) {
+		if(isVisible()) {
 			int drawn_x = GameGrid.canvasX(x);
 			int drawn_y = GameGrid.canvasY(y);
 			canvas.drawBitmap(bitmap, drawn_x - (bitmap.getWidth() / 2), drawn_y - (bitmap.getHeight() / 2), null);
@@ -180,6 +180,14 @@ public abstract class GameActor implements ViewObject {
 	 */
 	public int getState() {
 		return(current_state_idx);
+	}
+	
+	public void setVisible(boolean visibility) {
+		visible = visibility;
+	}
+	
+	public boolean isVisible() {
+		return(visible);
 	}
 
 }

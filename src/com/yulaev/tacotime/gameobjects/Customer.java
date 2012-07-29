@@ -9,7 +9,10 @@ import com.yulaev.tacotime.gamelogic.Interaction;
 import com.yulaev.tacotime.gamelogic.GameGrid;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.graphics.drawable.NinePatchDrawable;
 import android.util.Log;
 
 /** Customer implements a single customer that requests one or more items out of the possible foodItems list.
@@ -35,7 +38,7 @@ public class Customer extends GameActor {
 	//Define queue position (customer's position in CustomerQueue)
 	private static int queue_position;
 	
-	public static int MAX_ORDER_SIZE = 1;
+	public static int MAX_ORDER_SIZE = 2;
 
 	/** Initialize a new Customer.
 	 * 
@@ -149,6 +152,54 @@ public class Customer extends GameActor {
 		}
 	}
 	
+	/** Called when the customer needs to be drawn. Apart from drawing the customer icon we also
+	 * draw the customer's order
+	 */
+	public void draw(Canvas canvas) {
+		super.draw(canvas);
+		
+		//draw the order using a 9patch speech bubble, if this Customer is visible and is waiting for their order
+		//to be fulfilled
+		if(isVisible() && this.getState() == STATE_INLINE) {
+			int ICON_WIDTH = 20 + 10; //10 is for padding
+			int BUBBLE_WIDTH = 54;
+			int BUBBLE_HEIGHT = 32;
+			
+			//TODO: this might not be great for performance (due to GC performance?)
+			NinePatchDrawable speechBubble = (NinePatchDrawable)caller.getResources().getDrawable(R.drawable.speech_bubble_sm);
+
+			int bubble_left =  GameGrid.canvasX(this.x) + this.bitmap.getWidth()/2 + 2; //+2 at the end for padding :)
+			int bubble_top = GameGrid.canvasY(this.y) - speechBubble.getMinimumHeight()/2;
+			int bubble_right = bubble_left + BUBBLE_WIDTH + (ICON_WIDTH*(customerOrderSize-1));
+			int bubble_bottom = bubble_top + BUBBLE_HEIGHT;
+			
+			speechBubble.setBounds(bubble_left, bubble_top, bubble_right, bubble_bottom);
+			speechBubble.draw(canvas);
+			
+			//Now draw the actual food items in the bubble!
+			int foodicon_x = bubble_left + 34 - 6; //this puts is right in the middle of the area for the left-most icon
+				//within the speech bubble; I don't know why the (-6) looks better but it does
+			int foodicon_y = (bubble_top + bubble_bottom) / 2;
+			
+			//Draw an icon for each food item on the customer's order
+			for(int i = 0; i < customerOrderSize; i++) {
+				Bitmap foodBitmap;
+				
+				if(customerOrder.get(i).isSatisfied()) 
+					foodBitmap = customerOrder.get(i).getBitmapInactive();
+				else 
+					foodBitmap = customerOrder.get(i).getBitmapActive();
+				
+				int foodicon_adjusted_x = foodicon_x - customerOrder.get(i).getBitmapInactive().getWidth()/2;
+				int foodicon_adjusted_y = foodicon_y - customerOrder.get(i).getBitmapInactive().getHeight()/2;				
+				canvas.drawBitmap(foodBitmap,foodicon_adjusted_x,foodicon_adjusted_y,null);
+
+				foodicon_x += ICON_WIDTH;
+			}
+			
+		}
+	}
+	
 	int customerOrderSize;
 	ArrayList<GameFoodItem> customerOrder;
 	float moneyMultiplier;
@@ -190,6 +241,7 @@ public class Customer extends GameActor {
 	
 	/** Returns a simple string representation of this Customer and his/her order.
 	 * @return a simple string representation of this Customer and his/her order
+	 * 
 	 */
 	public String toString() {
 		StringBuilder retvalBuilder = new StringBuilder();

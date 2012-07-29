@@ -121,12 +121,13 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		gameLogicThread.addGameItem(blender);
 		
 		//Set up all Food Items (UPDATE FOR NEW FOODITEM)
-		gameLogicThread.addNewFoodItem(new FoodItemNothing(), CoffeeGirl.STATE_NORMAL);
-		gameLogicThread.addNewFoodItem(new FoodItemCoffee(), CoffeeGirl.STATE_CARRYING_COFFEE);
-		gameLogicThread.addNewFoodItem(new FoodItemCupcake(), CoffeeGirl.STATE_CARRYING_CUPCAKE);
-		gameLogicThread.addNewFoodItem(new FoodItemBlendedDrink(), CoffeeGirl.STATE_CARRYING_BLENDEDDRINK);
+		gameLogicThread.addNewFoodItem(new FoodItemNothing(this.getContext()), CoffeeGirl.STATE_NORMAL);
+		gameLogicThread.addNewFoodItem(new FoodItemCoffee(this.getContext()), CoffeeGirl.STATE_CARRYING_COFFEE);
+		gameLogicThread.addNewFoodItem(new FoodItemCupcake(this.getContext()), CoffeeGirl.STATE_CARRYING_CUPCAKE);
+		gameLogicThread.addNewFoodItem(new FoodItemBlendedDrink(this.getContext()), CoffeeGirl.STATE_CARRYING_BLENDEDDRINK);
 		
-		//Magic numbers: 20 - x-position of Customers, 1 - starting customer queue length, 
+		//Magic numbers: 40 - x-position of Customers, (GameGrid.GAMEGRID_HEIGHT-45) - y-position of customers
+		//1 - starting customer queue length, 
 		CustomerQueue custQueue = new CustomerQueue(this.getContext(), 40, GameGrid.GAMEGRID_HEIGHT-45, GameItem.ORIENTATION_SOUTH, 
 				1, gameLogicThread.getFoodItems());
 		viewThread.addViewObject(custQueue);

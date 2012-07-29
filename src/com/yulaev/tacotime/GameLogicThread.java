@@ -166,7 +166,7 @@ public class GameLogicThread extends Thread {
 				interactedWith.equals("CustomerQueue") &&
 				interactionResult.was_success) {
 			GameInfo.setAndReturnPoints(interactionResult.point_result);
-			GameInfo.setAndReturnPoints(interactionResult.money_result);
+			GameInfo.setAndReturnMoney(interactionResult.money_result);
 			coffeeGirl.setItemHolding("nothing");
 		}
 		

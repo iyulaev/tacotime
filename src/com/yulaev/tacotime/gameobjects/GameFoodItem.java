@@ -1,11 +1,14 @@
 package com.yulaev.tacotime.gameobjects;
 
+import android.graphics.Bitmap;
+
 /** GameFoodItem is simply a container class that describes a food item and how many points it
  * is worth when given to a customer, or when thrown out
  * @author ivany
  *
  */
 public abstract class GameFoodItem {
+	
 	/**The name for this GameFoodItem*/
 	private String foodItemName;
 	
@@ -49,4 +52,16 @@ public abstract class GameFoodItem {
 	public boolean isSatisfied() { return is_satisfied; }
 	
 	public abstract GameFoodItem clone() ;
+	
+	/** Returns a bitmap representation of this food item (for drawing to the screen, f.ex.) when
+	 * the food item is "active", i.e. when the colors are not desaturated 
+	 * @return Bitmap to use when drawing this food item
+	 */
+	public abstract Bitmap getBitmapActive();
+	
+	/** Returns a bitmap representation of this food item (for drawing to the screen, f.ex.) when
+	 * the food item is "inactive", i.e. when the colors are desaturated and the icon is ghosted 
+	 * @return Bitmap to use when drawing this food item, when it is inactive
+	 */
+	public abstract Bitmap getBitmapInactive();
 }

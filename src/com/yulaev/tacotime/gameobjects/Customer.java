@@ -36,7 +36,7 @@ public class Customer extends GameActor {
 	public static int STATE_FINISHED = 3;
 	
 	//Define queue position (customer's position in CustomerQueue)
-	private static int queue_position;
+	private int queue_position;
 	
 	public static int MAX_ORDER_SIZE = 2;
 
@@ -84,12 +84,12 @@ public class Customer extends GameActor {
 	public int getQueuePosition() { return queue_position; }
 	public void decQueuePosition() { queue_position--; } 
 	
-	//Define the starting location of customers, the position if they're first, second, of third, 
+	//Define the starting location of customers, the position if they're first or second,  
 	//and the exit location of customers
 	private int location_start_x = 40;
 	private int location_start_y = GameGrid.GAMEGRID_HEIGHT - 5;
-	private int locations_queue_x[] = {40,40,40};
-	private int locations_queue_y[] = {GameGrid.GAMEGRID_HEIGHT - 35, GameGrid.GAMEGRID_HEIGHT - 25, GameGrid.GAMEGRID_HEIGHT - 15};
+	private int locations_queue_x[] = {40,40};
+	private int locations_queue_y[] = {GameGrid.GAMEGRID_HEIGHT - 35, GameGrid.GAMEGRID_HEIGHT - 15};
 	private int locations_exit_x = GameGrid.GAMEGRID_WIDTH - 5;
 	private int locations_exit_y = GameGrid.GAMEGRID_HEIGHT - 35;
 	
@@ -119,10 +119,11 @@ public class Customer extends GameActor {
 	public void onUpdate() {
 		super.onUpdate();
 		
-		if(this.getQueuePosition() < CustomerQueue.QUEUE_VISIBLE_LENGTH && getState() == STATE_HIDDEN) {
+		//If customer has been set visible (by the CustomerQueue) and it is currently in the hidden state
+		//then advance to the in-line state
+		if(this.isVisible() && getState() == STATE_HIDDEN) {
 			setState(STATE_INLINE);
-			visible = true;
-			Log.d(activitynametag, "Customer advanced to STATE_INLINE");
+			//Log.d(activitynametag, "Customer advanced to STATE_INLINE");
 		}
 		
 		//If state is "in line" make sure that we are standing in the appropriate part of the line
@@ -146,14 +147,12 @@ public class Customer extends GameActor {
 			if(x == locations_exit_x && y == locations_exit_y) setState(STATE_FINISHED);
 		}
 		
-		if(this.getState() == STATE_FINISHED) {
-			visible = false;
-			
-		}
+		//If the customer has advanced to the finished state then do nothing
+		if(this.getState() == STATE_FINISHED) ;
 	}
 	
 	/** Called when the customer needs to be drawn. Apart from drawing the customer icon we also
-	 * draw the customer's order
+	 * draw the customer's order, using icons and a speech bubble (which is a 9patch drawing)
 	 */
 	public void draw(Canvas canvas) {
 		super.draw(canvas);
@@ -206,7 +205,8 @@ public class Customer extends GameActor {
 	float pointsMultiplier;
 	
 	/** 
-	 * @return true if the interaction filled a dependency, otherwise false
+	 * @return true if the interaction filled a dependency i.e. fufilled a customer's order request,
+	 * otherwise false
 	 */
 	public Interaction onInteraction(String itemInteracted) {
 		for(int i = 0; i < customerOrderSize; i++) {

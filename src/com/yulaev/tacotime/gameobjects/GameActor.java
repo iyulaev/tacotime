@@ -121,6 +121,7 @@ public abstract class GameActor implements ViewObject {
 	
 	
 
+	//See ViewObject for documentation for these members
 	public boolean isActor() { return true; }
 	public boolean isItem() { return false;	}
 	public abstract String getName();

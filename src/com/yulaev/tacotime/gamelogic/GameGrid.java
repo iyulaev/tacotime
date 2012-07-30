@@ -17,7 +17,7 @@ public class GameGrid {
 		
 	
 	public static final int GAMEGRID_WIDTH = 80+(GAMEGRID_PADDING_LEFT+GAMEGRID_PADDING_RIGHT);
-	public static final int GAMEGRID_HEIGHT = 80+(GAMEGRID_PADDING_TOP+GAMEGRID_PADDING_BOTTOM);
+	public static final int GAMEGRID_HEIGHT = 70+(GAMEGRID_PADDING_TOP+GAMEGRID_PADDING_BOTTOM);
 	
 	
 	private static int canvas_width, canvas_height;

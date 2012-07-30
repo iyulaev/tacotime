@@ -129,7 +129,7 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		//Magic numbers: 40 - x-position of Customers, (GameGrid.GAMEGRID_HEIGHT-45) - y-position of customers
 		//1 - starting customer queue length, 
 		CustomerQueue custQueue = new CustomerQueue(this.getContext(), 40, GameGrid.GAMEGRID_HEIGHT-45, GameItem.ORIENTATION_SOUTH, 
-				1, gameLogicThread.getFoodItems());
+				5, gameLogicThread.getFoodItems());
 		viewThread.addViewObject(custQueue);
 		viewThread.addGameItem(custQueue);
 		inputThread.addViewObject(custQueue);

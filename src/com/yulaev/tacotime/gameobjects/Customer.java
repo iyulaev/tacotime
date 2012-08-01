@@ -10,6 +10,7 @@ import com.yulaev.tacotime.gamelogic.GameGrid;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.NinePatchDrawable;
@@ -31,9 +32,17 @@ public class Customer extends GameActor {
 	
 	//Define states for customer
 	public static int STATE_HIDDEN = 0;
-	public static int STATE_INLINE = 1;
-	public static int STATE_SERVED = 2;
-	public static int STATE_FINISHED = 3;
+	public static int STATE_INLINE_HAPPY = 1;
+	public static int STATE_INLINE_OK = 2;
+	public static int STATE_INLINE_ANGRY = 3;
+	public static int STATE_SERVED = 4;
+	public static int STATE_FINISHED = 5;
+	
+	//Define waiting time and correpsonding mood
+	private int seconds_between_pissed_off;
+	public static int SECONDS_BW_PO_STARTING = 25;
+	private int curr_mood;
+	private long mood_last_updated; //time (in seconds) when mood was last updated
 	
 	//Define queue position (customer's position in CustomerQueue)
 	private int queue_position;
@@ -46,9 +55,13 @@ public class Customer extends GameActor {
 	 * @param move_rate The moverate for this customer (default should be Customer.DEFAULT_CUSTOMER_MOVERATE)
 	 * @param starting_queue_position The (initial) queue position of this customer; will be decremented by 
 	 * 	CustomerQueue as the Customer queue is advanced
+	 * @param point_mult = level-dependent multiplier for points
+	 * @param money_mult = level-dependent multiplier for money
+	 * @param impatience How quickly this customer becomes impatient
 	 * @param foodItemChoices The menu of GameFoodItem choices that this customer may select from
 	 */
-	public Customer(Context caller, int move_rate, int starting_queue_position, List<GameFoodItem> foodItemChoices) {
+	public Customer(Context caller, int move_rate, int starting_queue_position, 
+			float point_mult, float money_mult, float impatience, List<GameFoodItem> foodItemChoices) {
 		super(caller, move_rate);
 		
 		queue_position = starting_queue_position;
@@ -63,12 +76,18 @@ public class Customer extends GameActor {
 			int item_choice = 1 + random.nextInt(foodItemChoices.size()-1);
 			customerOrder.add(foodItemChoices.get(item_choice).clone());
 		}
-		moneyMultiplier = random.nextFloat() + 1.0f;
-		pointsMultiplier = random.nextFloat() + 1.0f;
+		moneyMultiplier = money_mult * random.nextFloat() + 1.0f;
+		pointsMultiplier = point_mult * random.nextFloat() + 1.0f;
+		
+		//Generate impatience with a random factor
+		float seconds_between_po_divisor = (random.nextFloat() + 1.0f) * impatience;
+		seconds_between_pissed_off = (int) (((float)SECONDS_BW_PO_STARTING) / seconds_between_po_divisor);
 		
 		//Initialize all of the states that this Customer can have
 		this.addState("hidden", R.drawable.customer_waiting);
-		this.addState("inline", R.drawable.customer_waiting);
+		this.addState("inline_happy", R.drawable.customer_waiting);
+		this.addState("inline_ok", R.drawable.customer_waiting_ok);
+		this.addState("inline_angry", R.drawable.customer_waiting_angry);
 		this.addState("served", R.drawable.customer_happy);
 		this.addState("finished", R.drawable.customer_waiting);
 		setState(STATE_HIDDEN);
@@ -89,7 +108,7 @@ public class Customer extends GameActor {
 	private int location_start_x = 40;
 	private int location_start_y = GameGrid.GAMEGRID_HEIGHT - 5;
 	private int locations_queue_x[] = {40,40};
-	private int locations_queue_y[] = {GameGrid.GAMEGRID_HEIGHT - 35, GameGrid.GAMEGRID_HEIGHT - 15};
+	private int locations_queue_y[] = {GameGrid.GAMEGRID_HEIGHT - 30, GameGrid.GAMEGRID_HEIGHT - 12};
 	private int locations_exit_x = GameGrid.GAMEGRID_WIDTH - 5;
 	private int locations_exit_y = GameGrid.GAMEGRID_HEIGHT - 35;
 	
@@ -99,7 +118,7 @@ public class Customer extends GameActor {
 	protected synchronized void setState(int new_state) {
 		super.setState(new_state);
 		
-		if(new_state == STATE_INLINE) {
+		if(new_state == STATE_INLINE_HAPPY) {
 			x = location_start_x;
 			y = location_start_y;
 		}
@@ -119,27 +138,33 @@ public class Customer extends GameActor {
 	public void onUpdate() {
 		super.onUpdate();
 		
+		/* Customer state machine */
 		//If customer has been set visible (by the CustomerQueue) and it is currently in the hidden state
 		//then advance to the in-line state
 		if(this.isVisible() && getState() == STATE_HIDDEN) {
-			setState(STATE_INLINE);
+			setState(STATE_INLINE_HAPPY);
+			mood_last_updated = System.currentTimeMillis() / 1000;
 			//Log.d(activitynametag, "Customer advanced to STATE_INLINE");
 		}
 		
 		//If state is "in line" make sure that we are standing in the appropriate part of the line
-		if(this.getState() == STATE_INLINE) {
+		if(this.getState() == STATE_INLINE_HAPPY || this.getState() == STATE_INLINE_OK || this.getState() == STATE_INLINE_ANGRY) {
 			setLocked();
 			this.target_x = locations_queue_x[getQueuePosition()];			
 			this.target_y = locations_queue_y[getQueuePosition()];
 			unLock();
 			
-			//Log.d(activitynametag, "Customer is STATE_INLINE");
-		}
-		
-		//If we are presently in line and at the front of the queue, check if our dependencies have been met
-		//if they have then we can transition to served
-		if(this.getState() == STATE_INLINE) {
+			//If we are presently in line and at the front of the queue, check if our dependencies have been met
+			//if they have then we can transition to served
 			if(orderSatisfied()) setState(STATE_SERVED);
+			
+			//Update mood?
+			if(mood_last_updated + seconds_between_pissed_off < (System.currentTimeMillis()/1000)) {
+				mood_last_updated = System.currentTimeMillis()/1000;
+				
+				if(this.getState() == STATE_INLINE_HAPPY) setState(STATE_INLINE_OK);
+				else if(this.getState() == STATE_INLINE_OK) setState(STATE_INLINE_ANGRY);
+			}
 		}
 		
 		//If we have been served and have advanced to the exit location then set state to finished
@@ -149,6 +174,7 @@ public class Customer extends GameActor {
 		
 		//If the customer has advanced to the finished state then do nothing
 		if(this.getState() == STATE_FINISHED) ;
+		
 	}
 	
 	/** Called when the customer needs to be drawn. Apart from drawing the customer icon we also
@@ -159,7 +185,7 @@ public class Customer extends GameActor {
 		
 		//draw the order using a 9patch speech bubble, if this Customer is visible and is waiting for their order
 		//to be fulfilled
-		if(isVisible() && this.getState() == STATE_INLINE) {
+		if(isVisible() && (this.getState() == STATE_INLINE_HAPPY || this.getState() == STATE_INLINE_OK || this.getState() == STATE_INLINE_ANGRY)) {
 			int ICON_WIDTH = 20 + 10; //10 is for padding
 			int BUBBLE_WIDTH = 54;
 			int BUBBLE_HEIGHT = 32;

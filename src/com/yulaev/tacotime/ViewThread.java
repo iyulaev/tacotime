@@ -86,10 +86,20 @@ public class ViewThread extends Thread {
 	
 	public synchronized void addGameItem(GameItem nGI) {
 		gameItems.add(nGI);
+		viewObjects.add(nGI);
 	}
 	
 	public synchronized void setActor(CoffeeGirl nActor) {
 		this.actor = nActor;
+	}
+	
+	/** Clear gameItems, viewObjects, actor - typically one between game levels to  "reset" the game 
+	 * 
+	 */
+	public synchronized void reset () {
+		this.viewObjects = new ArrayList<ViewObject>();
+		this.gameItems = new ArrayList<GameItem>();
+		this.actor = null;
 	}
 	
 	/** Call onUpdate() on all ViewObjects so that they can calculate their next position. Then re-draw the Canvas

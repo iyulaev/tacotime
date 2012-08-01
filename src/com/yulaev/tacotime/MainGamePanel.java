@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.yulaev.tacotime.gamelogic.GameGrid;
+import com.yulaev.tacotime.gamelogic.leveldefs.GameLevel_1;
 import com.yulaev.tacotime.gameobjects.Blender;
 import com.yulaev.tacotime.gameobjects.CoffeeGirl;
 import com.yulaev.tacotime.gameobjects.CoffeeMachine;
@@ -87,54 +88,9 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		timerThread.setRunning(true);
 		viewThread.setRunning(true);
 		
-		//Setup coffeegirl (actor)
-		CoffeeGirl coffeegirl = new CoffeeGirl(this.getContext(), holder.getSurfaceFrame());
-		viewThread.addViewObject(coffeegirl);
-		viewThread.setActor(coffeegirl);
-		inputThread.addViewObject(coffeegirl);
-		gameLogicThread.setActor(coffeegirl);
-		
-		//Create and add objects to viewThread containers (UPDATE FOR NEW GAMEITEM)
-		CoffeeMachine coffeeMachine = new CoffeeMachine(this.getContext(), R.drawable.coffeemachine, 16, 40, GameItem.ORIENTATION_WEST);
-		//GameItem coffeeMachine = new GameItem(this.getContext(), "CoffeeMachine", R.drawable.coffeemachine, 100, 50, GameItem.ORIENTATION_NORTH);
-		viewThread.addViewObject(coffeeMachine);
-		viewThread.addGameItem(coffeeMachine);
-		inputThread.addViewObject(coffeeMachine);
-		gameLogicThread.addGameItem(coffeeMachine);		
-		
-		TrashCan trashCan = new TrashCan(this.getContext(), R.drawable.trashcan, 110, 40, GameItem.ORIENTATION_EAST);
-		viewThread.addViewObject(trashCan);
-		viewThread.addGameItem(trashCan);
-		inputThread.addViewObject(trashCan);
-		gameLogicThread.addGameItem(trashCan);
-		
-		CupCakeTray cupcakeTray = new CupCakeTray(this.getContext(), R.drawable.cupcake_tray, 113, 60, GameItem.ORIENTATION_EAST);
-		viewThread.addViewObject(cupcakeTray);
-		viewThread.addGameItem(cupcakeTray);
-		inputThread.addViewObject(cupcakeTray);
-		gameLogicThread.addGameItem(cupcakeTray);
-		
-		Blender blender = new Blender(this.getContext(), R.drawable.blender_idle, 16, 60, GameItem.ORIENTATION_WEST);
-		viewThread.addViewObject(blender);
-		viewThread.addGameItem(blender);
-		inputThread.addViewObject(blender);
-		gameLogicThread.addGameItem(blender);
-		
-		//Set up all Food Items (UPDATE FOR NEW FOODITEM)
-		gameLogicThread.addNewFoodItem(new FoodItemNothing(this.getContext()), CoffeeGirl.STATE_NORMAL);
-		gameLogicThread.addNewFoodItem(new FoodItemCoffee(this.getContext()), CoffeeGirl.STATE_CARRYING_COFFEE);
-		gameLogicThread.addNewFoodItem(new FoodItemCupcake(this.getContext()), CoffeeGirl.STATE_CARRYING_CUPCAKE);
-		gameLogicThread.addNewFoodItem(new FoodItemBlendedDrink(this.getContext()), CoffeeGirl.STATE_CARRYING_BLENDEDDRINK);
-		
-		//Magic numbers: 40 - x-position of Customers, (GameGrid.GAMEGRID_HEIGHT-45) - y-position of customers
-		//1 - starting customer queue length, 
-		CustomerQueue custQueue = new CustomerQueue(this.getContext(), 40, GameGrid.GAMEGRID_HEIGHT-45, GameItem.ORIENTATION_SOUTH, 
-				5, gameLogicThread.getFoodItems());
-		viewThread.addViewObject(custQueue);
-		viewThread.addGameItem(custQueue);
-		inputThread.addViewObject(custQueue);
-		gameLogicThread.addGameItem(custQueue);
-		
+		//Launch level 1!
+		GameLevel_1 level1 = new GameLevel_1();
+		level1.loadLevel(viewThread, gameLogicThread, inputThread, this.getContext());
 		
 		//Kick off all of the threads
 		gameLogicThread.start();

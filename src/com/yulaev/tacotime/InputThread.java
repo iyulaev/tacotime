@@ -61,6 +61,13 @@ public class InputThread extends Thread {
 		viewObjects.add(nVO);
 	}
 	
+	/** Clear all VOs by creating a new viewObjects array list
+	 * Done between levels to  "reset" the game
+	 */
+	public void reset() {
+		viewObjects = new ArrayList<ViewObject>();
+	}
+	
 	/** This method is called when a HANDLE_ONTAP message is received by this InputThread. It calls 
 	 * handleTap() for all ViewObjects present in the game so that they are aware that user input 
 	 * has occured.

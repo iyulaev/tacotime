@@ -26,7 +26,7 @@ public class CoffeeGirl extends GameActor {
 	public static final int STATE_CARRYING_CUPCAKE = 2;
 	public static final int STATE_CARRYING_BLENDEDDRINK = 3;
 	
-	public CoffeeGirl(Context caller, Rect canvas) {
+	public CoffeeGirl(Context caller) {
 		super(caller, DEFAULT_COFFEEGIRL_MOVERATE);
 		
 		//Add a state for each thing that CoffeeGirl may carry

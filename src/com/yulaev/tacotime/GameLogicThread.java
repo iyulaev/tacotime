@@ -76,54 +76,6 @@ public class GameLogicThread extends Thread {
 		};		
 	}
 	
-	/** Sets the actor associated with this GameLogicThread
-	 * 
-	 * @param n_actor The CoffeeGirl Object that will be this game's Actor, i.e. the player-controlled character
-	 */
-	public void setActor(CoffeeGirl n_actor) {
-		coffeeGirl = n_actor;
-	}
-	
-	 /** Adds a GameItem to this TacoTime game. The GameItem will be put into the gameItems data structure 
-	  * so that it's state can be updated when an interaction occurs. 
-	  * @param n_gameItem The GameItem to put into the gameItems map.
-	  */
-	public void addGameItem(GameItem n_gameItem) {
-		gameItems.put(n_gameItem.getName(), n_gameItem);
-	}
-	
-	/** This method is typically called by MainGamePanel when adding new GameFoodItems into the game. Basically 
-	 * we add a new type of food item and an associated CoffeeGirl state.
-	 * @param foodItem The GameFoodItem to add to this game.
-	 * @param associated_coffeegirl_state The associated state that CoffeeGirl will be put into when she 
-	 * receives the FoodItem.
-	 */
-	public void addNewFoodItem(GameFoodItem foodItem, int associated_coffeegirl_state) {
-		boolean doSetItemHolding = false;
-		if(foodItems.isEmpty()) doSetItemHolding = true;
-		
-		foodItems.put(foodItem.getName(), foodItem);
-		coffeeGirl.setItemHoldingToStateAssoc(foodItem.getName(), associated_coffeegirl_state);
-		
-		//If CoffeeGirl's "held item" hasn't been set up yet then set it to the first foodItem that we add
-		//better hope that the first one we add is "nothing"!
-		if(doSetItemHolding) coffeeGirl.setItemHolding(foodItem.getName());
-	}
-	
-	/** Return a List of the GameFoodItems that have been added to this GameLogicThread. Utility method that
-	 * is a bit out of place but it is convenient since we have to explain the GameFoodItem -> CoffeeGirl State
-	 * mapping to GTL anyway and so it implicitly gets a List of the GameFoodItems that are valid in this game.
-	 * 
-	 * @return A List of GameFoodItems valid for this game/level/whatever.
-	 */
-	public List<GameFoodItem> getFoodItems() {
-		ArrayList<GameFoodItem> retval = new ArrayList<GameFoodItem>();
-		Iterator<String> it = foodItems.keySet().iterator();
-		while(it.hasNext()) retval.add(foodItems.get(it.next()));
-		
-		return(retval);
-	}
-	
 	/** Since CoffeeGirl interacts with all other game items, describing the CoffeeGirl state machine is done on the global level
 	 * rather than within CoffeeGirl itself. As a side effect GameInfo money and/or points may change depending on how
 	 * CoffeeGirl's state has changed
@@ -172,6 +124,63 @@ public class GameLogicThread extends Thread {
 		
 		//Default case - don't change state!
 		//return(old_state);
+	}
+	
+	/** Sets the actor associated with this GameLogicThread
+	 * 
+	 * @param n_actor The CoffeeGirl Object that will be this game's Actor, i.e. the player-controlled character
+	 */
+	public void setActor(CoffeeGirl n_actor) {
+		coffeeGirl = n_actor;
+	}
+	
+	 /** Adds a GameItem to this TacoTime game. The GameItem will be put into the gameItems data structure 
+	  * so that it's state can be updated when an interaction occurs. 
+	  * @param n_gameItem The GameItem to put into the gameItems map.
+	  */
+	public void addGameItem(GameItem n_gameItem) {
+		gameItems.put(n_gameItem.getName(), n_gameItem);
+	}
+	
+	/** This method is typically called by MainGamePanel when adding new GameFoodItems into the game. Basically 
+	 * we add a new type of food item and an associated CoffeeGirl state.
+	 * @param foodItem The GameFoodItem to add to this game.
+	 * @param associated_coffeegirl_state The associated state that CoffeeGirl will be put into when she 
+	 * receives the FoodItem.
+	 */
+	public void addNewFoodItem(GameFoodItem foodItem, int associated_coffeegirl_state) {
+		boolean doSetItemHolding = false;
+		if(foodItems.isEmpty()) doSetItemHolding = true;
+		
+		foodItems.put(foodItem.getName(), foodItem);
+		coffeeGirl.setItemHoldingToStateAssoc(foodItem.getName(), associated_coffeegirl_state);
+		
+		//If CoffeeGirl's "held item" hasn't been set up yet then set it to the first foodItem that we add
+		//better hope that the first one we add is "nothing"!
+		if(doSetItemHolding) coffeeGirl.setItemHolding(foodItem.getName());
+	}
+	
+	/** Return a List of the GameFoodItems that have been added to this GameLogicThread. Utility method that
+	 * is a bit out of place but it is convenient since we have to explain the GameFoodItem -> CoffeeGirl State
+	 * mapping to GTL anyway and so it implicitly gets a List of the GameFoodItems that are valid in this game.
+	 * 
+	 * @return A List of GameFoodItems valid for this game/level/whatever.
+	 */
+	public List<GameFoodItem> getFoodItems() {
+		ArrayList<GameFoodItem> retval = new ArrayList<GameFoodItem>();
+		Iterator<String> it = foodItems.keySet().iterator();
+		while(it.hasNext()) retval.add(foodItems.get(it.next()));
+		
+		return(retval);
+	}
+	
+	/**Clears all of the gameItems, foodItems, etc in preparation to load a new level.
+	 * 
+	 */
+	public void reset() {
+		coffeeGirl = null;
+		gameItems = new HashMap<String, GameItem>();
+		foodItems = new HashMap<String, GameFoodItem>();
 	}
 	
 	@Override

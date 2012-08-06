@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.yulaev.tacotime.gamelogic.GameGrid;
+import com.yulaev.tacotime.gamelogic.GameInfo;
 import com.yulaev.tacotime.gamelogic.leveldefs.GameLevel_1;
 import com.yulaev.tacotime.gameobjects.Blender;
 import com.yulaev.tacotime.gameobjects.CoffeeGirl;
@@ -66,7 +67,8 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		MessageRouter.inputThread = inputThread;
 		
 		//create the Game Logic Thread
-		gameLogicThread = new GameLogicThread();
+		gameLogicThread = new GameLogicThread(viewThread, timerThread, inputThread, this.getContext());
+		gameLogicThread.setSelf(gameLogicThread);
 		MessageRouter.gameLogicThread = gameLogicThread;
 		
 		// make the GamePanel focusable so it can handle events
@@ -88,15 +90,11 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		timerThread.setRunning(true);
 		viewThread.setRunning(true);
 		
-		//Launch level 1!
-		GameLevel_1 level1 = new GameLevel_1();
-		level1.loadLevel(viewThread, gameLogicThread, inputThread, this.getContext());
-		
 		//Kick off all of the threads
-		gameLogicThread.start();
-		timerThread.start();
 		viewThread.start();
 		inputThread.start();
+		gameLogicThread.start();
+		timerThread.start();
 	}
 
 	/** This method winds down all of the threads. */
@@ -139,6 +137,7 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 	Paint gridPaint;
 	Paint moneyPaint;
 	Paint pointsPaint;
+	Paint announcementPaint;
 	
 	@Override
 	protected void onDraw(Canvas canvas) {
@@ -152,8 +151,14 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 	 * @param voAr An ArrayList of ViewObjects that will be drawn
 	 * @param money The amount of money the player has so that we can draw it
 	 * @param points The number of points the player has so that we can draw it
+	 * @param boolean draw_announcement_message Whether or not to draw an announcement; it is a message that
+	 * overlays everything else on the screen
+	 * @param announcementMessage The announcement message to draw; will not be drawn (and may be null) if
+	 * draw_announcement_message is set to false
 	 */
-	protected void onDraw(Canvas canvas, ArrayList<ViewObject> voAr, int money, int points) {
+	protected void onDraw(Canvas canvas, ArrayList<ViewObject> voAr, 
+			int money, int points, 
+			boolean draw_announcement_message, String announcementMessage) {
 		if(gridPaint == null) {
 			gridPaint = new Paint();
 			gridPaint.setColor(Color.GRAY);
@@ -161,24 +166,33 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		
 		canvas.drawColor(Color.BLACK);
 		
+		//Draw in a background
 		canvas.drawRect(0,0, GameGrid.maxCanvasX(), GameGrid.maxCanvasY(), gridPaint);
 		
+		//Draw ALL ViewObjects on the board
 		Iterator<ViewObject> it = voAr.iterator();
 		while(it.hasNext()) {
 			it.next().draw(canvas);
 		}
 		
-		if(moneyPaint == null || pointsPaint == null) {
+		if(moneyPaint == null || pointsPaint == null || announcementPaint == null) {
 			moneyPaint = new Paint();
 			moneyPaint.setColor(Color.BLUE);
-			moneyPaint.setTextSize(12);
+			moneyPaint.setTextSize(14);
 			pointsPaint = new Paint();
 			pointsPaint.setColor(Color.GREEN);
-			pointsPaint.setTextSize(12);
+			pointsPaint.setTextSize(14);
+			announcementPaint = new Paint();
+			announcementPaint.setColor(Color.RED);
+			announcementPaint.setTextSize(24);
 		}
 		
-		canvas.drawText(Integer.toString(money), 10, canvas.getHeight()-30, moneyPaint);
-		canvas.drawText(Integer.toString(points), 10, canvas.getHeight()-15, pointsPaint);
+		canvas.drawText(Integer.toString(money), 14, canvas.getHeight()-40, moneyPaint);
+		canvas.drawText(Integer.toString(points), 14, canvas.getHeight()-15, pointsPaint);
+		
+		if(draw_announcement_message) {
+			canvas.drawText(announcementMessage, 30, canvas.getHeight()/2, announcementPaint);
+		}
 		
 	}
 

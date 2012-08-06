@@ -57,5 +57,49 @@ public class MessageRouter {
 			Log.v("MessageRouter", "Sent Interaction Event message");
 		}
 	}
+	
+	/** This message informs the GameLogicThread that one game tick (one real-time second) has passed
+	 * 
+	 */
+	public synchronized static void sendTickMessage() {
+		if(gameLogicThread != null) {
+			Message message = Message.obtain();
+			message.what = GameLogicThread.MESSAGE_TICK_PASSED;
+			gameLogicThread.handler.sendMessage(message);
+			
+			//Log.v("MessageRouter", "Sent Tick Event message");
+		}
+	}
+	
+	public synchronized static void sendPauseMessage(boolean paused) {
+		if(inputThread != null) {
+			Message message = Message.obtain();
+			if(paused) message.what = InputThread.MESSAGE_SET_PAUSED;
+			else message.what = InputThread.MESSAGE_SET_UNPAUSED;
+			inputThread.handler.sendMessage(message);
+		}
+		
+		if(viewThread != null) {
+			Message message = Message.obtain();
+			if(paused) message.what = ViewThread.MESSAGE_SET_PAUSED;
+			else message.what = ViewThread.MESSAGE_SET_UNPAUSED;
+			viewThread.handler.sendMessage(message);
+		}
+	}
+	
+	/** Sends  message to the ViewThread telling it to display an announcement
+	 * 
+	 */
+	public synchronized static void sendAnnouncementMessage(String announcementText, boolean doDisplay) {
+		if(viewThread != null) {
+			Message message = Message.obtain();
+			if(doDisplay) {
+				message.what = ViewThread.MESSAGE_NEW_ANNOUNCEMENT;
+				message.obj = announcementText;
+			}
+			else message.what = ViewThread.MESSAGE_STOP_ANNOUNCEMENT;
+			viewThread.handler.sendMessage(message);
+		}
+	}
 
 }

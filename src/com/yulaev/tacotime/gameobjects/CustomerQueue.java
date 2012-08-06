@@ -45,8 +45,10 @@ public class CustomerQueue extends GameItem {
 	 * with and therefore how many customers will have to be served on this level.
 	 * @param foodItemMenu A List of FoodItems that the Customer's can create their random order from
 	 */
-	public CustomerQueue(Context caller, int x_pos, int y_pos, 
-			int orientation, int queue_length, float point_mult, float money_mult, float impatience, List<GameFoodItem> foodItemMenu) {
+	public CustomerQueue(Context caller, int x_pos, int y_pos, int orientation, 
+			int queue_length, float point_mult, float money_mult, 
+			float impatience, int max_items_in_order, 
+			List<GameFoodItem> foodItemMenu) {
 		//public GameItem(Context caller, String name, int r_bitmap, int x_pos, int y_pos, int orientation, int gg_width, int gg_height)
 		super(caller, "CustomerQueue", R.drawable.countertop, x_pos, y_pos, orientation, 10, 10);
 		
@@ -54,7 +56,7 @@ public class CustomerQueue extends GameItem {
 		this.queue_length = queue_length;
 		customerList = new ArrayList<Customer>(queue_length);
 		for(int i = 0; i < queue_length; i++) {
-			customerList.add(new Customer(caller, Customer.DEFAULT_CUSTOMER_MOVERATE, i, point_mult, money_mult, impatience, foodItemMenu));
+			customerList.add(new Customer(caller, Customer.DEFAULT_CUSTOMER_MOVERATE, i, point_mult, money_mult, impatience, max_items_in_order, foodItemMenu));
 		}
 		
 		Log.v(activitynametag, "Created new CustomerQueue with " + queue_length + " customers.");
@@ -143,5 +145,14 @@ public class CustomerQueue extends GameItem {
 	 * */
 	public Interaction onInteraction(String foodItem) {
 		return(head().onInteraction(foodItem));
+	}
+	
+	/** Return true if the last Customer (and by extension every other customer) in this queue has been served
+	 * 
+	 * @return True if the last Customer has been served, otherwise false.
+	 */
+	public boolean isFinished() {
+		if(customerList.get(queue_length-1).orderSatisfied()) return true;
+		return false;
 	}
 }

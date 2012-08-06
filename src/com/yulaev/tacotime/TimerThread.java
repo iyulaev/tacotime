@@ -41,14 +41,14 @@ public class TimerThread extends Thread {
 			//no timers yet!
 			if(System.currentTimeMillis() > lastTimerTick + TIMER_GRANULARIY)
 			{
-				;//do nothing
+				MessageRouter.sendTickMessage();
+				lastTimerTick = System.currentTimeMillis();
 			}
 			
-			try {Thread.sleep(TIMER_GRANULARIY);}
+			//So that we are off by no more than about 30% of a tick (roughly)
+			try {Thread.sleep(TIMER_GRANULARIY/3);}
 			catch (Exception e) {;}
 		}
-
-		Log.d(activitynametag, "TimerThread loop executed " + tickCount + " times");
 	}
 	
 }

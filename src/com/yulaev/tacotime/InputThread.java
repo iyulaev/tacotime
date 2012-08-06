@@ -26,6 +26,8 @@ public class InputThread extends Thread {
 	
 	//Define types of messages accepted by ViewThread
 	public static final int MESSAGE_HANDLE_ONTAP = 0;
+	public static final int MESSAGE_SET_PAUSED = 1;
+	public static final int MESSAGE_SET_UNPAUSED = 2;
 
 	//This message handler will receive messages, probably from the UI Thread, and
 	//update the data objects and do other things that are related to handling
@@ -34,20 +36,27 @@ public class InputThread extends Thread {
 	
 	//Here we hold all of the objects that the ViewThread must update
 	ArrayList<ViewObject> viewObjects;
+	
+	//True if this thread is running and sending input results through mesage router
+	private boolean paused;
 
 	/** Mostly just sets up a Handler that receives messages from the main game Activity 
 	 * and calls the handleTap() methods for all of the ViewObjects in the game screen */
 	public InputThread() {
 		super();
 		this.viewObjects = new ArrayList<ViewObject>();
+		paused = false;
 		
 		handler = new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
 				if(msg.what == MESSAGE_HANDLE_ONTAP) {
 					Log.d(activitynametag, "Got input message!");
-					handleTap(msg.arg1, msg.arg2);
+					if(!paused) handleTap(msg.arg1, msg.arg2);
 				}
+				
+				else if (msg.what == MESSAGE_SET_PAUSED) setPaused(true);
+				else if (msg.what == MESSAGE_SET_UNPAUSED) setPaused(false);
 			}
 		};		
 	}
@@ -85,6 +94,10 @@ public class InputThread extends Thread {
 		
 		;
 
+	}
+	
+	public void setPaused(boolean n_paused) {
+		this.paused = n_paused;
 	}
 	
 }

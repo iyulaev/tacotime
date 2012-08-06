@@ -32,6 +32,6 @@ public class Blender extends GameItem {
 		//super.addState(String stateName, int state_delay_ms, int r_bitmap, boolean input_sensitive, boolean time_sensitive)
 		this.addState("idle", 0, R.drawable.blender_idle, true, "coffee", false);
 		this.addState("blending", 3000, R.drawable.blender, false, true);
-		this.addState("done", 0, R.drawable.blender_done, true, false);
+		this.addState("done", 0, R.drawable.blender_done, true, "nothing", false);
 	}
 }

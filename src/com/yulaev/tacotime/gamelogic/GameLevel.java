@@ -5,6 +5,8 @@
 
 package com.yulaev.tacotime.gamelogic;
 
+import android.content.Context;
+
 import com.yulaev.tacotime.GameLogicThread;
 import com.yulaev.tacotime.InputThread;
 import com.yulaev.tacotime.ViewThread;
@@ -26,6 +28,9 @@ public class GameLevel {
 	//how impatient are the customers
 	//2.0 will cause their "patience" to tick down twice as fast
 	protected float customer_impatience;
+	//what is the maximum number of items a customer can order
+	//should never be greater than 3
+	protected int customer_max_order_size;
 	
 	//upgrades available (not yet implemented)
 	protected String [] upgradesAvailable;
@@ -36,10 +41,14 @@ public class GameLevel {
 	 * @param gLT GameLogicThread associated with this game session
 	 * @param iT InputThread associated with this game session
 	 */
-	public void loadLevel(ViewThread vT, GameLogicThread gLT, InputThread iT) {
+	public void loadLevel(ViewThread vT, GameLogicThread gLT, InputThread iT, Context caller) {
 		vT.reset();
 		gLT.reset();
 		iT.reset();
+	}
+	
+	public int getLevelTime() {
+		return this.time_limit_sec;
 	}
 
 }

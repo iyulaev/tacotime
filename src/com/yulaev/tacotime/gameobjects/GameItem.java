@@ -87,8 +87,6 @@ public class GameItem implements ViewObject {
 		x = x_pos;
 		y = y_pos;
 		
-		Log.v(activitynametag, "Got to here 1");
-		
 		width = gg_width;
 		height = gg_height;
 		
@@ -203,12 +201,9 @@ public class GameItem implements ViewObject {
 	 * EVENT_NULL signifying that no event has been queued.
 	 */
 	public int consumeEvent() {
-		
-		
 		if(interactionQueueLength > 0) {
 			interactionQueueLength--;
-			Log.v(activitynametag+"."+this.getName(), "Consumed interaction event (not null).");
-			//return(interactionQueue[interactionQueueLength + 1]); TODO why doesn't this work??
+			//Log.v(activitynametag+"."+this.getName(), "Consumed interaction event (not null).");
 			return(EVENT_DEFAULT);
 		}
 		else return EVENT_NULL;

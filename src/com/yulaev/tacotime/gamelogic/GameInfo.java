@@ -9,7 +9,23 @@ package com.yulaev.tacotime.gamelogic;
 public class GameInfo {
 	public static int money;
 	public static int points;
-	public static int level;
+	
+	//These variables keep track of what level we are on, how many seconds remain on the clock,
+	//and whether the level is in play or not
+	private static int level;
+	private static int levelTime;
+
+	
+	//State information regarding what "view state" we are currently in
+	public static final int MODE_MAINGAMEPANEL_PREPLAY = 0;
+	public static final int MODE_MAINGAMEPANEL_PREPLAY_MESSAGE = 2;
+	public static final int MODE_MAINGAMEPANEL_INPLAY = 3;
+	public static final int MODE_MAINGAMEPANEL_POSTPLAY_MESSAGE = 4;
+	public static final int MODE_MAINGAMEPANEL_POSTPLAY = 5;
+	public static final int MODE_GAMEMENU_VIEW = 6;
+	public static final int MODE_MAINMENU_VIEW = 7;
+	private static int gameMode;
+	
 	
 	/** Increment money and return the new value. Can be used to simply get the value of money
 	 * if increment is set to zero.
@@ -47,4 +63,16 @@ public class GameInfo {
 	 * @return The game level that this game is currently in.
 	 */
 	public static int getLevel() { return level; }
+	
+	public static int setLevelTime(int n_leveltime) { 
+		levelTime = n_leveltime; 
+		return levelTime; 
+	}
+	
+	public static int decrementLevelTime() { return(--levelTime); }
+	public static int getLevelTime() { return levelTime; }
+	
+	public static void setGameMode(int n_gamemode) { gameMode = n_gamemode; }
+	public static int getGameMode() { return gameMode; }
+	
 }

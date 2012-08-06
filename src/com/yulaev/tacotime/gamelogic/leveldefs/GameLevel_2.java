@@ -20,7 +20,7 @@ import com.yulaev.tacotime.gameobjects.FoodItemNothing;
 import com.yulaev.tacotime.gameobjects.GameItem;
 import com.yulaev.tacotime.gameobjects.TrashCan;
 
-public class GameLevel_1 extends GameLevel {
+public class GameLevel_2 extends GameLevel {
 	/** Set up this level; add all GameItems and such to the Threads, set up the Customers and such
 	 * with the per-level parameters.
 	 * @param vT ViewThread associated with this game session
@@ -31,13 +31,13 @@ public class GameLevel_1 extends GameLevel {
 	public void loadLevel(ViewThread viewThread, GameLogicThread gameLogicThread, InputThread inputThread, Context caller) {
 		super.loadLevel(viewThread, gameLogicThread, inputThread, caller);
 		
-		this.level_number = 1;
-		this.customerQueue_length = 5;
-		this.point_mult = 1.0f;
-		this.money_mult = 1.0f;
+		this.level_number = 2;
+		this.customerQueue_length = 8;
+		this.point_mult = 1.3f;
+		this.money_mult = 1.3f;
 		this.customer_impatience = 0.8f;
-		this.time_limit_sec = 30;
-		this.customer_max_order_size = 1;
+		this.time_limit_sec = 60;
+		this.customer_max_order_size = 2;
 		
 		//Setup coffeegirl (actor)
 		CoffeeGirl coffeegirl = new CoffeeGirl(caller);
@@ -73,17 +73,17 @@ public class GameLevel_1 extends GameLevel {
 		inputThread.addViewObject(cupcakeTray);
 		gameLogicThread.addGameItem(cupcakeTray);
 		
-		/*Blender blender = new Blender(caller, R.drawable.blender_idle, 16, 60, GameItem.ORIENTATION_WEST);
+		Blender blender = new Blender(caller, R.drawable.blender_idle, 16, 80, GameItem.ORIENTATION_WEST);
 		//viewThread.addViewObject(blender);
 		viewThread.addGameItem(blender);
 		inputThread.addViewObject(blender);
-		gameLogicThread.addGameItem(blender);*/
+		gameLogicThread.addGameItem(blender);
 		
 		//Set up all Food Items (UPDATE FOR NEW FOODITEM)
 		gameLogicThread.addNewFoodItem(new FoodItemNothing(caller), CoffeeGirl.STATE_NORMAL);
 		gameLogicThread.addNewFoodItem(new FoodItemCoffee(caller), CoffeeGirl.STATE_CARRYING_COFFEE);
 		gameLogicThread.addNewFoodItem(new FoodItemCupcake(caller), CoffeeGirl.STATE_CARRYING_CUPCAKE);
-		//gameLogicThread.addNewFoodItem(new FoodItemBlendedDrink(caller), CoffeeGirl.STATE_CARRYING_BLENDEDDRINK);
+		gameLogicThread.addNewFoodItem(new FoodItemBlendedDrink(caller), CoffeeGirl.STATE_CARRYING_BLENDEDDRINK);
 		
 		//Magic numbers: 40 - x-position of Customers, (GameGrid.GAMEGRID_HEIGHT-45) - y-position of customers
 		//1 - starting customer queue length, 

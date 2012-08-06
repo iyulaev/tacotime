@@ -47,7 +47,8 @@ public class Customer extends GameActor {
 	//Define queue position (customer's position in CustomerQueue)
 	private int queue_position;
 	
-	public static int MAX_ORDER_SIZE = 2;
+	public static int DEFAULT_MAX_ORDER_SIZE = 2;
+	private int max_order_size;
 
 	/** Initialize a new Customer.
 	 * 
@@ -61,7 +62,9 @@ public class Customer extends GameActor {
 	 * @param foodItemChoices The menu of GameFoodItem choices that this customer may select from
 	 */
 	public Customer(Context caller, int move_rate, int starting_queue_position, 
-			float point_mult, float money_mult, float impatience, List<GameFoodItem> foodItemChoices) {
+			float point_mult, float money_mult, float impatience, int max_order_size,
+			List<GameFoodItem> foodItemChoices) {
+			
 		super(caller, move_rate);
 		
 		queue_position = starting_queue_position;
@@ -69,8 +72,9 @@ public class Customer extends GameActor {
 		
 		//Generate this customer's "point multiplier" and food item order
 		Random random = new Random();
+		this.max_order_size = max_order_size;
 		customerOrder = new ArrayList<GameFoodItem>();
-		customerOrderSize = 1+random.nextInt(MAX_ORDER_SIZE);
+		customerOrderSize = 1+random.nextInt(max_order_size);
 		for(int i = 0; i <= customerOrderSize; i++) {
 			//add 1 at the beginning because "nothing" is not a valid choice ;)
 			int item_choice = 1 + random.nextInt(foodItemChoices.size()-1);

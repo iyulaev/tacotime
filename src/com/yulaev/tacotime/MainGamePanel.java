@@ -1,5 +1,6 @@
 /** This is the main View (SurfaceView) of the TacoTime game engine. In addition to implementing 
- * the UI it also creates all of the game Threads, generates some initial objects, and launches everything.
+ * the UI it also creates all of the game Threads, and launches everything. GameLogicThread (now)
+ * deals with loading all of the levle data, setting up the GameItems, etc.
  * 
  * @author iyulaev
  */
@@ -49,6 +50,10 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 	InputThread inputThread;
 	GameLogicThread gameLogicThread;
 
+	/** Constructor for MainGamePanel. Mostly this sets up and launches all of the game threads.
+	 * 
+	 * @param context The context that creates this MainGamePanel
+	 */
 	public MainGamePanel(Context context) {
 		super(context);
 		// adding the callback (this) to the surface holder to intercept events
@@ -75,6 +80,9 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		setFocusable(true);
 	}
 
+	/** Not sure why this is here right now but I suppose it is to handle changes like a change
+	 * in orientation (which we should suppress anyway!)
+	 */
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
 	}
@@ -145,7 +153,8 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 	}
 
 	/** This onDraw() method will draw all of the ViewObjects in the game; it is the main onDraw() method
-	 * that gets called by the ViewThread.
+	 * that gets called by the ViewThread. It can also draw announcement messages that overlay the
+	 * rest of the game.
 	 * 
 	 * @param canvas The Canvas to draw everything onto
 	 * @param voAr An ArrayList of ViewObjects that will be drawn

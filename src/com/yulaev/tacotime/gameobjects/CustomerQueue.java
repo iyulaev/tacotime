@@ -43,6 +43,11 @@ public class CustomerQueue extends GameItem {
 	 * @param orientation The orientation of the counter-top, determines where the sensitivity area is placed.
 	 * @param queue_length The queue length; this is how many Customers this CustomerQueue will be initialized
 	 * with and therefore how many customers will have to be served on this level.
+	 * @param point_mult The point multiplier for customer order completions; typically set per-level when each level is loaded.
+	 * @param money_mult The money multiplier for customer order completions; typically set per-level when each level
+	 * @param impatience How quickly each customer in this CustomerQueue's mood will degrade as they 
+	 * wait longer for order fulfillemtn
+	 * @param max_items_in_order The maximum number of items that can be in any Customer's order from the game menu
 	 * @param foodItemMenu A List of FoodItems that the Customer's can create their random order from
 	 */
 	public CustomerQueue(Context caller, int x_pos, int y_pos, int orientation, 
@@ -56,7 +61,14 @@ public class CustomerQueue extends GameItem {
 		this.queue_length = queue_length;
 		customerList = new ArrayList<Customer>(queue_length);
 		for(int i = 0; i < queue_length; i++) {
-			customerList.add(new Customer(caller, Customer.DEFAULT_CUSTOMER_MOVERATE, i, point_mult, money_mult, impatience, max_items_in_order, foodItemMenu));
+			customerList.add(new Customer(caller, 
+					Customer.DEFAULT_CUSTOMER_MOVERATE, 
+					i, 
+					point_mult, 
+					money_mult, 
+					impatience, 
+					max_items_in_order, 
+					foodItemMenu));
 		}
 		
 		Log.v(activitynametag, "Created new CustomerQueue with " + queue_length + " customers.");

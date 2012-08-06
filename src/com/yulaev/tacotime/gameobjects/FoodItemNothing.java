@@ -7,6 +7,10 @@ import android.util.Log;
 
 import com.yulaev.tacotime.R;
 
+/** Describes the "Nothing" food item. Mostly we just define the number of points and amount of money that
+ * this FoodItem is worth (zero lol!); for a detailed description of the methods and their purpose please 
+ * see the GameFoodItem class documentation.*/
+
 public class FoodItemNothing extends GameFoodItem {
 	
 	private static boolean bitmaps_initialized = false;

@@ -64,15 +64,35 @@ public class GameInfo {
 	 */
 	public static int getLevel() { return level; }
 	
+	/** Set the remaining time left to finish this level
+	 * @param n_leveltime The numbre of clock ticks that shall be alloted to finish the current level.
+	 * @return The (input) level time
+	 */
 	public static int setLevelTime(int n_leveltime) { 
 		levelTime = n_leveltime; 
 		return levelTime; 
 	}
 	
+	/** Decrement the remaining time (in clock ticks) for this level
+	 * @return The new value of levelTime, the remaining amount of clock ticks for this level.
+	 */
 	public static int decrementLevelTime() { return(--levelTime); }
+	
+	/** Return the remaining time for this level
+	 * @return The remaining number of clock ticks for this level
+	 */
 	public static int getLevelTime() { return levelTime; }
 	
+	/** Set the mode (state) that this Game is currently in. Really this is what drives the GameLogicThread's
+	 * core state machine.
+	 * @param n_gamemode The mode (state) that this Game is in.
+	 */
 	public static void setGameMode(int n_gamemode) { gameMode = n_gamemode; }
+	
+	/** Get the mode (state) that this Game is in.
+	 * 
+	 * @return Current mode (state) of this Game.
+	 */
 	public static int getGameMode() { return gameMode; }
 	
 }

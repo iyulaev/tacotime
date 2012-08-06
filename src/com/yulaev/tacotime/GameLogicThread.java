@@ -32,6 +32,10 @@ import com.yulaev.tacotime.gameobjects.GameItem;
  * This thread handles all of the game logic. That is, whenever some two objects, usually the CoffeeGirl
  * and another GameItem, interact, this thread determines the result of the interaction. It also controls
  * the state of CoffeeGirl and increments points based on the result of in-game interactions.
+ * 
+ * GameLogicThread also features within it a state machine that corresponds to the current stage in the
+ * game (i.e. are we playing? are we viewing a menu?). The state machine is advanced by "ticks" from the
+ * TimerThread. This state machine is described in stateMachineClockTick().
  */
 public class GameLogicThread extends Thread {
 	
@@ -75,11 +79,14 @@ public class GameLogicThread extends Thread {
 		GameInfo.money = 0;
 		GameInfo.points = 0;
 		GameInfo.setLevel(0);
-		GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_PREPLAY); //TODO: this should probably be initialized elsewhere
+		GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_PREPLAY); //TODO: this should probably be initialized elsewhere,
+				//perhaps in the TacoTimeActivity game entry point?
 		
 		gameItems = new HashMap<String, GameItem>();
 		foodItems = new HashMap<String, GameFoodItem>();
 		
+		//Creates a Handler that will be used to process Interaction and ClockTick messages, and advance the CoffeeGirl and
+		//GameLogicThread state machines
 		handler = new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
@@ -110,6 +117,10 @@ public class GameLogicThread extends Thread {
 		};		
 	}
 	
+	/** Used to provide a reference to this GameLogicThread instance. Mostly just used when we load a level, so that the 
+	 * GameLevel class that we create can add GameItems and other such things to this GameLogicThread instance.
+	 * @param gameLogicThread
+	 */
 	public void setSelf(GameLogicThread gameLogicThread) { this.gameLogicThread = gameLogicThread; }
 	
 	/** Since CoffeeGirl interacts with all other game items, describing the CoffeeGirl state machine is done on the global level
@@ -182,6 +193,8 @@ public class GameLogicThread extends Thread {
 			GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_PREPLAY_MESSAGE);
 		}
 		
+		//If we are in the pre-play message, update the message we display (indicating to the user when we
+		//are to start the level). Start the level when the count gets to zero.
 		else if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_PREPLAY_MESSAGE) {
 			if(message_timer > 0) {
 				message_timer--;
@@ -212,6 +225,7 @@ public class GameLogicThread extends Thread {
 			}
 		}
 		
+		//If we are done displaying the message then ... (this should be fixed).
 		else if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_POSTPLAY_MESSAGE) {
 			if(message_timer > 0) {
 				message_timer--;
@@ -233,6 +247,11 @@ public class GameLogicThread extends Thread {
 		coffeeGirl = n_actor;
 	}
 	
+	/** Set the CustomerQueue associated with this GameLogicThread. Called by a GameLevel constructor after the
+	 * constructor has finished initlaizing the CustomerQueue so that this GLT can query the status of the 
+	 * queue and advance it's state machine accordingly, i.e. finish the level when the queue is exhausted.
+	 * @param n_customerQueue
+	 */
 	public void setCustomerQueue(CustomerQueue n_customerQueue) {
 		customerQueue = n_customerQueue;
 		this.addGameItem(customerQueue);

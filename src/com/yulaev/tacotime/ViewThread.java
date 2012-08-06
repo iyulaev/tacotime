@@ -19,7 +19,10 @@ import com.yulaev.tacotime.gameobjects.ViewObject;
 /**
  * @author iyulaev
  *
- * This Thread ... (TODO)
+ * This Thread is responsible for all of the in-game 2D rendering work, as well as tracking the
+ * GameGrid-based position of all of the game elements and observing when they interact. Every
+ * VIEW_REFRESH_PERIOD the ViewThread will call the onUpdate() method for every GameItem, and
+ * then will draw the GameItem to the Canvas.
  */
 public class ViewThread extends Thread {
 	
@@ -62,6 +65,11 @@ public class ViewThread extends Thread {
 	private boolean draw_announcement_message;
 	private String announcementMessage;
 
+	/** Constructor for ViewThread. Most of the work is in setting up the Message Handler, which is responsible 
+	 * for receving messages from the GameLogicThread.
+	 * @param surfaceHolder The SurfaceHolder for the canvas that we will be drawing to
+	 * @param gamePanel The MainGamePanel that we will be doing drawing duty for.
+	 */
 	public ViewThread(SurfaceHolder surfaceHolder, MainGamePanel gamePanel) {
 		super();
 		this.surfaceHolder = surfaceHolder;
@@ -86,6 +94,7 @@ public class ViewThread extends Thread {
 				else if (msg.what == MESSAGE_SET_PAUSED) setPaused(true);
 				else if (msg.what == MESSAGE_SET_UNPAUSED) setPaused(false);
 				
+				//handle announcement messages entered in by the GameLogicThread
 				else if (msg.what == MESSAGE_NEW_ANNOUNCEMENT) {
 					announcementMessage = (String) msg.obj;
 					draw_announcement_message = true;
@@ -103,21 +112,31 @@ public class ViewThread extends Thread {
 	 */
 	public void setRunning(boolean n_running) { running = n_running; }
 	
+	/** Allows the ViewThread to be paused. When the ViewThread is paused stuff still gets drawn to the canvas but
+	 * no GameItems get updated and no interactions are allowed to take place.
+	 * @param n_paused
+	 */
 	public void setPaused(boolean n_paused) { paused = n_paused; }
 
 	/** Add a ViewObject to the viewThread viewObjects ArrayList; all ViewObjects are updated and rendered by the ViewThread
-	 * 
 	 * @param nVO New ViewObject to add to this ViewThread's VO list.
 	 */
 	public synchronized void addViewObject(ViewObject nVO) {
 		viewObjects.add(nVO);
 	}
 	
+	/** Add a Gameitem to this viewThread's gameItems Arraylist; all of the GameItems are tracked for potential interactions. As
+	 * as side effect all gameItems are addviewObject()'d also.
+	 * @param nGI The new GameItem to add to this threads gameItems array.
+	 */
 	public synchronized void addGameItem(GameItem nGI) {
 		gameItems.add(nGI);
 		viewObjects.add(nGI);
 	}
 	
+	/** Sets the main player Actor for this ViewThread 
+	 * @param nActor the Actor that we will specify for this ViewThread.
+	 * */
 	public synchronized void setActor(CoffeeGirl nActor) {
 		this.actor = nActor;
 	}
@@ -131,7 +150,9 @@ public class ViewThread extends Thread {
 		this.actor = null;
 	}
 	
-	/** Call onUpdate() on all ViewObjects so that they can calculate their next position. Then re-draw the Canvas
+	/** Call onUpdate() on all ViewObjects so that they can calculate their next position. Then re-draw the Canvas.
+	 * Also check for Interactions between the Actor and GameItems and send InteractionEvents through MessageRouter
+	 * to the GameLogicThread if an interaction occurs.
 	 */
 	private void refreshView() {
 		//If we are "paused" then no viewObjects should be updated; thier positions should remain static and
@@ -139,8 +160,6 @@ public class ViewThread extends Thread {
 		if(!paused) {
 			//Call onUpdate() on all ViewObjects
 			for(int i = 0; i < viewObjects.size(); i++) viewObjects.get(i).onUpdate();
-			/*Iterator<ViewObject> voIt= viewObjects.iterator();
-			while(voIt.hasNext()) voIt.next().onUpdate();*/
 			
 			//Check for interactions between the Actor and any ViewObjects
 			for(int i = 0; i < gameItems.size(); i++) {
@@ -148,14 +167,9 @@ public class ViewThread extends Thread {
 				//AND there is an event in gameItems(i)'s queue, send a message to the GameLogic thread
 				if(gameItems.get(i).inSensitivityArea(actor)) {				
 					int consumed_event = gameItems.get(i).consumeEvent();
-					
-					if(consumed_event != GameItem.EVENT_NULL) {
+					//Notify the GLT (via MessageRouter) if an Interaction generates some non-null event
+					if(consumed_event != GameItem.EVENT_NULL) 
 						MessageRouter.sendInteractionEvent(gameItems.get(i).getName());
-						//Log.d(activitynametag, "Detected that Actor entered sensitivity area AND an event was queued!");
-					}
-					else {
-						//Log.d(activitynametag, "Detected that Actor entered sensitivity area, but got event " + consumed_event);
-					}
 				}
 			}
 		}
@@ -172,8 +186,6 @@ public class ViewThread extends Thread {
 		finally {
 			if(canvas != null) surfaceHolder.unlockCanvasAndPost(canvas);
 		}
-		
-		//Log.d(activitynametag, "refreshView() done!");
 	}
 	
 	/** Set whether the announcement message should be displayed or not

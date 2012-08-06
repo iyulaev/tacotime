@@ -1,7 +1,6 @@
 package com.yulaev.tacotime.gameobjects;
 
 import java.util.ArrayList;
-
 import com.yulaev.tacotime.R;
 import com.yulaev.tacotime.gamelogic.GameGrid;
 import com.yulaev.tacotime.gamelogic.State;
@@ -11,6 +10,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+
+/** A GameActor is any ViewObject in the Game that moves about and can interact with (or through) GameItems. GameActors
+ * are for now limited to CoffeeGirl (the player character) and Customers, who interact with CoffeeGirl through the
+ * CustomerQueue structure/GameItem.
+ * @author ivany
+ *
+ */
 
 public abstract class GameActor implements ViewObject {
 	//Bitmap of this CoffeeGirl

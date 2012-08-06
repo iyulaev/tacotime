@@ -71,6 +71,12 @@ public class MessageRouter {
 		}
 	}
 	
+	/** This method is used to pause or unpause the game. When the game is paused, the Canvas that
+	 * represents the game is still re-drawn but all motion of GameActors ceases, GameItems are no 
+	 * longer updated, and GameLogicThread's state machine does not advance since the TimerThread
+	 * stops sending out tick messages.
+	 * @param paused Whether to pause the game or not.
+	 */
 	public synchronized static void sendPauseMessage(boolean paused) {
 		if(inputThread != null) {
 			Message message = Message.obtain();
@@ -85,9 +91,17 @@ public class MessageRouter {
 			else message.what = ViewThread.MESSAGE_SET_UNPAUSED;
 			viewThread.handler.sendMessage(message);
 		}
+		
+		if(timerThread != null) {
+			Message message = Message.obtain();
+			if(paused) message.what = TimerThread.MESSAGE_SET_PAUSED;
+			else message.what = TimerThread.MESSAGE_SET_UNPAUSED;
+			timerThread.handler.sendMessage(message);
+		}
 	}
 	
-	/** Sends  message to the ViewThread telling it to display an announcement
+	/** Sends  message to the ViewThread telling it to display an announcement. An announcement is displayed
+	 * by overlaying some text on top of the game canvas display.
 	 * 
 	 */
 	public synchronized static void sendAnnouncementMessage(String announcementText, boolean doDisplay) {

@@ -4,6 +4,8 @@ import android.content.Context;
 
 import com.yulaev.tacotime.R;
 
+/** This is a TrashCan. It is a GameItem. It is used for disposing of things for a (small) point penalty. */
+
 public class TrashCan extends GameItem {
 	/** Constructor for TrashCan; TrashCan is stateless
 	 */

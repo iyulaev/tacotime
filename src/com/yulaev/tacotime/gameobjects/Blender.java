@@ -3,7 +3,7 @@ package com.yulaev.tacotime.gameobjects;
 import com.yulaev.tacotime.R;
 import android.content.Context;
 
-/** This class describes the Blender used in the TacoTime game
+/** This class describes the Blender GameItem used in the TacoTime game
  * 
  * @author ivany
  *

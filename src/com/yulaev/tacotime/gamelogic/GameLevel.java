@@ -47,6 +47,10 @@ public class GameLevel {
 		iT.reset();
 	}
 	
+	/** Return the number of clock ticks that should be alloted for completing this level.
+	 * 
+	 * @return The number of clock ticks that should be alloted for completing this level.
+	 */
 	public int getLevelTime() {
 		return this.time_limit_sec;
 	}

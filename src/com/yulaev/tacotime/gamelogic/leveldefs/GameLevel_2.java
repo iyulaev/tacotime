@@ -20,6 +20,8 @@ import com.yulaev.tacotime.gameobjects.FoodItemNothing;
 import com.yulaev.tacotime.gameobjects.GameItem;
 import com.yulaev.tacotime.gameobjects.TrashCan;
 
+/** Describes level #2 for the Coffee Time game! */
+
 public class GameLevel_2 extends GameLevel {
 	/** Set up this level; add all GameItems and such to the Threads, set up the Customers and such
 	 * with the per-level parameters.

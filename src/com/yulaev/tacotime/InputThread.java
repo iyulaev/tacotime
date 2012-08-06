@@ -52,6 +52,7 @@ public class InputThread extends Thread {
 			public void handleMessage(Message msg) {
 				if(msg.what == MESSAGE_HANDLE_ONTAP) {
 					Log.d(activitynametag, "Got input message!");
+					//If we are paused, do not propagate user input to rest of the game
 					if(!paused) handleTap(msg.arg1, msg.arg2);
 				}
 				
@@ -89,6 +90,8 @@ public class InputThread extends Thread {
 		while(it.hasNext()) it.next().handleTap(x,y);
 	}
 	
+	/** Does nothing! Everything is handled in the handler.
+	 */
 	@Override
 	public void run() {
 		
@@ -96,6 +99,10 @@ public class InputThread extends Thread {
 
 	}
 	
+	/** Toggles the "paused" member variable. When paused is true then no handleTap calls are made and 
+	 * therefore no user interface inputs get propagated to the ViewObjects (various items) of the game.
+	 * @param n_paused The new setting for paused.
+	 */
 	public void setPaused(boolean n_paused) {
 		this.paused = n_paused;
 	}

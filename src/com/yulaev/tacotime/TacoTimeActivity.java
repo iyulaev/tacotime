@@ -1,5 +1,5 @@
 /** This class implements the very top level of the TacoTime game engine.
- * Mostly all it does is create the MaingamePanel() and set up the window appearance.
+ * It shows the Main Menu, that's about it.
  * 
  * @author iyulaev
  */
@@ -8,36 +8,64 @@ package com.yulaev.tacotime;
 
 import com.yulaev.tacotime.gamelogic.GameGrid;
 
+import com.yulaev.tacotime.R;
+
+import android.app.AlertDialog.Builder;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 
 public class TacoTimeActivity extends Activity {
 	
 	private static final String activitynametag = "TacoTimeActivity";
 	
-    /** Called when the activity is first created. */
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+	/** Called when the activity is first created. */
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		
+		// requesting to turn the title OFF
+		requestWindowFeature(Window.FEATURE_NO_TITLE);		
+		
+		// Change content view so that we are using mainmenulayout now!
+		setContentView(R.layout.mainmenulayout);
+		
+		Button newGame = (Button) findViewById(R.id.new_game);
+		newGame.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				Intent i = new Intent(v.getContext(), TacoTimeMainGameActivity.class);
+				startActivityForResult(i,0);
+			}
+		});
+		
+		Button continueGame = (Button) findViewById(R.id.continue_game);
+		continueGame.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				showUnimplementedError("Continue game");
+			}
+		});
+	}
+	
+	private void showUnimplementedError(String whatsNotImplemented) {
+       
+		Builder b = new AlertDialog.Builder(this)
+        .setTitle("Not Implemented")
+        .setIcon(R.drawable.fooditem_coffee )
+        .setMessage("Sorry! " + whatsNotImplemented + " hasn't been implemented yet.")
+        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                        //Put your code in here for a positive response
+                }
+        });
         
-        // requesting to turn the title OFF
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        
-        // making it full screen
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        
-        // Setup game grid, by giving it window dimensions
-        DisplayMetrics dm = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(dm);
-        GameGrid.setupGameGrid(dm.widthPixels, dm.heightPixels);
-        
-        
-        // Change content view so that 
-        setContentView(new MainGamePanel(this));
-        Log.d(activitynametag, "View added");
-    }
+        b.show();
+	}
 }

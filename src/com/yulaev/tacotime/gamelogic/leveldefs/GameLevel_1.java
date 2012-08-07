@@ -8,17 +8,17 @@ import com.yulaev.tacotime.R;
 import com.yulaev.tacotime.ViewThread;
 import com.yulaev.tacotime.gamelogic.GameGrid;
 import com.yulaev.tacotime.gamelogic.GameLevel;
-import com.yulaev.tacotime.gameobjects.Blender;
 import com.yulaev.tacotime.gameobjects.CoffeeGirl;
-import com.yulaev.tacotime.gameobjects.CoffeeMachine;
-import com.yulaev.tacotime.gameobjects.CupCakeTray;
 import com.yulaev.tacotime.gameobjects.CustomerQueue;
-import com.yulaev.tacotime.gameobjects.FoodItemBlendedDrink;
-import com.yulaev.tacotime.gameobjects.FoodItemCoffee;
-import com.yulaev.tacotime.gameobjects.FoodItemCupcake;
-import com.yulaev.tacotime.gameobjects.FoodItemNothing;
 import com.yulaev.tacotime.gameobjects.GameItem;
-import com.yulaev.tacotime.gameobjects.TrashCan;
+import com.yulaev.tacotime.gameobjects.fooditemdefs.FoodItemBlendedDrink;
+import com.yulaev.tacotime.gameobjects.fooditemdefs.FoodItemCoffee;
+import com.yulaev.tacotime.gameobjects.fooditemdefs.FoodItemCupcake;
+import com.yulaev.tacotime.gameobjects.fooditemdefs.FoodItemNothing;
+import com.yulaev.tacotime.gameobjects.objectdefs.Blender;
+import com.yulaev.tacotime.gameobjects.objectdefs.CoffeeMachine;
+import com.yulaev.tacotime.gameobjects.objectdefs.CupCakeTray;
+import com.yulaev.tacotime.gameobjects.objectdefs.TrashCan;
 
 /** Describes level #1 for the Coffee Time game! */
 

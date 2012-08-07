@@ -17,13 +17,13 @@ import com.yulaev.tacotime.gamelogic.GameLevel;
 import com.yulaev.tacotime.gamelogic.Interaction;
 import com.yulaev.tacotime.gamelogic.leveldefs.GameLevel_1;
 import com.yulaev.tacotime.gamelogic.leveldefs.GameLevel_2;
-import com.yulaev.tacotime.gameobjects.Blender;
 import com.yulaev.tacotime.gameobjects.CoffeeGirl;
-import com.yulaev.tacotime.gameobjects.CoffeeMachine;
 import com.yulaev.tacotime.gameobjects.CustomerQueue;
 import com.yulaev.tacotime.gameobjects.GameFoodItem;
 import com.yulaev.tacotime.gameobjects.ViewObject;
 import com.yulaev.tacotime.gameobjects.GameItem;
+import com.yulaev.tacotime.gameobjects.objectdefs.Blender;
+import com.yulaev.tacotime.gameobjects.objectdefs.CoffeeMachine;
 
 
 /**

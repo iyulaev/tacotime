@@ -1,8 +1,9 @@
-package com.yulaev.tacotime.gameobjects;
+package com.yulaev.tacotime.gameobjects.objectdefs;
 
 import android.content.Context;
 
 import com.yulaev.tacotime.R;
+import com.yulaev.tacotime.gameobjects.GameItem;
 
 /** This is a TrashCan. It is a GameItem. It is used for disposing of things for a (small) point penalty. */
 

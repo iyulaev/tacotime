@@ -1,4 +1,4 @@
-package com.yulaev.tacotime.gameobjects;
+package com.yulaev.tacotime.gameobjects.fooditemdefs;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.yulaev.tacotime.R;
+import com.yulaev.tacotime.gameobjects.GameFoodItem;
 
 /** Describes the "Nothing" food item. Mostly we just define the number of points and amount of money that
  * this FoodItem is worth (zero lol!); for a detailed description of the methods and their purpose please 

@@ -1,4 +1,6 @@
-package com.yulaev.tacotime.gameobjects;
+package com.yulaev.tacotime.gameobjects.objectdefs;
+
+import com.yulaev.tacotime.gameobjects.GameItem;
 
 import android.content.Context;
 

@@ -1,6 +1,8 @@
-package com.yulaev.tacotime.gameobjects;
+package com.yulaev.tacotime.gameobjects.objectdefs;
 
 import com.yulaev.tacotime.R;
+import com.yulaev.tacotime.gameobjects.GameItem;
+
 import android.content.Context;
 
 /** This class describes the Coffee Machine used in the TacoTime game

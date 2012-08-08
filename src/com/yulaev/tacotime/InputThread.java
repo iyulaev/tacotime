@@ -4,11 +4,9 @@ package com.yulaev.tacotime;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.SurfaceHolder;
 
 import com.yulaev.tacotime.gameobjects.ViewObject;
 
@@ -28,6 +26,13 @@ public class InputThread extends Thread {
 	public static final int MESSAGE_HANDLE_ONTAP = 0;
 	public static final int MESSAGE_SET_PAUSED = 1;
 	public static final int MESSAGE_SET_UNPAUSED = 2;
+	public static final int MESSAGE_INGAME_DIALOG_LAUNCHED = 3;
+	public static final int MESSAGE_INGAME_DIALOG_FINISHED = 4;
+	
+	//Define the possible results for the in-game dialog
+	public static final int INGAMEDIALOGRESULT_MAIN_MENU = 0;
+	public static final int INGAMEDIALOGRESULT_RETRY_LEVEL = 1;
+	public static final int INGAMEDIALOGRESULT_CONTINUE = 2;
 
 	//This message handler will receive messages, probably from the UI Thread, and
 	//update the data objects and do other things that are related to handling
@@ -37,7 +42,7 @@ public class InputThread extends Thread {
 	//Here we hold all of the objects that the ViewThread must update
 	ArrayList<ViewObject> viewObjects;
 	
-	//True if this thread is running and sending input results through mesage router
+	//True if this thread is running and sending input results through message router
 	private boolean paused;
 
 	/** Mostly just sets up a Handler that receives messages from the main game Activity 
@@ -58,6 +63,22 @@ public class InputThread extends Thread {
 				
 				else if (msg.what == MESSAGE_SET_PAUSED) setPaused(true);
 				else if (msg.what == MESSAGE_SET_UNPAUSED) setPaused(false);
+				else if (msg.what == MESSAGE_INGAME_DIALOG_LAUNCHED) setPaused(true);
+				else if (msg.what == MESSAGE_INGAME_DIALOG_FINISHED) {
+					setPaused(false);
+					int result = msg.arg1;
+					
+					//debugging only...
+					String dialogResultString = "null";
+					if(result == InputThread.INGAMEDIALOGRESULT_MAIN_MENU) dialogResultString = "main menu";
+					if(result == InputThread.INGAMEDIALOGRESULT_RETRY_LEVEL) dialogResultString = "retry level";
+					if(result == InputThread.INGAMEDIALOGRESULT_CONTINUE) dialogResultString = "continue";
+					Log.d(activitynametag, "Dialog result was: " + dialogResultString);
+					
+					//on continue, do nothing
+					if(result == INGAMEDIALOGRESULT_RETRY_LEVEL); //TODO: send message to GTL to restart the level
+					else if(result == INGAMEDIALOGRESULT_MAIN_MENU); //TODO: send message to GTL to restroy the TacoTimeMainGameActivity
+				}
 			}
 		};		
 	}

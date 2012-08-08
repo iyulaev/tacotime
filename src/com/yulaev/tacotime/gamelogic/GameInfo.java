@@ -7,6 +7,7 @@ package com.yulaev.tacotime.gamelogic;
  *
  */
 public class GameInfo {
+	//The amount of money and points that the player currently has
 	public static int money;
 	public static int points;
 	

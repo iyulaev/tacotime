@@ -103,6 +103,10 @@ public class MessageRouter {
 	/** Sends  message to the ViewThread telling it to display an announcement. An announcement is displayed
 	 * by overlaying some text on top of the game canvas display.
 	 * 
+	 * @param announcementText The text to display, overlayed on the screen, by viewThread.
+	 * @param doDisplay If true, the announcementText will be displayed. If false, no text will be displayed
+	 * and any presently displayed text gets cleared.
+	 * 
 	 */
 	public synchronized static void sendAnnouncementMessage(String announcementText, boolean doDisplay) {
 		if(viewThread != null) {
@@ -113,6 +117,29 @@ public class MessageRouter {
 			}
 			else message.what = ViewThread.MESSAGE_STOP_ANNOUNCEMENT;
 			viewThread.handler.sendMessage(message);
+		}
+	}
+	
+	/** Called when the back button gets pressed during game play. Tells the input thread that the back button 
+	 * has been pressed and that the in-game dialog has been launched.
+	 */
+	public synchronized static void sendBackButtonDuringGameplayMessage() {
+		if(inputThread != null) {
+			Message message = Message.obtain();
+			message.what = InputThread.MESSAGE_INGAME_DIALOG_LAUNCHED;
+			inputThread.handler.sendMessage(message);
+		}
+	}
+	
+	/** Called when the in-game menu returns and finishes
+	 * @param dialog_result the result of the in-game dialog call;
+	 */
+	public synchronized static void sendInGameDialogResult(int dialog_result) {
+		if(inputThread != null) {
+			Message message = Message.obtain();
+			message.what = InputThread.MESSAGE_INGAME_DIALOG_FINISHED;
+			message.arg1 = dialog_result;
+			inputThread.handler.sendMessage(message);
 		}
 	}
 

@@ -37,8 +37,6 @@ public class ViewThread extends Thread {
 	
 	//Define view refresh period in ms
 	public static final int VIEW_REFRESH_PERIOD = 20;
-	//Define a "suspended" check period in ms, this is how often we check if we are still suspended
-	public static final int VIEW_SUSPEND_CHECK_PERIOD = 250; 
 
 	// Surface holder that can access the physical surface
 	private SurfaceHolder surfaceHolder;
@@ -203,9 +201,25 @@ public class ViewThread extends Thread {
 		announcementMessage = newAccouncement;
 	}
 	
-	public void setSuspended(boolean n_suspended) {
-		this.suspended = n_suspended;
+	/** Sets whether or not this ViewThread should be suspended. If we set suspended to false we 
+	 * launch a notification to wake the ViewThread back up.
+	 * @param n_suspended Whether this ViewThread should be suspended.
+	 */
+	public synchronized void setSuspended(boolean n_suspended) {		
+		if(!n_suspended && this.suspended) {
+			this.suspended = n_suspended;
+			notifyAll();
+		}
+		else this.suspended = n_suspended;
 	}
+	
+	private synchronized void checkSuspended() {
+		while(this.suspended) {
+			try { wait(); }
+			catch (InterruptedException e) {}
+		}
+	}
+
 	
 	/** The ViewThread run() method implements a loop which will attempt to redraw the Canvas
 	 * no more often than every ViewThread.VIEW_REFRESH_PERIOD milliseconds.
@@ -216,16 +230,16 @@ public class ViewThread extends Thread {
 		long lastViewUpdate = 0L;
 		
 		while(running) {
+			
+			checkSuspended();
 		
-			if(System.currentTimeMillis() > lastViewUpdate + ViewThread.VIEW_REFRESH_PERIOD &&
-					!suspended) {
+			if(System.currentTimeMillis() > lastViewUpdate + ViewThread.VIEW_REFRESH_PERIOD) {
 				lastViewUpdate = System.currentTimeMillis();
 				refreshView();
 			}
 			
 			try {
-				if(!suspended) Thread.sleep(ViewThread.VIEW_REFRESH_PERIOD);
-				else Thread.sleep(ViewThread.VIEW_SUSPEND_CHECK_PERIOD);
+				Thread.sleep(ViewThread.VIEW_REFRESH_PERIOD);
 			}
 			catch (Exception e) {;}
 		

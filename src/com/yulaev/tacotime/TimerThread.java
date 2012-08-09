@@ -30,12 +30,14 @@ public class TimerThread extends Thread {
 	// flag to hold game state 
 	private boolean running;
 	private boolean paused;
+	private boolean suspended;
 
 	public TimerThread() {
 		super();
 		
 		paused = false;
 		running = false;
+		suspended = false;
 
 		handler = new Handler() {
 			@Override
@@ -51,11 +53,26 @@ public class TimerThread extends Thread {
 		this.paused = n_paused;
 	}
 	
-	public synchronized void setSuspended(boolean n_paused) {
-		this.paused = n_paused;
+	/** Sets whether or not this TimerThread should be suspended. If we set suspended to false we 
+	 * launch a notification to wake the TimerThread back up.
+	 * @param n_suspended Whether this TimerThread should be suspended.
+	 */
+	public synchronized void setSuspended(boolean n_suspended) {		
+		if(!n_suspended && this.suspended) {
+			this.suspended = n_suspended;
+			notifyAll();
+		}
+		else this.suspended = n_suspended;
+	}
+	
+	private synchronized void checkSuspended() {
+		while(this.suspended) {
+			try { wait(); }
+			catch (InterruptedException e) {}
+		}
 	}
 
-	/** The run() methods does nothing every TIMER_GRANULARITY milliseconds.
+	/** The run() methods launched a tick message every TIMER_GRANULARITY milliseconds.
 	 */
 	@Override
 	public void run() {
@@ -64,6 +81,9 @@ public class TimerThread extends Thread {
 		
 		while (running) {
 			tickCount++;
+			
+			//If we are suspended then this will block until we are no longer
+			checkSuspended();
 			
 			//Fire off timers if sufficient time has elapsed
 			//no timers yet!

@@ -8,11 +8,16 @@
 package com.yulaev.tacotime;
 
 import com.yulaev.tacotime.gamelogic.GameGrid;
+import com.yulaev.tacotime.gamelogic.GameInfo;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Window;
@@ -27,19 +32,46 @@ public class TacoTimeMainGameActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+		Log.d(activitynametag, "TTMGA constructor called!");
+		
 		// requesting to turn the title OFF
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
 		// making it full screen
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		
+		//Determine whether to load a saved game or not
+		boolean load_saved_game = false;
+		Intent i = getIntent();
+		load_saved_game = i.getBooleanExtra("LoadSavedGame", false);
+		
 		// Setup game grid, by giving it window dimensions
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 		GameGrid.setupGameGrid(dm.widthPixels, dm.heightPixels);
 		
+		MainGamePanel mgpView = new MainGamePanel(this, load_saved_game);
+		
+		//Used only for allocating an intent to be launched from 
+		final Context ttmgaContext = mgpView.getContext(); //this seems wrong...
+		
+		//Define a handler for handling messages from things like GLT, informing us that we need to launch an activity
+		Handler handler = new Handler() {
+			@Override
+			public void handleMessage(Message msg) {
+				//If we get this message from the GameLogicThread when we've just finished
+				//a level and need to load the between-level menu
+				if(msg.what == GameLogicThread.MESSAGE_LEVEL_END) {
+					Intent i = new Intent(ttmgaContext, BetweenLevelMenuActivity.class);
+					startActivityForResult(i,0);
+				}
+			}
+		};
+		
+		MessageRouter.ttaHandler = handler; 
+		
 		// Change content view so that we can see the MainGamePanel!
-		setContentView(new MainGamePanel(this));
+		setContentView(mgpView);
 	}
 	
 	/** When the Back button gets pressed during game play, we should NOT actually go back; rather, we should
@@ -70,6 +102,9 @@ public class TacoTimeMainGameActivity extends Activity {
 			.setPositiveButton("Main Menu", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int id) {
 					MessageRouter.sendInGameDialogResult(InputThread.INGAMEDIALOGRESULT_MAIN_MENU);
+					
+					//Destroy TTMGA/MGP and go back to the main menu activity
+					finish();
 				}
 			})
 			//Maps to "retry level"

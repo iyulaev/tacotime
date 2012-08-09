@@ -50,6 +50,10 @@ public class TimerThread extends Thread {
 	private synchronized void setPaused(boolean n_paused) {
 		this.paused = n_paused;
 	}
+	
+	public synchronized void setSuspended(boolean n_paused) {
+		this.paused = n_paused;
+	}
 
 	/** The run() methods does nothing every TIMER_GRANULARITY milliseconds.
 	 */

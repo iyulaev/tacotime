@@ -76,8 +76,13 @@ public class InputThread extends Thread {
 					Log.d(activitynametag, "Dialog result was: " + dialogResultString);
 					
 					//on continue, do nothing
-					if(result == INGAMEDIALOGRESULT_RETRY_LEVEL); //TODO: send message to GTL to restart the level
-					else if(result == INGAMEDIALOGRESULT_MAIN_MENU); //TODO: send message to GTL to restroy the TacoTimeMainGameActivity
+					
+					//On "retry level" have GTL load the last saved game
+					if(result == INGAMEDIALOGRESULT_RETRY_LEVEL) {
+						MessageRouter.sendLoadGameMessage();
+					}
+					
+					else if(result == INGAMEDIALOGRESULT_MAIN_MENU); //does nothing, since the TTMGA will handle destroying TTMGA
 				}
 			}
 		};		

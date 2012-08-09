@@ -1,5 +1,6 @@
-/** This class implements the very top level of the TacoTime game engine.
- * It shows the Main Menu, that's about it.
+/** This class implements the Activity that drives the between-level menu. This is the menu that 
+ * is shown to the user between levels (upon completing a level) and allows the user to buy upgrades and
+ * save & continue, or to retry the level.
  * 
  * @author iyulaev
  */
@@ -7,8 +8,6 @@
 package com.yulaev.tacotime;
 
 import com.yulaev.tacotime.R;
-import com.yulaev.tacotime.gamelogic.GameInfo;
-import com.yulaev.tacotime.gamelogic.Interaction;
 
 import android.app.AlertDialog.Builder;
 import android.app.Activity;
@@ -16,16 +15,13 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 
-public class TacoTimeActivity extends Activity {
+public class BetweenLevelMenuActivity extends Activity {
 	
-	private static final String activitynametag = "TacoTimeActivity";
+	private static final String activitynametag = "BetweenLevelMenuActivity";
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -36,24 +32,28 @@ public class TacoTimeActivity extends Activity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);		
 		
 		// Change content view so that we are using mainmenulayout now!
-		setContentView(R.layout.mainmenulayout);
+		setContentView(R.layout.betweenlevelmenu);
 		
-		Button newGame = (Button) findViewById(R.id.new_game);
-		newGame.setOnClickListener(new View.OnClickListener() {
+		Button retryLevel = (Button) findViewById(R.id.retry_level);
+		retryLevel.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Intent i = new Intent(v.getContext(), TacoTimeMainGameActivity.class);
-				i.putExtra("LoadSavedGame", false);
-				startActivityForResult(i,0);
+				MessageRouter.sendLoadGameMessage();
+				finish();
 			}
 		});
 		
-		Button continueGame = (Button) findViewById(R.id.continue_game);
-		continueGame.setOnClickListener(new View.OnClickListener() {
+		Button saveAndContinue = (Button) findViewById(R.id.save_and_continue);
+		saveAndContinue.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				//showUnimplementedError("Continue game");
-				Intent i = new Intent(v.getContext(), TacoTimeMainGameActivity.class);
-				i.putExtra("LoadSavedGame", true);
-				startActivityForResult(i,0);
+				MessageRouter.sendNextLevelMessage();
+				finish();
+			}
+		});
+		
+		Button viewBuyUpgrades = (Button) findViewById(R.id.view_buy_upgrades);
+		viewBuyUpgrades.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				showUnimplementedError("View / Buy Upgrades");
 			}
 		});
 	}

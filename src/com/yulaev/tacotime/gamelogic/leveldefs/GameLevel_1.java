@@ -34,7 +34,7 @@ public class GameLevel_1 extends GameLevel {
 		super.loadLevel(viewThread, gameLogicThread, inputThread, caller);
 		
 		this.level_number = 1;
-		this.customerQueue_length = 5;
+		this.customerQueue_length = 1;
 		this.point_mult = 1.0f;
 		this.money_mult = 1.0f;
 		this.customer_impatience = 0.8f;

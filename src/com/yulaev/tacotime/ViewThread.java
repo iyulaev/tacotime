@@ -36,7 +36,9 @@ public class ViewThread extends Thread {
 	public static final int MESSAGE_STOP_ANNOUNCEMENT = 4;
 	
 	//Define view refresh period in ms
-	public static final int VIEW_REFRESH_PERIOD = 20; 
+	public static final int VIEW_REFRESH_PERIOD = 20;
+	//Define a "suspended" check period in ms, this is how often we check if we are still suspended
+	public static final int VIEW_SUSPEND_CHECK_PERIOD = 250; 
 
 	// Surface holder that can access the physical surface
 	private SurfaceHolder surfaceHolder;
@@ -54,11 +56,12 @@ public class ViewThread extends Thread {
 	//Here we hold all of the GameItems that are rendered by this ViewThread
 	ArrayList<GameItem> gameItems;
 	
-	//If running is false then we do the refreshView() command which sends an onUpdate() request
-	//to all ViewObjects and also redraws the canvas
+	//If running is false then we fall out of the event loop and die
 	private boolean running;
 	//If paused is true then, during refreshView(), we do not call onUpdate() BUT we still re-draw the entire canvas
 	private boolean paused;
+	//If suspended is true then the event loop continues but we do not do anything special
+	private boolean suspended;
 	
 	//Variables to hold the current announcement message (a message that will be printed in LARGE CHARACTERS
 	//that overlay everything else on the canvas
@@ -80,6 +83,7 @@ public class ViewThread extends Thread {
 		
 		running = false;
 		paused = true;
+		suspended = false;
 		
 		draw_announcement_message = false;
 		
@@ -198,8 +202,10 @@ public class ViewThread extends Thread {
 	public void setAnnouncement(String newAccouncement) {
 		announcementMessage = newAccouncement;
 	}
-		
 	
+	public void setSuspended(boolean n_suspended) {
+		this.suspended = n_suspended;
+	}
 	
 	/** The ViewThread run() method implements a loop which will attempt to redraw the Canvas
 	 * no more often than every ViewThread.VIEW_REFRESH_PERIOD milliseconds.
@@ -211,12 +217,16 @@ public class ViewThread extends Thread {
 		
 		while(running) {
 		
-			if(System.currentTimeMillis() > lastViewUpdate + ViewThread.VIEW_REFRESH_PERIOD) {
+			if(System.currentTimeMillis() > lastViewUpdate + ViewThread.VIEW_REFRESH_PERIOD &&
+					!suspended) {
 				lastViewUpdate = System.currentTimeMillis();
 				refreshView();
 			}
 			
-			try {Thread.sleep(ViewThread.VIEW_REFRESH_PERIOD);}
+			try {
+				if(!suspended) Thread.sleep(ViewThread.VIEW_REFRESH_PERIOD);
+				else Thread.sleep(ViewThread.VIEW_SUSPEND_CHECK_PERIOD);
+			}
 			catch (Exception e) {;}
 		
 		}

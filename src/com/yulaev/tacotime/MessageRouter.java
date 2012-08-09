@@ -1,9 +1,11 @@
 /** This class routes messages to other classes; used as sort of a global message
- * creator and passer.
+ * creator and passer. It has no state, it is purely for announcing events and passing
+ * information between threads.
  */
 
 package com.yulaev.tacotime;
 
+import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
@@ -13,6 +15,7 @@ public class MessageRouter {
 	public static TimerThread timerThread;
 	public static InputThread inputThread;
 	public static GameLogicThread gameLogicThread;
+	public static Handler ttaHandler;
 	
 	/** Called when a View Update should occur (not used) 
 	 * 
@@ -53,8 +56,6 @@ public class MessageRouter {
 			message.what = GameLogicThread.MESSAGE_INTERACTION_EVENT;
 			message.obj = itemName;
 			gameLogicThread.handler.sendMessage(message);
-			
-			Log.v("MessageRouter", "Sent Interaction Event message");
 		}
 	}
 	
@@ -66,8 +67,6 @@ public class MessageRouter {
 			Message message = Message.obtain();
 			message.what = GameLogicThread.MESSAGE_TICK_PASSED;
 			gameLogicThread.handler.sendMessage(message);
-			
-			//Log.v("MessageRouter", "Sent Tick Event message");
 		}
 	}
 	
@@ -92,6 +91,31 @@ public class MessageRouter {
 			viewThread.handler.sendMessage(message);
 		}
 		
+		if(timerThread != null) {
+			Message message = Message.obtain();
+			if(paused) message.what = TimerThread.MESSAGE_SET_PAUSED;
+			else message.what = TimerThread.MESSAGE_SET_UNPAUSED;
+			timerThread.handler.sendMessage(message);
+		}
+	}
+	
+	public synchronized static void sendPauseUIMessage(boolean paused) {
+		if(inputThread != null) {
+			Message message = Message.obtain();
+			if(paused) message.what = InputThread.MESSAGE_SET_PAUSED;
+			else message.what = InputThread.MESSAGE_SET_UNPAUSED;
+			inputThread.handler.sendMessage(message);
+		}
+		
+		if(viewThread != null) {
+			Message message = Message.obtain();
+			if(paused) message.what = ViewThread.MESSAGE_SET_PAUSED;
+			else message.what = ViewThread.MESSAGE_SET_UNPAUSED;
+			viewThread.handler.sendMessage(message);
+		}
+	}
+	
+	public synchronized static void sendPauseTimerMessage(boolean paused) {
 		if(timerThread != null) {
 			Message message = Message.obtain();
 			if(paused) message.what = TimerThread.MESSAGE_SET_PAUSED;
@@ -140,6 +164,54 @@ public class MessageRouter {
 			message.what = InputThread.MESSAGE_INGAME_DIALOG_FINISHED;
 			message.arg1 = dialog_result;
 			inputThread.handler.sendMessage(message);
+		}
+	}
+	
+	/** Called when we are asked to load the last saved game */
+	public synchronized static void sendLoadGameMessage() {
+		if(gameLogicThread != null) {
+			Message message = Message.obtain();
+			message.what = GameLogicThread.MESSAGE_LOAD_GAME;
+			gameLogicThread.handler.sendMessage(message);
+			
+			Log.v("MessageRouter", "Sent Load Game message");
+		}
+	}
+	
+	/** Called when we are asked to save the current game to our saved game db 
+	 * TODO unused, remove at some point.
+	 * */
+	public synchronized static void sendSaveGameMessage() {
+		if(gameLogicThread != null) {
+			Message message = Message.obtain();
+			message.what = GameLogicThread.MESSAGE_SAVE_GAME;
+			gameLogicThread.handler.sendMessage(message);
+			
+			Log.v("MessageRouter", "Sent Save Game message");
+		}
+	}
+	
+	/** Called when we are asked (typically by the betweenLevelMenuActivity) to save the game and
+	 * continue onto the next level. */
+	public synchronized static void sendNextLevelMessage() {
+		if(gameLogicThread != null) {
+			Message message = Message.obtain();
+			message.what = GameLogicThread.MESSAGE_NEXT_LEVEL;
+			gameLogicThread.handler.sendMessage(message);
+			
+			Log.v("MessageRouter", "Sent next level message");
+		}
+	}
+	
+	/** Called when we are asked (typically by the betweenLevelMenuActivity) to save the game and
+	 * continue onto the next level. */
+	public synchronized static void sendLevelEndMessage() {
+		if(gameLogicThread != null) {
+			Message message = Message.obtain();
+			message.what = GameLogicThread.MESSAGE_LEVEL_END;
+			ttaHandler.sendMessage(message);
+			
+			Log.v("MessageRouter", "Sent level end message to the TacoTimeActivity handler");
 		}
 	}
 

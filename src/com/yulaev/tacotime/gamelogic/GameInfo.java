@@ -1,5 +1,7 @@
 package com.yulaev.tacotime.gamelogic;
 
+import android.util.Log;
+
 /**The GameInfo class keeps track of high-level global game data, such as how many points and how
  * much money the player has. Most methods are synchronized so that concurrency (sharing this
  * GameInfo object between multiple threads) should not be an issue.
@@ -7,6 +9,12 @@ package com.yulaev.tacotime.gamelogic;
  *
  */
 public class GameInfo {
+	public static final String activitynametag = "GameInfo";
+	
+	//The name of the "character" that the player has chosen. Should be used to load and save games to
+	//the saved game database.
+	public static String characterName = "null";
+	
 	//The amount of money and points that the player currently has
 	public static int money;
 	public static int points;
@@ -54,7 +62,7 @@ public class GameInfo {
 	 * @param new_level The new level that we will be on.
 	 * @return The new level that the game is set to.
 	 */
-	public static int setLevel(int new_level) {
+	public static synchronized int setLevel(int new_level) {
 		level = new_level;
 		return(level);
 	}
@@ -63,13 +71,13 @@ public class GameInfo {
 	 * 
 	 * @return The game level that this game is currently in.
 	 */
-	public static int getLevel() { return level; }
+	public static synchronized int getLevel() { return level; }
 	
 	/** Set the remaining time left to finish this level
 	 * @param n_leveltime The numbre of clock ticks that shall be alloted to finish the current level.
 	 * @return The (input) level time
 	 */
-	public static int setLevelTime(int n_leveltime) { 
+	public static synchronized int setLevelTime(int n_leveltime) { 
 		levelTime = n_leveltime; 
 		return levelTime; 
 	}
@@ -77,23 +85,47 @@ public class GameInfo {
 	/** Decrement the remaining time (in clock ticks) for this level
 	 * @return The new value of levelTime, the remaining amount of clock ticks for this level.
 	 */
-	public static int decrementLevelTime() { return(--levelTime); }
+	public static synchronized int decrementLevelTime() { return(--levelTime); }
 	
 	/** Return the remaining time for this level
 	 * @return The remaining number of clock ticks for this level
 	 */
-	public static int getLevelTime() { return levelTime; }
+	public static synchronized int getLevelTime() { return levelTime; }
 	
 	/** Set the mode (state) that this Game is currently in. Really this is what drives the GameLogicThread's
 	 * core state machine.
 	 * @param n_gamemode The mode (state) that this Game is in.
 	 */
-	public static void setGameMode(int n_gamemode) { gameMode = n_gamemode; }
+	public static synchronized void setGameMode(int n_gamemode) { gameMode = n_gamemode; }
 	
 	/** Get the mode (state) that this Game is in.
 	 * 
 	 * @return Current mode (state) of this Game.
 	 */
-	public static int getGameMode() { return gameMode; }
+	public static synchronized int getGameMode() { return gameMode; }
+	
+	
+	
+	
+	/** Reset this GameInfo, effectively clearing global game state. Note, however, that characterName, 
+	 * which is set by the very first "entry menu" for this game, does not get cleared. */
+	public static synchronized void reset() {
+		setGameMode(MODE_MAINGAMEPANEL_PREPLAY);
+		setLevelTime(0);
+		setLevel(0);
+		
+		money = 0;
+		points = 0;
+	}
+	
+	/** Loads the saved game for this character. Not implemented yet. */
+	public static synchronized void loadSavedGame() {
+		Log.d(activitynametag, "GameInfo got loadSavedGame() call, but not implemented yet.");
+	}
+	
+	/** Saves game state for this character. Not implemented yet. */
+	public static synchronized void saveCurrentGame() {
+		Log.d(activitynametag, "GameInfo got saveCurrentGame() call, but not implemented yet.");
+	}
 	
 }

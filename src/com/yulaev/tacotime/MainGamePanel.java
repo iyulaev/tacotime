@@ -49,13 +49,20 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 	ViewThread viewThread;
 	InputThread inputThread;
 	GameLogicThread gameLogicThread;
+	
+	//Make sure we don't double-make the threads
+	boolean threads_launched;
 
 	/** Constructor for MainGamePanel. Mostly this sets up and launches all of the game threads.
 	 * 
 	 * @param context The context that creates this MainGamePanel
+	 * @param load_saved_game Whether to load a saved game or not
 	 */
-	public MainGamePanel(Context context) {
+	public MainGamePanel(Context context, boolean load_saved_game) {
 		super(context);
+		
+		Log.d(activitynametag, "MainGamePanel constructor called!");
+		
 		// adding the callback (this) to the surface holder to intercept events
 		getHolder().addCallback(this);
 		
@@ -72,9 +79,11 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		MessageRouter.inputThread = inputThread;
 		
 		//create the Game Logic Thread
-		gameLogicThread = new GameLogicThread(viewThread, timerThread, inputThread, this.getContext());
+		gameLogicThread = new GameLogicThread(viewThread, timerThread, inputThread, this.getContext(), load_saved_game);
 		gameLogicThread.setSelf(gameLogicThread);
 		MessageRouter.gameLogicThread = gameLogicThread;
+		
+		threads_launched = false;
 		
 		// make the GamePanel focusable so it can handle events
 		setFocusable(true);
@@ -93,28 +102,38 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 	 *  this is done.
 	 */
 	public void surfaceCreated(SurfaceHolder holder) {
-		// at this point the surface is created and
-		// we can safely start the game loop
-		timerThread.setRunning(true);
-		viewThread.setRunning(true);
+		Log.d(activitynametag, "MainGamePanel surfaceCreated() called!");
 		
-		//Kick off all of the threads
-		viewThread.start();
-		inputThread.start();
-		gameLogicThread.start();
-		timerThread.start();
+		timerThread.setSuspended(false);
+		viewThread.setSuspended(false);
+		
+		if(!threads_launched) {
+			// at this point the surface is created and
+			// we can safely start the game loop
+			timerThread.setRunning(true);
+			viewThread.setRunning(true);
+
+			//Kick off all of the threads
+			viewThread.start();
+			inputThread.start();
+			gameLogicThread.start();
+			timerThread.start();
+			
+			threads_launched = true;
+		}
 	}
 
 	/** This method winds down all of the threads. */
 	public void surfaceDestroyed(SurfaceHolder holder) {
-		Log.d(activitynametag, "Surface is being destroyed");
+		Log.d(activitynametag, "MainGamePanel surfaceDestroyed() called!");
 		
-		timerThread.setRunning(false);
-		viewThread.setRunning(false);
+		//Pause the threads that have event loops built in
+		timerThread.setSuspended(true);
+		viewThread.setSuspended(true);
 		
 		// tell the thread to shut down and wait for it to finish
 		// this is a clean shutdown
-		boolean retry = true;
+		/*boolean retry = true;
 		while (retry) {
 			try {
 				timerThread.join();
@@ -125,9 +144,9 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 			} catch (InterruptedException e) {
 				// try again shutting down the thread
 			}
-		}
-		
-		Log.d(activitynametag, "Threads were shut down cleanly");
+			
+			Log.d(activitynametag, "Threads were shut down cleanly");
+		}*/
 	}
 	
 	/** Responds to a touch event; mostly just sends the tap event to the InputThread via MessageRouter. 

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/betweenlevelmenu">
+    
+    <ImageView android:id="@+id/title"
+		android:layout_alignParentTop="true" android:layout_centerHorizontal="true"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:src="@drawable/betweenlevelmenuart" android:layout_gravity="center"
+		android:background="#0000"
+		android:layout_weight="0.25"
+		android:padding = "1dip"/>
+    
+    <Button android:id="@+id/retry_level" android:layout_width="fill_parent"
+			android:layout_height="100dip" android:text="Retry Level"
+			android:layout_weight="0.5"
+			android:textSize="20sp"
+			android:textStyle="bold"
+			android:gravity="center_horizontal|center_vertical" />
+    
+    <Button android:id="@+id/save_and_continue" android:layout_width="fill_parent"
+			android:layout_height="100dip" android:text="Save and Continue"
+			android:layout_weight="0.5"
+			android:textSize="20sp"
+			android:textStyle="bold"
+			android:gravity="center_horizontal|center_vertical"/>
+    
+    <Button android:id="@+id/view_buy_upgrades" android:layout_width="fill_parent"
+			android:layout_height="100dip" android:text="View / Buy Upgrades"
+			android:layout_weight="0.5"
+			android:textSize="20sp"
+			android:textStyle="bold"
+			android:gravity="center_horizontal|center_vertical"/>
+    
+    <!-- <Button android:id="@+id/continue_game" android:layout_width="fill_parent"
+			android:layout_height="fill_parent" android:text="Game Info"
+			android:layout_weight="0.33"
+			android:textSize="20sp"
+			android:textStyle="bold"
+			android:gravity="center_horizontal|center_vertical"
+			android:drawableLeft="@drawable/rail_widesp" /> -->
+    
+
+</LinearLayout>

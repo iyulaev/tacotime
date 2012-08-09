@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.Message;
@@ -44,11 +45,17 @@ public class GameLogicThread extends Thread {
 	//Define types of messages accepted by ViewThread
 	public static final int MESSAGE_INTERACTION_EVENT = 0;
 	public static final int MESSAGE_TICK_PASSED = 1;
+	public static final int MESSAGE_LOAD_GAME = 2;
+	public static final int MESSAGE_SAVE_GAME = 3;
+	public static final int MESSAGE_NEXT_LEVEL = 4;
+	
+	//Define types of messages accepted by OTHER threads/handlers
+	public static final int MESSAGE_LEVEL_END = -1;
 
 	//This message handler will receive messages, probably from the UI Thread, and
 	//update the data objects and do other things that are related to handling
 	//game-specific input
-	public static Handler handler;
+	public Handler handler;
 	
 	public CoffeeGirl coffeeGirl;
 	public CustomerQueue customerQueue;
@@ -65,7 +72,7 @@ public class GameLogicThread extends Thread {
 	int message_timer;
 	
 	/** Mostly just initializes the Handler that receives and acts on in-game interactions that occur */
-	public GameLogicThread(ViewThread viewThread, TimerThread timerThread, InputThread inputThread, Context caller) {
+	public GameLogicThread(ViewThread viewThread, TimerThread timerThread, InputThread inputThread, Context caller, boolean load_saved) {
 		super();
 		
 		//Set pointers to all of the other threads
@@ -75,15 +82,13 @@ public class GameLogicThread extends Thread {
 		this.inputThread = inputThread;
 		this.caller = caller;
 		
-		//"initialize" GameInfo
-		GameInfo.money = 0;
-		GameInfo.points = 0;
-		GameInfo.setLevel(0);
-		GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_PREPLAY); //TODO: this should probably be initialized elsewhere,
-				//perhaps in the TacoTimeActivity game entry point?
+		//"reset" GameInfo
+		GameInfo.reset();
 		
 		gameItems = new HashMap<String, GameItem>();
 		foodItems = new HashMap<String, GameFoodItem>();
+		
+		if(load_saved) loadSavedGame();
 		
 		//Creates a Handler that will be used to process Interaction and ClockTick messages, and advance the CoffeeGirl and
 		//GameLogicThread state machines
@@ -110,8 +115,29 @@ public class GameLogicThread extends Thread {
 				//Handle messages from timerThread that tell the GameLogicThread that a second has passed
 				//This is the main state machine for the GameLogicThread! Which controls how the game works!
 				//So this is the most important part of the game!!!
-				if(msg.what == MESSAGE_TICK_PASSED) {
+				else if(msg.what == MESSAGE_TICK_PASSED) {
 					stateMachineClockTick();
+				}
+				
+				//If we get a message to load a level, then load the saved game and transition to "pre-play" state
+				//Note that "retry level" will call this also, since to retry level we just load the last game
+				else if(msg.what == MESSAGE_LOAD_GAME) {
+					GameInfo.loadSavedGame();
+					GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_PREPLAY);
+					MessageRouter.sendPauseTimerMessage(false);
+				}
+				
+				//save the current game
+				//TODO remove this isn't used
+				else if(msg.what == MESSAGE_SAVE_GAME) {
+					GameInfo.saveCurrentGame();
+				}
+				
+				//If we are to advance to the next level, set the GameMode appropriately and unpause
+				else if(msg.what == MESSAGE_NEXT_LEVEL) {
+					GameInfo.saveCurrentGame();
+					GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_PREPLAY);
+					MessageRouter.sendPauseTimerMessage(false);
 				}
 			}
 		};		
@@ -122,6 +148,11 @@ public class GameLogicThread extends Thread {
 	 * @param gameLogicThread
 	 */
 	public void setSelf(GameLogicThread gameLogicThread) { this.gameLogicThread = gameLogicThread; }
+	
+	/** Used to load a saved game */
+	private void loadSavedGame() {
+		GameInfo.loadSavedGame();
+	}
 	
 	/** Since CoffeeGirl interacts with all other game items, describing the CoffeeGirl state machine is done on the global level
 	 * rather than within CoffeeGirl itself. As a side effect GameInfo money and/or points may change depending on how
@@ -232,9 +263,7 @@ public class GameLogicThread extends Thread {
 			}
 			else {
 				MessageRouter.sendPauseMessage(true);
-				//GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_POSTPLAY);
-				GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_PREPLAY);
-				//TODO - message to the MenuThread to bring up a popup?
+				MessageRouter.sendLevelEndMessage();
 			}
 		}
 	}

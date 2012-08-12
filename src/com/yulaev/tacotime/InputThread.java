@@ -63,17 +63,21 @@ public class InputThread extends Thread {
 				
 				else if (msg.what == MESSAGE_SET_PAUSED) setPaused(true);
 				else if (msg.what == MESSAGE_SET_UNPAUSED) setPaused(false);
-				else if (msg.what == MESSAGE_INGAME_DIALOG_LAUNCHED) setPaused(true);
+				else if (msg.what == MESSAGE_INGAME_DIALOG_LAUNCHED) {
+					MessageRouter.sendPauseTimerMessage(true);
+					setPaused(true);
+				}
 				else if (msg.what == MESSAGE_INGAME_DIALOG_FINISHED) {
 					setPaused(false);
+					MessageRouter.sendPauseTimerMessage(false);
 					int result = msg.arg1;
 					
 					//debugging only...
-					String dialogResultString = "null";
+					/*String dialogResultString = "null";
 					if(result == InputThread.INGAMEDIALOGRESULT_MAIN_MENU) dialogResultString = "main menu";
 					if(result == InputThread.INGAMEDIALOGRESULT_RETRY_LEVEL) dialogResultString = "retry level";
 					if(result == InputThread.INGAMEDIALOGRESULT_CONTINUE) dialogResultString = "continue";
-					Log.d(activitynametag, "Dialog result was: " + dialogResultString);
+					Log.d(activitynametag, "Dialog result was: " + dialogResultString);*/
 					
 					//on continue, do nothing
 					
@@ -82,7 +86,8 @@ public class InputThread extends Thread {
 						MessageRouter.sendLoadGameMessage();
 					}
 					
-					else if(result == INGAMEDIALOGRESULT_MAIN_MENU); //does nothing, since the TTMGA will handle destroying TTMGA
+					//on "return to main menu" does nothing, since the TTMGA will handle destroying TTMGA
+					else if(result == INGAMEDIALOGRESULT_MAIN_MENU); 
 				}
 			}
 		};		

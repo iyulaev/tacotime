@@ -1,4 +1,4 @@
-/**GameUpgrade represents an upgrade item that the user can buy or otherwise aquire while the
+/**GameUpgrade represents an upgrade item that the user can buy or otherwise acquire while the
  * game is being played. Upgrades have various effects; some can alter characteristics of the
  * user player (for example, making CoffeeGirl walk/run faster), while some may add game items;
  * for example, the CounterTop upgrade adds a new GameItem, a countertop that the user can use as
@@ -29,6 +29,7 @@ public class GameUpgrade {
 		return upgradeName;
 	}
 	
+	//Accessor methods for GameUpgrade fields
 	public String getUpgradeLongName() { return upgradeLongName; }
 	public String getUpgradeDescription() { return upgradeDescription; }
 	public int getUpgradeCost() { return upgradeCost; }

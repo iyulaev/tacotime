@@ -136,7 +136,7 @@ public class GameInfo {
 		Log.d(activitynametag, "GameInfo got saveCurrentGame() call, but not implemented yet.");
 	}
 	
-	/** Adds an upgrade that we've aquired to the list of bought upgrades (upgradesBought)
+	/** Adds an upgrade that we've acquired to the list of bought upgrades (upgradesBought)
 	 * 
 	 * @param upgrade The GameUpgrade to add to the list of upgrades that we've bought
 	 */

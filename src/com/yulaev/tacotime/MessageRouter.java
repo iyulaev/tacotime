@@ -74,6 +74,10 @@ public class MessageRouter {
 	 * represents the game is still re-drawn but all motion of GameActors ceases, GameItems are no 
 	 * longer updated, and GameLogicThread's state machine does not advance since the TimerThread
 	 * stops sending out tick messages.
+	 * 
+	 * Called by GLT to un-pause the game when the pre-play count-down timer expires. Called by GTL
+	 * to pause the game when the level ends.
+	 * 
 	 * @param paused Whether to pause the game or not.
 	 */
 	public synchronized static void sendPauseMessage(boolean paused) {
@@ -99,6 +103,13 @@ public class MessageRouter {
 		}
 	}
 	
+	/** Send a message to inputThread and viewThread that the UI should be paused; prevents any
+	 * ViewObjects from being updated and any input from affecting game state WHEN paused is true
+	 * 
+	 * TODO: unused
+	 * 
+	 * @param paused Whether to pause or un-pause view and input threads
+	 */
 	public synchronized static void sendPauseUIMessage(boolean paused) {
 		if(inputThread != null) {
 			Message message = Message.obtain();
@@ -115,6 +126,14 @@ public class MessageRouter {
 		}
 	}
 	
+	/** Pause the timer and prevent GameLogicThread from updating game state. Mostly used to un-pause the
+	 * game after a Level gets loaded or a (saved) game gets loaded, since the game will have been puased by
+	 * sendPauseMessage(); this allows the GLT state machine to advance but prevents the ViewThread from updating 
+	 * which is intended since the pre-play count-down timer has not expired and therefore the players is 
+	 * not allowed to start playing (yet)
+	 * 
+	 * @param paused Whether to pause the GLT or not 
+	 */
 	public synchronized static void sendPauseTimerMessage(boolean paused) {
 		if(timerThread != null) {
 			Message message = Message.obtain();

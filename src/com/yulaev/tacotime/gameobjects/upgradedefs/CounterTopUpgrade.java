@@ -1,3 +1,7 @@
+/** Describe the CounterTop upgrade. See CounterTop (GameItem) class for details on what GameItem
+ * this upgrade introduces into the game.
+ */
+
 package com.yulaev.tacotime.gameobjects.upgradedefs;
 
 import com.yulaev.tacotime.gameobjects.GameUpgrade;

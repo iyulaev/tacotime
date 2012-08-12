@@ -1,3 +1,11 @@
+/** CounterTop implements a GameItem that is a counter top. CoffeeGirl can placed prepared
+ * food items here without losing points. Then, CoffeeGirl can pick the prepared items up 
+ * and serve them. This allows food items to be made out-of-turn with respect to the customers
+ * without having to use the trash can and thereby lose points.
+ * 
+ * CounterTop is typically accessed/acquired through the CounterTopUpgrade.
+ */
+
 package com.yulaev.tacotime.gameobjects.objectdefs;
 
 import android.content.Context;
@@ -5,6 +13,7 @@ import android.content.Context;
 import com.yulaev.tacotime.R;
 import com.yulaev.tacotime.gamelogic.Interaction;
 import com.yulaev.tacotime.gameobjects.GameItem;
+
 
 public class CounterTop extends GameItem {
 	//Define all of the state indices
@@ -37,7 +46,9 @@ public class CounterTop extends GameItem {
 	}
 	
 	/** Called by onInteraction only. Used to (try) to transition states. We define the state machine for CounterTop explicitly 
-	 * here since the state transitions will be based on what GameFoodItem the CoffeeGirl is holding.
+	 * here since the state transitions will be based on what GameFoodItem the CoffeeGirl is holding. Thus the tryChangeState() for
+	 * GameItem is overridden.
+	 * 
 	 * @param has_interacted true if tryChangeState() was called as a response to a user interaction else false
 	 * @param input A String representing the name of the current GameFoodItem that CoffeeGirl is holding (if any)
 	 * @return The previous state if state changed, otherwise (-1)
@@ -51,6 +62,8 @@ public class CounterTop extends GameItem {
 		
 		if(!has_interacted) return(new Interaction(-1));
 		
+		//If CoffeeGirl provides is with "nothing" but we are holding something, we now hold nothing
+		//GLT is responsible for changing CoffeeGirl state to now be holding something
 		if(input.equals("nothing")) {
 			if( !(current_state_idx == STATE_IDLE) ) {
 				int old_state = current_state_idx;
@@ -58,6 +71,8 @@ public class CounterTop extends GameItem {
 				return(new Interaction(old_state));
 			}
 		}
+		//If we hold nothing but coffeegirl holds something, we now will hold that something
+		//GLT is expected to update CoffeeGirl state appropriately
 		else {
 			if(input.equals("coffee")) {
 				if( current_state_idx == STATE_IDLE ) {
@@ -82,9 +97,11 @@ public class CounterTop extends GameItem {
 			}
 		}
 		
+		//Default case - invalid/no interaction
 		return(new Interaction(-1));
 	}
 	
+	/** Override onUpdate, onInteraction() so that our custom tryChangeState() state machine is employed */
 	@Override
 	public void onUpdate() { tryChangeState(false, "null"); }
 	

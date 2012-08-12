@@ -1,3 +1,5 @@
+/** Describe the (2nd) CoffeeMachine upgrade */
+
 package com.yulaev.tacotime.gameobjects.upgradedefs;
 
 import com.yulaev.tacotime.gameobjects.GameUpgrade;

@@ -104,9 +104,11 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 	public void surfaceCreated(SurfaceHolder holder) {
 		Log.d(activitynametag, "MainGamePanel surfaceCreated() called!");
 		
+		//Un-suspend the drawing and timer threads
 		timerThread.setSuspended(false);
 		viewThread.setSuspended(false);
 		
+		//If we've not launched all of the Threads then do so
 		if(!threads_launched) {
 			// at this point the surface is created and
 			// we can safely start the game loop
@@ -203,6 +205,7 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 			it.next().draw(canvas);
 		}
 		
+		//Set up all of the Paint objects if we haven't done this yet! (should only happen once per game)
 		if(moneyPaint == null || pointsPaint == null || announcementPaint == null) {
 			moneyPaint = new Paint();
 			moneyPaint.setColor(Color.GREEN);
@@ -215,6 +218,7 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 			announcementPaint.setTextSize(24);
 		}
 		
+		//Draw money, points and display an announcement message IF there is an announcement
 		canvas.drawText(Integer.toString(money), 14, canvas.getHeight()-40, moneyPaint);
 		canvas.drawText(Integer.toString(points), 14, canvas.getHeight()-15, pointsPaint);
 		

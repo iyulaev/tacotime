@@ -1,4 +1,7 @@
-/** This activity implements a list of upgrades that the user may choose to buy */
+/** This activity implements a list of upgrades that the user may choose to buy. It is invoked (via an Intent) 
+ * by the BetweenLevelMenuActivity, since it is between levels that a user may buy upgrades. As a side-effect 
+ * this activity makes changes to GameInfo.upgradesBought() and GameInfo.money, if the user chooses to buy 
+ * various upgrades. */
 
 package com.yulaev.tacotime;
 
@@ -21,9 +24,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class UpgradeMenuActivity extends ListActivity {
-	ArrayList<GameUpgrade> upgradesList;
-	UpgradeMenuActivity me;
-	IconicAdapter theListAdapter;
+	//Used to self-reference this in Toasts, when calling from another namespace (like a Handler)
+	UpgradeMenuActivity me; 
+	
+	ArrayList<GameUpgrade> upgradesList; //holds a list of ALL GameUpgrades in this game
+	IconicAdapter theListAdapter; //Used to populate this ListLayout with the contents of upgradesList
 	
 	@Override
 	public void onCreate(Bundle bundle) {
@@ -43,6 +48,9 @@ public class UpgradeMenuActivity extends ListActivity {
 		super.onCreate(bundle);
 	}
 	
+	/** Called when the user clicks on a particular list item. Attempts to buy the upgrade 
+	 * that the user has clicked on.
+	 */
 	public void onListItemClick(ListView parent, View v, int position, long id) {
 		
 		if(tryBuyUpgrade(upgradesList.get(position))) {
@@ -66,6 +74,11 @@ public class UpgradeMenuActivity extends ListActivity {
 		
 	}
 	
+	/** Attempt to buy GameUpgrade upgrade. Return true if the upgrade is bought, otherwise return false. Side effects 
+	 * (game state being updated in GameInfo) only occur if the upgrade is bought successfully.
+	 * @param upgrade The GameUpgrade to purchase and add to GameInfo.upgradesBought.
+	 * @return true if the upgrade is bought successfully, otherwise false (i.e. not enough money or already bought)
+	 */
 	private boolean tryBuyUpgrade(GameUpgrade upgrade) {
 		if(GameInfo.money >= upgrade.getUpgradeCost() &&
 				!GameInfo.hasUpgrade(upgrade)) {
@@ -90,11 +103,21 @@ public class UpgradeMenuActivity extends ListActivity {
 		return(false);
 	}
 	
+	/** Buy GameUpgrad upgrade. Changes GameInfo.money and adds the upgarde to the upgradesBought list in
+	 * GameInfo
+	 * @param upgrade The GameUpgrade to buy.
+	 */
 	private void buyUpgrade(GameUpgrade upgrade) {
 		GameInfo.setAndReturnMoney(-1 * upgrade.getUpgradeCost());
 		GameInfo.addUpgrade(upgrade);
 	}
 	
+	/** IconicAdapter is used to populate our ListView with the available GameUpgrades. We also present the upgrade 
+	 * cost and the description of the upgrade, and we color different text fields as appropriate to signify items 
+	 * we can no longer buy or cannot afford. 
+	 * 
+	 * See in-line comments below for more details
+	 */
 	class IconicAdapter extends ArrayAdapter<GameUpgrade> {
 		UpgradeMenuActivity context;
 
@@ -103,21 +126,23 @@ public class UpgradeMenuActivity extends ListActivity {
 			this.context=context;
 		}
 
+		/** getView() is used to process each ListItem and fill in/color text as necessary */
 		public View getView(int position, View convertView, ViewGroup parent) {
 			LayoutInflater inflater=LayoutInflater.from(context);
 			View row=inflater.inflate(R.layout.upgradelistitem, null);
 			
+			//Fill in name for this ListItem
 			TextView name=(TextView)row.findViewById(R.id.upgrade_name);
 			name.setText(upgradesList.get(position).getUpgradeLongName());
 			//Color upgrades Grey for the ones we have
 			if(GameInfo.hasUpgrade(upgradesList.get(position)))
 				name.setTextColor(0xFF666666);
 			
-			
+			//Fill in description for this ListItem
 			TextView description=(TextView)row.findViewById(R.id.upgrade_description);
 			description.setText(upgradesList.get(position).getUpgradeDescription());
 			
-			
+			//Fill in ListItem's cost
 			TextView cost=(TextView)row.findViewById(R.id.upgrade_cost);
 			cost.setText(Integer.toString(upgradesList.get(position).getUpgradeCost()));
 			//Color costs RED for upgrades that we can't afford

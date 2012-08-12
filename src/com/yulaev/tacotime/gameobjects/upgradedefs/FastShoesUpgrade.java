@@ -1,3 +1,5 @@
+/** Describe the "fast shoes" upgrade */
+
 package com.yulaev.tacotime.gameobjects.upgradedefs;
 
 import com.yulaev.tacotime.gameobjects.GameUpgrade;

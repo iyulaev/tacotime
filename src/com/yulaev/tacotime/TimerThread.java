@@ -72,7 +72,9 @@ public class TimerThread extends Thread {
 		}
 	}
 
-	/** The run() methods launched a tick message every TIMER_GRANULARITY milliseconds.
+	/** The run() methods launched a tick message every TIMER_GRANULARITY milliseconds. It uses Thread.sleep() between
+	 * ticks to suspend execution and it uses checkSuspend() with wait()/notifyAll() to suspend this thread between 
+	 * game levels.
 	 */
 	@Override
 	public void run() {

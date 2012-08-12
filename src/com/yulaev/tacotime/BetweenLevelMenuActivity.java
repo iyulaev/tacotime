@@ -53,7 +53,9 @@ public class BetweenLevelMenuActivity extends Activity {
 		Button viewBuyUpgrades = (Button) findViewById(R.id.view_buy_upgrades);
 		viewBuyUpgrades.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				showUnimplementedError("View / Buy Upgrades");
+				//showUnimplementedError("View / Buy Upgrades");
+				Intent i = new Intent(v.getContext(), UpgradeMenuActivity.class);
+				startActivityForResult(i,0);
 			}
 		});
 	}

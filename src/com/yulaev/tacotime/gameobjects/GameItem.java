@@ -241,11 +241,11 @@ public class GameItem implements ViewObject {
 	public Interaction onInteraction() { return tryChangeState(true, "nothing"); }
 	
 	//Valid states of this GameItem
-	private ArrayList<State> validStates;
+	protected ArrayList<State> validStates;
 	//The index of the current state of this GameItem
-	private int current_state_idx;
+	protected int current_state_idx;
 	//The current State that this game item is in
-	private State currentState;
+	protected State currentState;
 	//The time that the current state was entered; mostly used to determine when the State can be transitioned of
 	//of if the State is delay sensitive
 	private long time_of_state_transition;
@@ -318,7 +318,7 @@ public class GameItem implements ViewObject {
 	 * 
 	 * @param new_state The index of the new state to set this GameItem's State to.
 	 */
-	private synchronized void setState(int new_state) {
+	protected synchronized void setState(int new_state) {
 		setLocked(); 
 		
 		currentState = validStates.get(new_state);

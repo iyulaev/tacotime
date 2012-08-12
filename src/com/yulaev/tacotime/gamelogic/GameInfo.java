@@ -1,5 +1,9 @@
 package com.yulaev.tacotime.gamelogic;
 
+import java.util.ArrayList;
+
+import com.yulaev.tacotime.gameobjects.GameUpgrade;
+
 import android.util.Log;
 
 /**The GameInfo class keeps track of high-level global game data, such as how many points and how
@@ -23,7 +27,9 @@ public class GameInfo {
 	//and whether the level is in play or not
 	private static int level;
 	private static int levelTime;
-
+	
+	//This string array represents the various upgrades that the user has bought 
+	private static ArrayList<String> upgradesBought;
 	
 	//State information regarding what "view state" we are currently in
 	public static final int MODE_MAINGAMEPANEL_PREPLAY = 0;
@@ -114,6 +120,8 @@ public class GameInfo {
 		setLevelTime(0);
 		setLevel(0);
 		
+		upgradesBought = new ArrayList<String>();
+		
 		money = 0;
 		points = 0;
 	}
@@ -126,6 +134,39 @@ public class GameInfo {
 	/** Saves game state for this character. Not implemented yet. */
 	public static synchronized void saveCurrentGame() {
 		Log.d(activitynametag, "GameInfo got saveCurrentGame() call, but not implemented yet.");
+	}
+	
+	/** Adds an upgrade that we've aquired to the list of bought upgrades (upgradesBought)
+	 * 
+	 * @param upgrade The GameUpgrade to add to the list of upgrades that we've bought
+	 */
+	public static synchronized void addUpgrade(GameUpgrade upgrade) {
+		if(upgradesBought == null) upgradesBought = new ArrayList<String>();
+		upgradesBought.add(upgrade.getName());
+		
+		Log.d(activitynametag, "Bought upgrade " + upgrade.getName());
+	}
+	
+	/** Check if we've already bought the GameUpgrade upgrade
+	 * 
+	 * @param upgrade The upgrade to check if we've bought
+	 * @return true if in this game upgrade has been bought/aquired, else false
+	 */
+	public static synchronized boolean hasUpgrade(GameUpgrade upgrade) {
+		return(hasUpgrade(upgrade.getName()));
+	}
+	
+	/** Return true if upgradeName exists in upgradesBought
+	 * 
+	 * @param upgradeName The upgrade we check the existence of in upgradesBought
+	 * @return true if in this game we've aquired an upgrade with name upgradeName, else false
+	 */
+	public static synchronized boolean hasUpgrade(String upgradeName) {
+		for(int count = 0 ; count < upgradesBought.size(); count++) {
+			if(upgradesBought.get(count).equals(upgradeName)) return(true);
+		}
+		
+		return(false);
 	}
 	
 }

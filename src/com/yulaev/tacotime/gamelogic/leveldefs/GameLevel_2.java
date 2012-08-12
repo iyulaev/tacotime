@@ -7,6 +7,7 @@ import com.yulaev.tacotime.InputThread;
 import com.yulaev.tacotime.R;
 import com.yulaev.tacotime.ViewThread;
 import com.yulaev.tacotime.gamelogic.GameGrid;
+import com.yulaev.tacotime.gamelogic.GameInfo;
 import com.yulaev.tacotime.gamelogic.GameLevel;
 import com.yulaev.tacotime.gameobjects.CoffeeGirl;
 import com.yulaev.tacotime.gameobjects.CustomerQueue;
@@ -17,6 +18,7 @@ import com.yulaev.tacotime.gameobjects.fooditemdefs.FoodItemCupcake;
 import com.yulaev.tacotime.gameobjects.fooditemdefs.FoodItemNothing;
 import com.yulaev.tacotime.gameobjects.objectdefs.Blender;
 import com.yulaev.tacotime.gameobjects.objectdefs.CoffeeMachine;
+import com.yulaev.tacotime.gameobjects.objectdefs.CounterTop;
 import com.yulaev.tacotime.gameobjects.objectdefs.CupCakeTray;
 import com.yulaev.tacotime.gameobjects.objectdefs.TrashCan;
 
@@ -56,12 +58,19 @@ public class GameLevel_2 extends GameLevel {
 		inputThread.addViewObject(coffeeMachine);
 		gameLogicThread.addGameItem(coffeeMachine);	
 		
-		coffeeMachine = new CoffeeMachine(caller, R.drawable.coffeemachine, 16, 60, GameItem.ORIENTATION_WEST);
-		//GameItem coffeeMachine = new GameItem(caller, "CoffeeMachine", R.drawable.coffeemachine, 100, 50, GameItem.ORIENTATION_NORTH);
-		//viewThread.addViewObject(coffeeMachine);
-		viewThread.addGameItem(coffeeMachine);
-		inputThread.addViewObject(coffeeMachine);
-		gameLogicThread.addGameItem(coffeeMachine);	
+		if(GameInfo.hasUpgrade("secondcoffeemachine")) {
+			coffeeMachine = new CoffeeMachine(caller, R.drawable.coffeemachine, 16, 60, GameItem.ORIENTATION_WEST);
+			viewThread.addGameItem(coffeeMachine);
+			inputThread.addViewObject(coffeeMachine);
+			gameLogicThread.addGameItem(coffeeMachine);
+		}
+		
+		if(GameInfo.hasUpgrade("countertop")) {
+			CounterTop counterTop = new CounterTop(caller, R.drawable.countertop_grey, 50, 20, GameItem.ORIENTATION_NORTH);
+			viewThread.addGameItem(counterTop);
+			inputThread.addViewObject(counterTop);
+			gameLogicThread.addGameItem(counterTop);
+		}
 		
 		TrashCan trashCan = new TrashCan(caller, R.drawable.trashcan, 110, 40, GameItem.ORIENTATION_EAST);
 		//viewThread.addViewObject(trashCan);

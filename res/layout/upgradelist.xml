@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?><RelativeLayout 
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/rootlayout"
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+	android:background="#FFFF"
+	android:layout_height="fill_parent">
+    
+		<LinearLayout android:id="@+id/title_holder"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:orientation="vertical"
+		android:layout_alignParentTop="true"
+		android:layout_centerHorizontal="true" android:background="@drawable/bkgthin">
+			<TextView android:id="@+id/title"
+				android:textColor="#000000"
+				android:gravity="left"
+				android:textSize="24sp"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:text="Upgrades"
+				android:layout_gravity="center_vertical"
+				android:background="#0000"/>
+
+			<TextView
+				android:id="@+id/subtitle"
+				android:layout_below="@id/title"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:textColor="#F666"
+				android:textSize="16sp"
+				android:layout_gravity="center_vertical"
+				android:cacheColorHint="#FFFF"
+				android:text="Select the upgrade you'd like to buy"
+				android:paddingLeft="10pt"
+			/>
+		</LinearLayout>
+
+
+	    <ListView
+	    android:id="@android:id/list"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:drawSelectorOnTop="false"
+	    android:divider="@drawable/div2"
+	    android:dividerHeight="1px"
+	    android:layout_below="@id/title_holder"
+	    android:cacheColorHint="#FFFF"
+			  />
+
+ </RelativeLayout>
+

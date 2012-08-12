@@ -205,10 +205,10 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		
 		if(moneyPaint == null || pointsPaint == null || announcementPaint == null) {
 			moneyPaint = new Paint();
-			moneyPaint.setColor(Color.BLUE);
+			moneyPaint.setColor(Color.GREEN);
 			moneyPaint.setTextSize(14);
 			pointsPaint = new Paint();
-			pointsPaint.setColor(Color.GREEN);
+			pointsPaint.setColor(Color.BLUE);
 			pointsPaint.setTextSize(14);
 			announcementPaint = new Paint();
 			announcementPaint.setColor(Color.RED);

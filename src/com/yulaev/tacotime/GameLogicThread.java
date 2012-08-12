@@ -25,6 +25,7 @@ import com.yulaev.tacotime.gameobjects.ViewObject;
 import com.yulaev.tacotime.gameobjects.GameItem;
 import com.yulaev.tacotime.gameobjects.objectdefs.Blender;
 import com.yulaev.tacotime.gameobjects.objectdefs.CoffeeMachine;
+import com.yulaev.tacotime.gameobjects.objectdefs.CounterTop;
 
 
 /**
@@ -201,8 +202,21 @@ public class GameLogicThread extends Thread {
 			coffeeGirl.setItemHolding("nothing");
 		}
 		
+		//CounterTop interactions
+		//If we hold nothing but the counter top has "something", we now hold that "something"
+		//If we hold "something" and the counter top has nothing, counter top now holds that "something"
+		if(interactedWith.contains("CounterTop")) {
+			if(old_state == CoffeeGirl.STATE_NORMAL && interactee_state == CounterTop.STATE_HOLDING_COFFEE)
+				coffeeGirl.setItemHolding("coffee");
+			if(old_state == CoffeeGirl.STATE_NORMAL && interactee_state == CounterTop.STATE_HOLDING_CUPCAKE)
+				coffeeGirl.setItemHolding("cupcake");
+			if(old_state == CoffeeGirl.STATE_NORMAL && interactee_state == CounterTop.STATE_HOLDING_BLENDEDDRINK)
+				coffeeGirl.setItemHolding("blended_drink");
+			if(old_state != CoffeeGirl.STATE_NORMAL && interactee_state == CounterTop.STATE_IDLE)
+				coffeeGirl.setItemHolding("nothing");
+		}
+		
 		//Default case - don't change state!
-		//return(old_state);
 	}
 
 	/** Updates this GameLogicThread's state machine. Should be called every time a clock tick (nominally one

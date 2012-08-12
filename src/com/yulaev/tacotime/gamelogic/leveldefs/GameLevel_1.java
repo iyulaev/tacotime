@@ -7,6 +7,7 @@ import com.yulaev.tacotime.InputThread;
 import com.yulaev.tacotime.R;
 import com.yulaev.tacotime.ViewThread;
 import com.yulaev.tacotime.gamelogic.GameGrid;
+import com.yulaev.tacotime.gamelogic.GameInfo;
 import com.yulaev.tacotime.gamelogic.GameLevel;
 import com.yulaev.tacotime.gameobjects.CoffeeGirl;
 import com.yulaev.tacotime.gameobjects.CustomerQueue;
@@ -34,7 +35,7 @@ public class GameLevel_1 extends GameLevel {
 		super.loadLevel(viewThread, gameLogicThread, inputThread, caller);
 		
 		this.level_number = 1;
-		this.customerQueue_length = 1;
+		this.customerQueue_length = 5;
 		this.point_mult = 1.0f;
 		this.money_mult = 1.0f;
 		this.customer_impatience = 0.8f;
@@ -56,12 +57,14 @@ public class GameLevel_1 extends GameLevel {
 		inputThread.addViewObject(coffeeMachine);
 		gameLogicThread.addGameItem(coffeeMachine);	
 		
-		coffeeMachine = new CoffeeMachine(caller, R.drawable.coffeemachine, 16, 60, GameItem.ORIENTATION_WEST);
-		//GameItem coffeeMachine = new GameItem(caller, "CoffeeMachine", R.drawable.coffeemachine, 100, 50, GameItem.ORIENTATION_NORTH);
-		//viewThread.addViewObject(coffeeMachine);
-		viewThread.addGameItem(coffeeMachine);
-		inputThread.addViewObject(coffeeMachine);
-		gameLogicThread.addGameItem(coffeeMachine);	
+		if(GameInfo.hasUpgrade("secondcoffeemachine")) {
+			coffeeMachine = new CoffeeMachine(caller, R.drawable.coffeemachine, 16, 60, GameItem.ORIENTATION_WEST);
+			//GameItem coffeeMachine = new GameItem(caller, "CoffeeMachine", R.drawable.coffeemachine, 100, 50, GameItem.ORIENTATION_NORTH);
+			//viewThread.addViewObject(coffeeMachine);
+			viewThread.addGameItem(coffeeMachine);
+			inputThread.addViewObject(coffeeMachine);
+			gameLogicThread.addGameItem(coffeeMachine);
+		}
 		
 		TrashCan trashCan = new TrashCan(caller, R.drawable.trashcan, 110, 40, GameItem.ORIENTATION_EAST);
 		//viewThread.addViewObject(trashCan);

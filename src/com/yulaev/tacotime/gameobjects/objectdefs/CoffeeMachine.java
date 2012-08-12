@@ -1,6 +1,7 @@
 package com.yulaev.tacotime.gameobjects.objectdefs;
 
 import com.yulaev.tacotime.R;
+import com.yulaev.tacotime.gamelogic.Interaction;
 import com.yulaev.tacotime.gameobjects.GameItem;
 
 import android.content.Context;

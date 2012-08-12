@@ -4,10 +4,13 @@ import java.util.HashMap;
 
 import com.yulaev.tacotime.R;
 import com.yulaev.tacotime.gamelogic.GameGrid;
+import com.yulaev.tacotime.gamelogic.GameInfo;
 import com.yulaev.tacotime.gamelogic.State;
+import com.yulaev.tacotime.gameobjects.upgradedefs.FastShoesUpgrade;
 
 import android.content.Context;
 import android.graphics.Rect;
+import android.util.Log;
 
 /** CoffeeGirl is the main actor in TacoTime. She is the character controlled by the player. CoffeeGirl has 
  * state managed by GameLogicThread and may interact with all of the GameItems.
@@ -18,7 +21,7 @@ public class CoffeeGirl extends GameActor {
 	private static final String activitynametag = "CoffeeGirl";
 	
 	/*The default moverate, in terms of the GameGrid vector length that may be traversed during each 100ms */  
-	private static int DEFAULT_COFFEEGIRL_MOVERATE = 10;
+	private static int DEFAULT_COFFEEGIRL_MOVERATE = 5;
 	
 	//Defines for states that CoffeeGirl can be in
 	public static final int STATE_NORMAL = 0;
@@ -28,6 +31,14 @@ public class CoffeeGirl extends GameActor {
 	
 	public CoffeeGirl(Context caller) {
 		super(caller, DEFAULT_COFFEEGIRL_MOVERATE);
+		
+		//Check if we have the "fast shoes" upgrade and change moverate if necessary
+		if(GameInfo.hasUpgrade(FastShoesUpgrade.UPGRADE_NAME)) {
+			Log.d(activitynametag, "CoffeeGirl detected that " + FastShoesUpgrade.UPGRADE_NAME + " has been bought.");
+			this.move_rate = (int) (((double) this.move_rate) * 1.2);
+		} else {
+			Log.d(activitynametag, "CoffeeGirl did not detect that " + FastShoesUpgrade.UPGRADE_NAME + " has been bought.");
+		}
 		
 		//Add a state for each thing that CoffeeGirl may carry
 		//Annoyingly a line must be added to MainGamePanel for each GameFoodItem that we add into

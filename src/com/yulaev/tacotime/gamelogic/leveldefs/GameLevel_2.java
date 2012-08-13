@@ -36,11 +36,11 @@ public class GameLevel_2 extends GameLevel {
 		super.loadLevel(viewThread, gameLogicThread, inputThread, caller);
 		
 		this.level_number = 2;
-		this.customerQueue_length = 8;
+		this.customerQueue_length = 10;
 		this.point_mult = 1.3f;
 		this.money_mult = 1.3f;
-		this.customer_impatience = 0.8f;
-		this.time_limit_sec = 60;
+		this.customer_impatience = 1.0f;
+		this.time_limit_sec = 90;
 		this.customer_max_order_size = 2;
 		
 		//Setup coffeegirl (actor)

@@ -64,6 +64,11 @@ public class BetweenLevelMenuActivity extends Activity {
 		});
 	}
 	
+	public void onBackPressed() {
+		MessageRouter.sendNextLevelMessage();
+		finish();
+	}
+	
 	/** This method creates an AlertDialog, telling the user that something hasn't been implemented yet
 	 * 
 	 * @param whatsNotImplemented String describing the thing that hasn't been implemented.

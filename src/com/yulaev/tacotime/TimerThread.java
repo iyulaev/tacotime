@@ -1,6 +1,8 @@
 package com.yulaev.tacotime;
 
 
+import com.yulaev.tacotime.gamelogic.GameInfo;
+
 import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.Message;
@@ -20,7 +22,7 @@ public class TimerThread extends Thread {
 	private static final String activitynametag = "TimerThread";
 	
 	//Set how often Tick messages get sent
-	private static final int TIMER_GRANULARIY = 1000;
+	public static final int TIMER_GRANULARIY = 1000;
 	
 	//Message passing (receiving)
 	Handler handler;
@@ -91,7 +93,12 @@ public class TimerThread extends Thread {
 			//no timers yet!
 			if(System.currentTimeMillis() > lastTimerTick + TIMER_GRANULARIY)
 			{
-				if(!paused)	MessageRouter.sendTickMessage();
+				if(!paused)	{
+					
+					MessageRouter.sendTickMessage();
+					
+				}
+				
 				lastTimerTick = System.currentTimeMillis();
 			}
 			

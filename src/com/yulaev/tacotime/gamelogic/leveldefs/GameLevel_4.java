@@ -19,13 +19,14 @@ import com.yulaev.tacotime.gameobjects.fooditemdefs.FoodItemNothing;
 import com.yulaev.tacotime.gameobjects.fooditemdefs.FoodItemPieSlice;
 import com.yulaev.tacotime.gameobjects.objectdefs.Blender;
 import com.yulaev.tacotime.gameobjects.objectdefs.CoffeeMachine;
+import com.yulaev.tacotime.gameobjects.objectdefs.CounterTop;
 import com.yulaev.tacotime.gameobjects.objectdefs.CupCakeTray;
 import com.yulaev.tacotime.gameobjects.objectdefs.PieTray;
 import com.yulaev.tacotime.gameobjects.objectdefs.TrashCan;
 
-/** Describes level #1 for the Coffee Time game! */
+/** Describes level #3 for the Coffee Time game! */
 
-public class GameLevel_1 extends GameLevel {
+public class GameLevel_4 extends GameLevel {
 	/** Set up this level; add all GameItems and such to the Threads, set up the Customers and such
 	 * with the per-level parameters.
 	 * @param vT ViewThread associated with this game session
@@ -36,13 +37,13 @@ public class GameLevel_1 extends GameLevel {
 	public void loadLevel(ViewThread viewThread, GameLogicThread gameLogicThread, InputThread inputThread, Context caller) {
 		super.loadLevel(viewThread, gameLogicThread, inputThread, caller);
 		
-		this.level_number = 1;
-		this.customerQueue_length = 5;
-		this.point_mult = 1.0f;
-		this.money_mult = 1.0f;
-		this.customer_impatience = 1.2f;
-		this.time_limit_sec = 45;
-		this.customer_max_order_size = 1;
+		this.level_number = 4;
+		this.customerQueue_length = 20;
+		this.point_mult = 1.5f;
+		this.money_mult = 1.5f;
+		this.customer_impatience = 0.8f;
+		this.time_limit_sec = 3 * 60;
+		this.customer_max_order_size = 3;
 		
 		//Setup coffeegirl (actor)
 		CoffeeGirl coffeegirl = new CoffeeGirl(caller);
@@ -59,6 +60,20 @@ public class GameLevel_1 extends GameLevel {
 		inputThread.addViewObject(coffeeMachine);
 		gameLogicThread.addGameItem(coffeeMachine);	
 		
+		if(GameInfo.hasUpgrade("secondcoffeemachine")) {
+			coffeeMachine = new CoffeeMachine(caller, R.drawable.coffeemachine, 16, 60, GameItem.ORIENTATION_WEST);
+			viewThread.addGameItem(coffeeMachine);
+			inputThread.addViewObject(coffeeMachine);
+			gameLogicThread.addGameItem(coffeeMachine);
+		}
+		
+		if(GameInfo.hasUpgrade("countertop")) {
+			CounterTop counterTop = new CounterTop(caller, R.drawable.countertop_grey, 50, 20, GameItem.ORIENTATION_NORTH);
+			viewThread.addGameItem(counterTop);
+			inputThread.addViewObject(counterTop);
+			gameLogicThread.addGameItem(counterTop);
+		}
+		
 		TrashCan trashCan = new TrashCan(caller, R.drawable.trashcan, 110, 80, GameItem.ORIENTATION_EAST);
 		//viewThread.addViewObject(trashCan);
 		viewThread.addGameItem(trashCan);
@@ -71,24 +86,24 @@ public class GameLevel_1 extends GameLevel {
 		inputThread.addViewObject(cupcakeTray);
 		gameLogicThread.addGameItem(cupcakeTray);
 		
-		/*PieTray pieTray = new PieTray(caller, R.drawable.cake_tray, 113, 40, GameItem.ORIENTATION_EAST);
+		PieTray pieTray = new PieTray(caller, R.drawable.cake_tray, 113, 40, GameItem.ORIENTATION_EAST);
 		//viewThread.addViewObject(cupcakeTray);
 		viewThread.addGameItem(pieTray);
 		inputThread.addViewObject(pieTray);
-		gameLogicThread.addGameItem(pieTray);*/
+		gameLogicThread.addGameItem(pieTray);
 		
-		/*Blender blender = new Blender(caller, R.drawable.blender_idle, 16, 60, GameItem.ORIENTATION_WEST);
+		Blender blender = new Blender(caller, R.drawable.blender_idle, 16, 80, GameItem.ORIENTATION_WEST);
 		//viewThread.addViewObject(blender);
 		viewThread.addGameItem(blender);
 		inputThread.addViewObject(blender);
-		gameLogicThread.addGameItem(blender);*/
+		gameLogicThread.addGameItem(blender);
 		
 		//Set up all Food Items (UPDATE FOR NEW FOODITEM)
 		gameLogicThread.addNewFoodItem(new FoodItemNothing(caller), CoffeeGirl.STATE_NORMAL);
 		gameLogicThread.addNewFoodItem(new FoodItemCoffee(caller), CoffeeGirl.STATE_CARRYING_COFFEE);
 		gameLogicThread.addNewFoodItem(new FoodItemCupcake(caller), CoffeeGirl.STATE_CARRYING_CUPCAKE);
-		//gameLogicThread.addNewFoodItem(new FoodItemBlendedDrink(caller), CoffeeGirl.STATE_CARRYING_BLENDEDDRINK);
-		//gameLogicThread.addNewFoodItem(new FoodItemPieSlice(caller), CoffeeGirl.STATE_CARRYING_PIESLICE);
+		gameLogicThread.addNewFoodItem(new FoodItemBlendedDrink(caller), CoffeeGirl.STATE_CARRYING_BLENDEDDRINK);
+		gameLogicThread.addNewFoodItem(new FoodItemPieSlice(caller), CoffeeGirl.STATE_CARRYING_PIESLICE);
 		
 		//Magic numbers: 40 - x-position of Customers, (GameGrid.GAMEGRID_HEIGHT-45) - y-position of customers
 		//1 - starting customer queue length, 

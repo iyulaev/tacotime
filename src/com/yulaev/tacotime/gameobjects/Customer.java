@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import com.yulaev.tacotime.R;
+import com.yulaev.tacotime.gamelogic.GameInfo;
 import com.yulaev.tacotime.gamelogic.Interaction;
 import com.yulaev.tacotime.gamelogic.GameGrid;
 
@@ -65,7 +66,7 @@ public class Customer extends GameActor {
 			float point_mult, float money_mult, float impatience, int max_order_size,
 			List<GameFoodItem> foodItemChoices) {
 			
-		super(caller, move_rate);
+		super(caller, move_rate, location_start_x, location_start_y);
 		
 		queue_position = starting_queue_position;
 		visible = false;
@@ -109,12 +110,12 @@ public class Customer extends GameActor {
 	
 	//Define the starting location of customers, the position if they're first or second,  
 	//and the exit location of customers
-	private int location_start_x = 40;
-	private int location_start_y = GameGrid.GAMEGRID_HEIGHT - 5;
-	private int locations_queue_x[] = {40,40};
-	private int locations_queue_y[] = {GameGrid.GAMEGRID_HEIGHT - 30, GameGrid.GAMEGRID_HEIGHT - 12};
-	private int locations_exit_x = GameGrid.GAMEGRID_WIDTH - 5;
-	private int locations_exit_y = GameGrid.GAMEGRID_HEIGHT - 35;
+	private static int location_start_x = 40;
+	private static int location_start_y = GameGrid.GAMEGRID_HEIGHT - 5;
+	private static int locations_queue_x[] = {40,40};
+	private static int locations_queue_y[] = {GameGrid.GAMEGRID_HEIGHT - 30, GameGrid.GAMEGRID_HEIGHT - 12};
+	private static int locations_exit_x = GameGrid.GAMEGRID_WIDTH - 5;
+	private static int locations_exit_y = GameGrid.GAMEGRID_HEIGHT - 35;
 	
 	/** Sets the state of this customer
 	 * @param new_state The State to put this customer into
@@ -147,7 +148,7 @@ public class Customer extends GameActor {
 		//then advance to the in-line state
 		if(this.isVisible() && getState() == STATE_HIDDEN) {
 			setState(STATE_INLINE_HAPPY);
-			mood_last_updated = System.currentTimeMillis() / 1000;
+			mood_last_updated = GameInfo.currentTimeMillis() / 1000;
 			//Log.d(activitynametag, "Customer advanced to STATE_INLINE");
 		}
 		
@@ -163,8 +164,8 @@ public class Customer extends GameActor {
 			if(orderSatisfied()) setState(STATE_SERVED);
 			
 			//Update mood?
-			if(mood_last_updated + seconds_between_pissed_off < (System.currentTimeMillis()/1000)) {
-				mood_last_updated = System.currentTimeMillis()/1000;
+			if(mood_last_updated + seconds_between_pissed_off < (GameInfo.currentTimeMillis()/1000)) {
+				mood_last_updated = GameInfo.currentTimeMillis()/1000;
 				
 				if(this.getState() == STATE_INLINE_HAPPY) setState(STATE_INLINE_OK);
 				else if(this.getState() == STATE_INLINE_OK) setState(STATE_INLINE_ANGRY);

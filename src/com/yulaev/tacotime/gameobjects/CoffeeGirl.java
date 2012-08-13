@@ -28,6 +28,7 @@ public class CoffeeGirl extends GameActor {
 	public static final int STATE_CARRYING_COFFEE = 1;
 	public static final int STATE_CARRYING_CUPCAKE = 2;
 	public static final int STATE_CARRYING_BLENDEDDRINK = 3;
+	public static final int STATE_CARRYING_PIESLICE = 4;
 	
 	public CoffeeGirl(Context caller) {
 		super(caller, DEFAULT_COFFEEGIRL_MOVERATE);
@@ -47,6 +48,7 @@ public class CoffeeGirl extends GameActor {
 		this.addState("carrying_coffee", R.drawable.coffeegirl_w_coffee);
 		this.addState("carrying_cupcake", R.drawable.coffeegirl_w_cupcake);
 		this.addState("carrying_blended_drink", R.drawable.coffeegirl_w_blended_drink);
+		this.addState("carrying_pie_slice", R.drawable.coffeegirl_w_cake_slice);
 	}
 	
 	/** This method is called by the InputThread when a user input (a tap) occurs somewhere on the screen. We convert

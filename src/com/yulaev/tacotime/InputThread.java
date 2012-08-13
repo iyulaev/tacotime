@@ -64,12 +64,12 @@ public class InputThread extends Thread {
 				else if (msg.what == MESSAGE_SET_PAUSED) setPaused(true);
 				else if (msg.what == MESSAGE_SET_UNPAUSED) setPaused(false);
 				else if (msg.what == MESSAGE_INGAME_DIALOG_LAUNCHED) {
-					MessageRouter.sendPauseTimerMessage(true);
+					MessageRouter.sendPauseMessage(true);
 					setPaused(true);
 				}
 				else if (msg.what == MESSAGE_INGAME_DIALOG_FINISHED) {
 					setPaused(false);
-					MessageRouter.sendPauseTimerMessage(false);
+					MessageRouter.sendPauseMessage(false);
 					int result = msg.arg1;
 					
 					//debugging only...

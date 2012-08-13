@@ -50,8 +50,8 @@
 			android:layout_height="wrap_content"
 			android:textSize="18sp"
 			android:layout_gravity="center_vertical"
-			android:textColor="#FEB0"
-			android:text=""
+			android:textColor="#F4D4"
+			android:text="upgrade cost field"
 			android:cacheColorHint="#FFFF"
 		/>
 		<TextView

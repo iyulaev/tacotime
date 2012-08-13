@@ -3,6 +3,7 @@ package com.yulaev.tacotime.gameobjects;
 import java.util.ArrayList;
 
 import com.yulaev.tacotime.gamelogic.GameGrid;
+import com.yulaev.tacotime.gamelogic.GameInfo;
 import com.yulaev.tacotime.gamelogic.Interaction;
 import com.yulaev.tacotime.gamelogic.State;
 
@@ -295,7 +296,7 @@ public class GameItem implements ViewObject {
 		
 		if(currentState.input_sensitive && !has_interacted) return(new Interaction(-1));
 		
-		long time_since_state_transition = System.currentTimeMillis()-time_of_state_transition;
+		long time_since_state_transition = GameInfo.currentTimeMillis()-time_of_state_transition;
 		if(currentState.time_sensitive && (time_since_state_transition < currentState.state_delay_ms)) return(new Interaction(-1));
 		
 		//If the current state requires an input item, the required input isn't "null", and the required input isn't what's provided
@@ -323,7 +324,7 @@ public class GameItem implements ViewObject {
 		
 		currentState = validStates.get(new_state);
 		current_state_idx = new_state;
-		time_of_state_transition = System.currentTimeMillis();
+		time_of_state_transition = GameInfo.currentTimeMillis();
 		this.bitmap = currentState.bitmap;
 		
 		unLock();

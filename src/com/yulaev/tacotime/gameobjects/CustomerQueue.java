@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.yulaev.tacotime.R;
+import com.yulaev.tacotime.gamelogic.GameInfo;
 import com.yulaev.tacotime.gamelogic.Interaction;
 
 import android.content.Context;

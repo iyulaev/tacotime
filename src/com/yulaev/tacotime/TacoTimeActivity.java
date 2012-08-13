@@ -50,10 +50,10 @@ public class TacoTimeActivity extends Activity {
 		Button continueGame = (Button) findViewById(R.id.continue_game);
 		continueGame.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				//showUnimplementedError("Continue game");
-				Intent i = new Intent(v.getContext(), TacoTimeMainGameActivity.class);
+				showUnimplementedError("Continue game");
+				/*Intent i = new Intent(v.getContext(), TacoTimeMainGameActivity.class);
 				i.putExtra("LoadSavedGame", true);
-				startActivityForResult(i,0);
+				startActivityForResult(i,0);*/
 			}
 		});
 	}

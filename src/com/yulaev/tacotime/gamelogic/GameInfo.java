@@ -41,6 +41,21 @@ public class GameInfo {
 	public static final int MODE_MAINMENU_VIEW = 7;
 	private static int gameMode;
 	
+	/*game time, only gets incremented  by the TimerThread
+	only gets incremented during active play; if the game is paused for some reason no incrementing
+	will occur
+	
+	A note on GameInfo.currentTimeMillis() vs System.currentTimeMillis() - the former only updates when
+	the game is running (TimerThread sending out ticks) AND the GLT is in the MODE_MAINGAMEPANEL_INPLAY
+	state. The granularity of these upgrades is roughly once every second. Thus, 
+	GameInfo.currentTimeMillis() is appropriate to use when, for example, we are using it to track time
+	between state transitions for items that occur on the scale of several seconds. For doing things 
+	like adjusting rate of motion for the time between frame updates (like for GameActor) is it probably 
+	inappropriate since the GameInfo.game_time_millis variable will update too slow.
+	
+	*/
+	private static long game_time_millis;
+	
 	
 	/** Increment money and return the new value. Can be used to simply get the value of money
 	 * if increment is set to zero.
@@ -124,11 +139,14 @@ public class GameInfo {
 		
 		money = 0;
 		points = 0;
+		
+		game_time_millis = 0;
 	}
 	
 	/** Loads the saved game for this character. Not implemented yet. */
 	public static synchronized void loadSavedGame() {
-		Log.d(activitynametag, "GameInfo got loadSavedGame() call, but not implemented yet.");
+		Log.d(activitynametag, "GameInfo got loadSavedGame() call, but not implemented yet. Restarting the level instead...");
+		level -= 1;
 	}
 	
 	/** Saves game state for this character. Not implemented yet. */
@@ -167,6 +185,17 @@ public class GameInfo {
 		}
 		
 		return(false);
+	}
+	
+	/** Return the current total ACTIVE play time for this game, in milliseconds */
+	public static synchronized long currentTimeMillis() {
+		return setAndGetGameTimeMillis(0); 
+	}
+	
+	/** Increment and return the current total ACTIVE play time for this game, in milliseconds */
+	public static synchronized long setAndGetGameTimeMillis(long increment) {
+		game_time_millis += increment;
+		return(game_time_millis);
 	}
 	
 }

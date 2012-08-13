@@ -65,6 +65,10 @@ public class TacoTimeMainGameActivity extends Activity {
 					Intent i = new Intent(ttmgaContext, BetweenLevelMenuActivity.class);
 					startActivityForResult(i,0);
 				}
+				//If we get a "game over" message then bounce the user back to the main menu
+				else if(msg.what == GameLogicThread.MESSAGE_GAME_END) {
+					finish();
+				}
 			}
 		};
 		

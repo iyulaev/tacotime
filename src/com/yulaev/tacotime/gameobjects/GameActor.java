@@ -3,6 +3,7 @@ package com.yulaev.tacotime.gameobjects;
 import java.util.ArrayList;
 import com.yulaev.tacotime.R;
 import com.yulaev.tacotime.gamelogic.GameGrid;
+import com.yulaev.tacotime.gamelogic.GameInfo;
 import com.yulaev.tacotime.gamelogic.State;
 
 import android.content.Context;
@@ -44,10 +45,26 @@ public abstract class GameActor implements ViewObject {
 	public synchronized boolean setLocked(){ while(locked); locked = true; return(locked); }	
 	public synchronized void unLock() { locked = false; }
 	
+	/** Creates a new GameActor. Strating location is set to the center of the game grid
+	 * 
+	 * @param caller The calling Context, for getting resources like Bitmap ids
+	 * @param move_rate The move rate, in terms of grid length per second, for this GameActor
+	 */
 	public GameActor(Context caller, int move_rate) {
+		this(caller, move_rate, GameGrid.GAMEGRID_WIDTH/2, GameGrid.GAMEGRID_HEIGHT/2);
+	}
+	
+	/** Creates a new GameActor
+	 * 
+	 * @param caller The calling Context, for getting resources like Bitmap ids
+	 * @param move_rate The move rate, in terms of grid length per second, for this GameActor
+	 * @param starting_x The starting x location on the GameGrid
+	 * @param starting_y The starting y location on the GameGrid
+	 */
+	public GameActor(Context caller, int move_rate, int starting_x, int starting_y) {
 		//Set starting position to middle of canvas
-		x = GameGrid.GAMEGRID_WIDTH/2;
-		y = GameGrid.GAMEGRID_HEIGHT/2;
+		x = starting_x;
+		y = starting_y;
 		target_x=x; target_y=y;
 		time_of_last_update = -1;
 		locked = false;

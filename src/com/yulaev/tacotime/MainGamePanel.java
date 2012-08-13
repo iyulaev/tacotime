@@ -216,6 +216,7 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 			announcementPaint = new Paint();
 			announcementPaint.setColor(Color.RED);
 			announcementPaint.setTextSize(24);
+			announcementPaint.setTextAlign(Paint.Align.CENTER);
 		}
 		
 		//Draw money, points and display an announcement message IF there is an announcement
@@ -223,7 +224,7 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		canvas.drawText(Integer.toString(points), 14, canvas.getHeight()-15, pointsPaint);
 		
 		if(draw_announcement_message) {
-			canvas.drawText(announcementMessage, 30, canvas.getHeight()/2, announcementPaint);
+			canvas.drawText(announcementMessage, canvas.getWidth()/2, canvas.getHeight()/2, announcementPaint);
 		}
 		
 	}

@@ -18,6 +18,8 @@ import com.yulaev.tacotime.gamelogic.GameLevel;
 import com.yulaev.tacotime.gamelogic.Interaction;
 import com.yulaev.tacotime.gamelogic.leveldefs.GameLevel_1;
 import com.yulaev.tacotime.gamelogic.leveldefs.GameLevel_2;
+import com.yulaev.tacotime.gamelogic.leveldefs.GameLevel_3;
+import com.yulaev.tacotime.gamelogic.leveldefs.GameLevel_4;
 import com.yulaev.tacotime.gameobjects.CoffeeGirl;
 import com.yulaev.tacotime.gameobjects.CustomerQueue;
 import com.yulaev.tacotime.gameobjects.GameFoodItem;
@@ -52,6 +54,7 @@ public class GameLogicThread extends Thread {
 	
 	//Define types of messages accepted by OTHER threads/handlers
 	public static final int MESSAGE_LEVEL_END = -1;
+	public static final int MESSAGE_GAME_END = -2;
 
 	//This message handler will receive messages, probably from the UI Thread, and
 	//update the data objects and do other things that are related to handling
@@ -175,6 +178,10 @@ public class GameLogicThread extends Thread {
 		if(old_state == CoffeeGirl.STATE_NORMAL && 
 				interactedWith.equals("CupCakeTray")) coffeeGirl.setItemHolding("cupcake");
 		
+		//CoffeeGirl's hands are empty, she interacts with a pie slice tray tray -> she is now carrying a pie slice
+		if(old_state == CoffeeGirl.STATE_NORMAL && 
+				interactedWith.equals("PieTray")) coffeeGirl.setItemHolding("pieslice");
+		
 		//CoffeeGirl has a coffee, she interacts with blender -> she now has nothing
 		if(old_state == CoffeeGirl.STATE_CARRYING_COFFEE && 
 				interactedWith.equals("Blender")) coffeeGirl.setItemHolding("nothing");
@@ -229,8 +236,10 @@ public class GameLogicThread extends Thread {
 		//IF we are viewing the main panel AND we are ready to play a level, this means the
 		//game is ready for another level - load one!
 		if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_PREPLAY) {
+			//At the very beginning of the level, load the current level (increment previous level # by one)
 			loadLevel(GameInfo.getLevel() + 1);
 			
+			//For three seconds tell the user that the evel is about to start
 			message_timer = 3;
 			MessageRouter.sendAnnouncementMessage("Level Start in " + message_timer, true);
 			
@@ -257,15 +266,21 @@ public class GameLogicThread extends Thread {
 		//If we are in play check to see if we should finish the level
 		else if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_INPLAY) {
 			GameInfo.decrementLevelTime();
-			
 			Log.v(activitynametag, GameInfo.getLevelTime() + " seconds remaining in this level!");
+			GameInfo.setAndGetGameTimeMillis(TimerThread.TIMER_GRANULARIY);
 			
 			//If we've run out of time on this level, or customerQueue has run out, then kill the level
 			if(GameInfo.getLevelTime() <= 0 || customerQueue.isFinished()) {
 				Log.v(activitynametag, "GLT is finishing this level!");
 				
 				message_timer = 3;
-				MessageRouter.sendAnnouncementMessage("Level " + GameInfo.getLevel() + " Finished", true); //remove the announcement message
+				
+				//Indicate that the level has been finished and, if we finished the last level, that the game is over
+				if(GameInfo.getLevel() < MAX_GAME_LEVEL)
+					MessageRouter.sendAnnouncementMessage("Level " + GameInfo.getLevel() + " Finished", true);
+				else
+					MessageRouter.sendAnnouncementMessage("Game Over", true);
+				
 				GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_POSTPLAY_MESSAGE);
 			}
 		}
@@ -276,8 +291,13 @@ public class GameLogicThread extends Thread {
 				message_timer--;
 			}
 			else {
-				MessageRouter.sendPauseMessage(true);
-				MessageRouter.sendLevelEndMessage();
+				if(GameInfo.getLevel() < MAX_GAME_LEVEL) {
+					MessageRouter.sendPauseMessage(true);
+					MessageRouter.sendLevelEndMessage();
+				}
+				else {
+					MessageRouter.sendGameOverMessage();
+				}
 			}
 		}
 	}
@@ -315,10 +335,14 @@ public class GameLogicThread extends Thread {
 	 * receives the FoodItem.
 	 */
 	public void addNewFoodItem(GameFoodItem foodItem, int associated_coffeegirl_state) {
+		//If this is the first food item that we are adding then have CoffeeGirl be holding that food item
+		//Better hope that the first food item is "nothing"!
 		boolean doSetItemHolding = false;
 		if(foodItems.isEmpty()) doSetItemHolding = true;
 		
+		//Add new food item to the list of food items for this level (foodItems)
 		foodItems.put(foodItem.getName(), foodItem);
+		//Set association between the new food item and an associated CoffeeGirl state
 		coffeeGirl.setItemHoldingToStateAssoc(foodItem.getName(), associated_coffeegirl_state);
 		
 		//If CoffeeGirl's "held item" hasn't been set up yet then set it to the first foodItem that we add
@@ -356,6 +380,7 @@ public class GameLogicThread extends Thread {
 
 	}
 	
+	public static final int MAX_GAME_LEVEL=4;
 	/** Loads a new level; creates a GameLevel Object corresponding to the new level
 	 * and kicks off (unpauses) all of the threads.
 	 * TODO: Should this really be done in the GameLogicThread or should we have a dedicated loader thread?
@@ -372,6 +397,17 @@ public class GameLogicThread extends Thread {
 			//Launch level 2!
 			newLevel = new GameLevel_2();
 			newLevel.loadLevel(viewThread, gameLogicThread, inputThread, this.caller);
+		}
+		else if(levelNumber == 3) {
+			newLevel = new GameLevel_3();
+			newLevel.loadLevel(viewThread, gameLogicThread, inputThread, this.caller);
+		}
+		else if(levelNumber == 4) {
+			newLevel = new GameLevel_4();
+			newLevel.loadLevel(viewThread, gameLogicThread, inputThread, this.caller);
+		}
+		else {
+			Log.e(activitynametag, "Invalid level reached!");
 		}
 		
 		//Set up the game state

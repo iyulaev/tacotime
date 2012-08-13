@@ -164,7 +164,7 @@ public class MessageRouter {
 	}
 	
 	/** Called when the back button gets pressed during game play. Tells the input thread that the back button 
-	 * has been pressed and that the in-game dialog has been launched.
+	 * has been pressed and that the in-game dialog has been launched. Typically sent by TacoTimeMainGameActivity.
 	 */
 	public synchronized static void sendBackButtonDuringGameplayMessage() {
 		if(inputThread != null) {
@@ -225,7 +225,7 @@ public class MessageRouter {
 	/** Called when we are asked (typically by the betweenLevelMenuActivity) to save the game and
 	 * continue onto the next level. */
 	public synchronized static void sendLevelEndMessage() {
-		if(gameLogicThread != null) {
+		if(ttaHandler != null) {
 			Message message = Message.obtain();
 			message.what = GameLogicThread.MESSAGE_LEVEL_END;
 			ttaHandler.sendMessage(message);
@@ -234,4 +234,14 @@ public class MessageRouter {
 		}
 	}
 
+	/** Called when the game has been finished (by the GameLogicThread) */
+	public synchronized static void sendGameOverMessage() {
+		if(ttaHandler != null) {
+			Message message = Message.obtain();
+			message.what = GameLogicThread.MESSAGE_GAME_END;
+			ttaHandler.sendMessage(message);
+			
+			Log.v("MessageRouter", "Sent game end message to the TacoTimeActivity handler");
+		}
+	}
 }

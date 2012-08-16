@@ -22,8 +22,10 @@ public class GameLevel {
 	
 	//multipliers for money and points for this level
 	protected float point_mult,money_mult;
-	//bonus money/points for clearing 
+	//bonus money/points for clearing the level within the alotted time
 	protected int point_bonus, money_bonus;
+	//If we don't clear it in time, what is the bonus then?
+	protected float point_bonus_derating, money_bonus_derating;
 	
 	//how impatient are the customers
 	//2.0 will cause their "patience" to tick down twice as fast
@@ -54,5 +56,14 @@ public class GameLevel {
 	public int getLevelTime() {
 		return this.time_limit_sec;
 	}
+	
+	public int getBonusPoints(boolean cleared_level_in_time) { 
+		return (cleared_level_in_time ? point_bonus : ((int) (point_bonus * point_bonus_derating) )); 
+	}
+	
+	public int getBonusMoney(boolean cleared_level_in_time) { 
+		return (cleared_level_in_time ? money_bonus : ((int) (money_bonus * money_bonus_derating) )); 
+	}
+	
 
 }

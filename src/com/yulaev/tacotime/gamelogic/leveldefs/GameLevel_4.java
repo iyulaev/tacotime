@@ -27,6 +27,21 @@ import com.yulaev.tacotime.gameobjects.objectdefs.TrashCan;
 /** Describes level #3 for the Coffee Time game! */
 
 public class GameLevel_4 extends GameLevel {
+	public GameLevel_4() {
+		this.level_number = 4;
+		this.customerQueue_length = 20;
+		this.point_mult = 1.5f;
+		this.money_mult = 1.5f;
+		this.customer_impatience = 0.8f;
+		this.time_limit_sec = 3 * 60;
+		this.customer_max_order_size = 3;
+		
+		this.point_bonus = 60;
+		this.money_bonus = 25;
+		this.point_bonus_derating = 0.25f;
+		this.money_bonus_derating = 0.25f;
+	}
+	
 	/** Set up this level; add all GameItems and such to the Threads, set up the Customers and such
 	 * with the per-level parameters.
 	 * @param vT ViewThread associated with this game session
@@ -44,6 +59,11 @@ public class GameLevel_4 extends GameLevel {
 		this.customer_impatience = 0.8f;
 		this.time_limit_sec = 3 * 60;
 		this.customer_max_order_size = 3;
+		
+		this.point_bonus = 60;
+		this.money_bonus = 25;
+		this.point_bonus_derating = 0.25f;
+		this.money_bonus_derating = 0.25f;
 		
 		//Setup coffeegirl (actor)
 		CoffeeGirl coffeegirl = new CoffeeGirl(caller);

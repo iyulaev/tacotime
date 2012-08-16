@@ -1,9 +1,13 @@
 /** This class routes messages to other classes; used as sort of a global message
  * creator and passer. It has no state, it is purely for announcing events and passing
  * information between threads.
+ * 
+ * This is the main interface between different threads of execution in TacoTime.
  */
 
 package com.yulaev.tacotime;
+
+import java.util.ArrayList;
 
 import android.os.Handler;
 import android.os.Message;
@@ -242,6 +246,52 @@ public class MessageRouter {
 			ttaHandler.sendMessage(message);
 			
 			Log.v("MessageRouter", "Sent game end message to the TacoTimeActivity handler");
+		}
+	}
+	
+	/** Called by GLT when the level is over. Tell the TacoTimeMainGameActivity to display the post-level dialog, 
+	 * i.e. the dialog that will tell the user how many points / dollars they earned on the level, including 
+	 * the level-dependent bonus
+	 * 
+	 * @param total_points The total number of points accrued through the end of this level
+	 * @param total_money The total number of money accrued through the end of this level
+	 * @param accrued_points The total points accrued during this level, NOT counting the bonus
+	 * @param accrued_money The total money accrued during this level, NOT counting the bonus
+	 * @param bonus_points The total bonus point count given for completing this level
+	 * @param bonus_money The total bonus money pile given for completing this level
+	 */
+	public synchronized static void sendPostLevelDialogOpenMessage(int total_points, int total_money, int accrued_points, 
+			int accrued_money, int bonus_points, int bonus_money) {
+		if(ttaHandler != null) {
+			Message message = Message.obtain();
+			message.what = GameLogicThread.MESSAGE_POSTLEVEL_DIALOG_OPEN;
+			
+			//Marshall all of the arguments into an ArrayList which we'll pass to the TacoTimeMainGameActivity
+			ArrayList<Integer> pointArray = new ArrayList<Integer>();
+			pointArray.add(new Integer(total_points));
+			pointArray.add(new Integer(total_money));
+			pointArray.add(new Integer(accrued_points));
+			pointArray.add(new Integer(accrued_money));
+			pointArray.add(new Integer(bonus_points));
+			pointArray.add(new Integer(bonus_money));		
+			message.obj = pointArray;
+			
+			ttaHandler.sendMessage(message);
+			
+			Log.v("MessageRouter", "Sent level end dialog display message to the TacoTimeActivity handler");
+		}
+	}
+	
+	/** Called by TacoTimeMainGameActivity to indicate to the GLT that the level-end dialog has been closed 
+	 * and that the GLT should continue as planned.
+	 */
+	public synchronized static void sendPostLevelDialogClosedMessage() {
+		if(gameLogicThread != null) {
+			Message message = Message.obtain();
+			message.what = GameLogicThread.MESSAGE_POSTLEVEL_DIALOG_CLOSED;
+			gameLogicThread.handler.sendMessage(message);
+			
+			Log.v("MessageRouter", "Sent level end dialog closed message to the GLT handler");
 		}
 	}
 }

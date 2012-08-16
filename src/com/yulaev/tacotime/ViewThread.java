@@ -58,7 +58,8 @@ public class ViewThread extends Thread {
 	private boolean running;
 	//If paused is true then, during refreshView(), we do not call onUpdate() BUT we still re-draw the entire canvas
 	private boolean paused;
-	//If suspended is true then the event loop continues but we do not do anything special
+	//If suspended is true then the event loop is stopped and we wait to be un-suspended. THis should be a relateively
+	//low-power and low computational intensity state
 	private boolean suspended;
 	
 	//Variables to hold the current announcement message (a message that will be printed in LARGE CHARACTERS

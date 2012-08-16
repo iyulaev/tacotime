@@ -12,17 +12,21 @@ public abstract class GameFoodItem {
 	/**The name for this GameFoodItem*/
 	private String foodItemName;
 	
+	/**The (weighed) probability of this food item being ordered; normalized to 1
+	 */
+	protected float orderProbability;
+	
 	/** Constructor for this GameFoodItem; just set the name.
 	 * 
 	 * @param name The name of this GameFoodItem.
 	 */
 	public GameFoodItem(String name) {
-		foodItemName = name;
-		is_satisfied = false;
+		this(name, false);
 	}
 	public GameFoodItem(String name, boolean n_is_satisfied) {
 		foodItemName = name;
 		is_satisfied = n_is_satisfied;
+		orderProbability = 1.0f;
 	}
 	
 	/** Return the name of this GameFoodItem */
@@ -64,4 +68,7 @@ public abstract class GameFoodItem {
 	 * @return Bitmap to use when drawing this food item, when it is inactive
 	 */
 	public abstract Bitmap getBitmapInactive();
+	
+	/**Return this GameFoodItem's order probability */
+	public float getOrderProbability() { return orderProbability; }
 }

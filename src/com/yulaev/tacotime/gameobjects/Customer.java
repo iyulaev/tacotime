@@ -71,16 +71,34 @@ public class Customer extends GameActor {
 		queue_position = starting_queue_position;
 		visible = false;
 		
-		//Generate this customer's "point multiplier" and food item order
+		//Generate this customer's food item order
 		Random random = new Random();
 		this.max_order_size = max_order_size;
-		customerOrder = new ArrayList<GameFoodItem>();
 		customerOrderSize = 1+random.nextInt(max_order_size);
+		customerOrder = new ArrayList<GameFoodItem>();
+		
+		//We set up the "bins" for determining each menu item
+		//The size of the bin will be the orderProbability of each GameFoodItem
+		//If we pick a random integer, and it is between bin[i-1] and bin[i], we pick foodItemChoices.get(i)
+		//Thus, items with higher orderProbability will be more likely to be chosen
+		float [] order_bins = new float[foodItemChoices.size()];
+		for(int i = 0; i < foodItemChoices.size(); i++) {
+			if(i == 0)
+				order_bins[i] = 0 + foodItemChoices.get(i).getOrderProbability();
+			else
+				order_bins[i] = order_bins[i-1] + foodItemChoices.get(i).getOrderProbability();
+		}
+		
 		for(int i = 0; i <= customerOrderSize; i++) {
-			//add 1 at the beginning because "nothing" is not a valid choice ;)
-			int item_choice = 1 + random.nextInt(foodItemChoices.size()-1);
+			//Normalize the random number we pick to the range of the bins
+			float item_choice_f = random.nextFloat() * order_bins[order_bins.length-1];
+			
+			int item_choice = 0;
+			while(order_bins[item_choice] < item_choice_f && item_choice < order_bins.length) item_choice++;
 			customerOrder.add(foodItemChoices.get(item_choice).clone());
 		}
+		
+		//Generate this customer's "point multiplier"
 		moneyMultiplier = money_mult * random.nextFloat() + 1.0f;
 		pointsMultiplier = point_mult * random.nextFloat() + 1.0f;
 		

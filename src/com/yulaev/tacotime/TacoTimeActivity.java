@@ -33,7 +33,7 @@ public class TacoTimeActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		
 		// requesting to turn the title OFF
-		requestWindowFeature(Window.FEATURE_NO_TITLE);		
+		// requestWindowFeature(Window.FEATURE_NO_TITLE);		
 		
 		// Change content view so that we are using mainmenulayout now!
 		setContentView(R.layout.mainmenulayout);

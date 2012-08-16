@@ -22,10 +22,12 @@ public class FoodItemNothing extends GameFoodItem {
 	
 	public FoodItemNothing() {
 		super("nothing");
+		orderProbability = 0.0f;
 	}
 
 	public FoodItemNothing(Context caller) {
 		super("nothing");
+		orderProbability = 0.0f;
 		
 		if(!bitmaps_initialized) {
 			bitmaps_initialized = true;

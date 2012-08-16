@@ -7,6 +7,8 @@
 
 package com.yulaev.tacotime;
 
+import java.util.ArrayList;
+
 import com.yulaev.tacotime.gamelogic.GameGrid;
 import com.yulaev.tacotime.gamelogic.GameInfo;
 
@@ -27,12 +29,15 @@ public class TacoTimeMainGameActivity extends Activity {
 	
 	private static final String activitynametag = "TacoTimeMainGameActivity";
 	
+	private TacoTimeMainGameActivity me;
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
 		Log.d(activitynametag, "TTMGA constructor called!");
+		me = this;
 		
 		// requesting to turn the title OFF
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -68,6 +73,49 @@ public class TacoTimeMainGameActivity extends Activity {
 				//If we get a "game over" message then bounce the user back to the main menu
 				else if(msg.what == GameLogicThread.MESSAGE_GAME_END) {
 					finish();
+				}
+				//If we get a "display level end dialog" message then bounce the user back to the main menu
+				else if(msg.what == GameLogicThread.MESSAGE_POSTLEVEL_DIALOG_OPEN) {
+					//Un-marshall all point counts from the message object
+					ArrayList<Integer> pointArray = (ArrayList<Integer>) msg.obj;
+					int total_points = pointArray.get(0).intValue();
+					int total_money = pointArray.get(1).intValue();
+					int accrued_points = pointArray.get(2).intValue();
+					int accrued_money = pointArray.get(3).intValue();
+					int bonus_points = pointArray.get(4).intValue();
+					int bonus_money = pointArray.get(5).intValue();
+					
+					StringBuilder dialogMessageBuilder = new StringBuilder();
+					dialogMessageBuilder.append("Level over!\n");
+					dialogMessageBuilder.append("Accrued Points: " + accrued_points + "\n");
+					dialogMessageBuilder.append("Bonus Points: " + bonus_points + "\n");
+					dialogMessageBuilder.append("Total Points: " + total_points + "\n\n");
+					dialogMessageBuilder.append("Accrued Money: " + accrued_money + "\n");
+					dialogMessageBuilder.append("Bonus Money: " + bonus_money + "\n");
+					dialogMessageBuilder.append("Total Money: " + total_money);					
+					
+					//Put together the AlertDialog that will ask the user main menu/retry/continue
+					AlertDialog.Builder builder = new AlertDialog.Builder(me);
+					builder.setMessage(dialogMessageBuilder.toString())
+						.setCancelable(true)
+						
+						//Maps to "return to main menu"
+						.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								MessageRouter.sendPostLevelDialogClosedMessage();
+							}
+						});
+					
+					AlertDialog alert = builder.create();
+					
+					//use an OnDismissListener so that if the user hits back again, it is the same as hitting 'continue'
+					alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
+						public void onCancel(DialogInterface dialog) {
+							MessageRouter.sendPostLevelDialogClosedMessage();
+						}
+					});
+					
+					alert.show();
 				}
 			}
 		};

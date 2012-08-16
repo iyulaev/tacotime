@@ -22,6 +22,7 @@ public class FoodItemBlendedDrink extends GameFoodItem {
 	
 	public FoodItemBlendedDrink() {
 		super("blended_drink");
+		super.orderProbability = 0.5f; 
 	}
 	
 	public FoodItemBlendedDrink(Context caller) {

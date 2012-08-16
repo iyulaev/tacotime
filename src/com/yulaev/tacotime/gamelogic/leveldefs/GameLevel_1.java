@@ -26,6 +26,22 @@ import com.yulaev.tacotime.gameobjects.objectdefs.TrashCan;
 /** Describes level #1 for the Coffee Time game! */
 
 public class GameLevel_1 extends GameLevel {
+	
+	public GameLevel_1() {
+		this.level_number = 1;
+		this.customerQueue_length = 5;
+		this.point_mult = 1.0f;
+		this.money_mult = 1.0f;
+		this.customer_impatience = 1.2f;
+		this.time_limit_sec = 45;
+		this.customer_max_order_size = 1;
+		
+		this.point_bonus = 20;
+		this.money_bonus = 10;
+		this.point_bonus_derating = 0.5f;
+		this.money_bonus_derating = 0.5f;		
+	}
+	
 	/** Set up this level; add all GameItems and such to the Threads, set up the Customers and such
 	 * with the per-level parameters.
 	 * @param vT ViewThread associated with this game session
@@ -35,14 +51,6 @@ public class GameLevel_1 extends GameLevel {
 	 */
 	public void loadLevel(ViewThread viewThread, GameLogicThread gameLogicThread, InputThread inputThread, Context caller) {
 		super.loadLevel(viewThread, gameLogicThread, inputThread, caller);
-		
-		this.level_number = 1;
-		this.customerQueue_length = 5;
-		this.point_mult = 1.0f;
-		this.money_mult = 1.0f;
-		this.customer_impatience = 1.2f;
-		this.time_limit_sec = 45;
-		this.customer_max_order_size = 1;
 		
 		//Setup coffeegirl (actor)
 		CoffeeGirl coffeegirl = new CoffeeGirl(caller);

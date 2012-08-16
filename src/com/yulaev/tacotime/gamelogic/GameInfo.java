@@ -22,6 +22,8 @@ public class GameInfo {
 	//The amount of money and points that the player currently has
 	public static int money;
 	public static int points;
+	//The amount of moeny and points that the player has aquired on this level
+	public static int level_money, level_points;
 	
 	//These variables keep track of what level we are on, how many seconds remain on the clock,
 	//and whether the level is in play or not
@@ -32,13 +34,14 @@ public class GameInfo {
 	private static ArrayList<String> upgradesBought;
 	
 	//State information regarding what "view state" we are currently in
+	//This defines the states that the GameLogicThread can be in
 	public static final int MODE_MAINGAMEPANEL_PREPLAY = 0;
 	public static final int MODE_MAINGAMEPANEL_PREPLAY_MESSAGE = 2;
 	public static final int MODE_MAINGAMEPANEL_INPLAY = 3;
 	public static final int MODE_MAINGAMEPANEL_POSTPLAY_MESSAGE = 4;
 	public static final int MODE_MAINGAMEPANEL_POSTPLAY = 5;
-	public static final int MODE_GAMEMENU_VIEW = 6;
-	public static final int MODE_MAINMENU_VIEW = 7;
+	public static final int MODE_GAMEMENU_VIEW = 7;
+	public static final int MODE_MAINMENU_VIEW = 8;
 	private static int gameMode;
 	
 	/*game time, only gets incremented  by the TimerThread
@@ -64,6 +67,7 @@ public class GameInfo {
 	 */
 	public static synchronized int setAndReturnMoney(int increment) {
 		money += increment;
+		level_money += increment;
 		return money;
 	}
 	
@@ -74,6 +78,7 @@ public class GameInfo {
 	 */
 	public static synchronized int setAndReturnPoints(int increment) {
 		points += increment;
+		level_points += increment;
 		return points;
 	}
 	
@@ -139,8 +144,18 @@ public class GameInfo {
 		
 		money = 0;
 		points = 0;
+		level_money = 0;
+		level_points = 0;
 		
 		game_time_millis = 0;
+	}
+	
+	/** Clear level state only; clears level_money and level_points
+	 * 
+	 */
+	public static synchronized void levelReset() {
+		level_money = 0;
+		level_points = 0;
 	}
 	
 	/** Loads the saved game for this character. Not implemented yet. */

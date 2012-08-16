@@ -51,6 +51,8 @@ public class GameLogicThread extends Thread {
 	public static final int MESSAGE_LOAD_GAME = 2;
 	public static final int MESSAGE_SAVE_GAME = 3;
 	public static final int MESSAGE_NEXT_LEVEL = 4;
+	public static final int MESSAGE_POSTLEVEL_DIALOG_OPEN = 5;
+	public static final int MESSAGE_POSTLEVEL_DIALOG_CLOSED = 6;
 	
 	//Define types of messages accepted by OTHER threads/handlers
 	public static final int MESSAGE_LEVEL_END = -1;
@@ -142,6 +144,13 @@ public class GameLogicThread extends Thread {
 					GameInfo.saveCurrentGame();
 					GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_PREPLAY);
 					MessageRouter.sendPauseTimerMessage(false);
+				}
+				
+				//If the post-leveldialog has been closed advance to the (final) post-play state
+				//whereupon we will exit the level and launch the between-level menu (or possibly just
+				//display "game over"
+				else if(msg.what == MESSAGE_POSTLEVEL_DIALOG_CLOSED) {
+					GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_POSTPLAY);
 				}
 			}
 		};		
@@ -285,19 +294,41 @@ public class GameLogicThread extends Thread {
 			}
 		}
 		
-		//If we are done displaying the message then ... (this should be fixed).
+		//Display the level end message for a while and then display the level-end dialog, summarizing
+		//the progress for this level
 		else if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_POSTPLAY_MESSAGE) {
 			if(message_timer > 0) {
 				message_timer--;
 			}
+			//We use message_timer again to make sure we only display the post-level dialog once :)
+			else if (message_timer == 0){
+				//Calculate our end-level bonus and display the level end dialog
+				GameLevel currLevel = getLevelInstance(GameInfo.getLevel());				
+				GameInfo.setAndReturnMoney(currLevel.getBonusMoney(GameInfo.getLevelTime() > 0));
+				GameInfo.setAndReturnPoints(currLevel.getBonusPoints(GameInfo.getLevelTime() > 0));
+				
+				//Send all of the accrued bonuses to the level-end dialog
+				//See MessageRouter.sendPostLevelDialogOpenMessage() javadocs for an explanation of the arguments given
+				MessageRouter.sendPostLevelDialogOpenMessage(GameInfo.points, GameInfo.money, 
+						GameInfo.level_points-currLevel.getBonusPoints(GameInfo.getLevelTime() > 0), 
+						GameInfo.level_money-currLevel.getBonusMoney(GameInfo.getLevelTime() > 0),
+						currLevel.getBonusPoints(GameInfo.getLevelTime() > 0),
+						currLevel.getBonusMoney(GameInfo.getLevelTime() > 0));
+				
+				message_timer--;
+			}
+		}
+		
+		//Finally, we either pause the game and send a level end message, going into a between-level menu
+		//Or we send a game over message and end this game
+		else if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_POSTPLAY) {
+			//
+			if(GameInfo.getLevel() < MAX_GAME_LEVEL) {
+				MessageRouter.sendPauseMessage(true);
+				MessageRouter.sendLevelEndMessage();
+			}
 			else {
-				if(GameInfo.getLevel() < MAX_GAME_LEVEL) {
-					MessageRouter.sendPauseMessage(true);
-					MessageRouter.sendLevelEndMessage();
-				}
-				else {
-					MessageRouter.sendGameOverMessage();
-				}
+				MessageRouter.sendGameOverMessage();
 			}
 		}
 	}
@@ -387,36 +418,49 @@ public class GameLogicThread extends Thread {
 	 * @param levelNumber
 	 */
 	public void loadLevel(int levelNumber) {
-		GameLevel newLevel = null;
-		if(levelNumber == 1) {
-			//Launch level 1!
-			newLevel = new GameLevel_1();
+		GameLevel newLevel = getLevelInstance(levelNumber);
+		if(newLevel != null)
 			newLevel.loadLevel(viewThread, gameLogicThread, inputThread, this.caller);
-		}
-		else if(levelNumber == 2) {
-			//Launch level 2!
-			newLevel = new GameLevel_2();
-			newLevel.loadLevel(viewThread, gameLogicThread, inputThread, this.caller);
-		}
-		else if(levelNumber == 3) {
-			newLevel = new GameLevel_3();
-			newLevel.loadLevel(viewThread, gameLogicThread, inputThread, this.caller);
-		}
-		else if(levelNumber == 4) {
-			newLevel = new GameLevel_4();
-			newLevel.loadLevel(viewThread, gameLogicThread, inputThread, this.caller);
-		}
-		else {
-			Log.e(activitynametag, "Invalid level reached!");
-		}
 		
 		//Set up the game state
 		GameInfo.setLevel(levelNumber);
+		
+		//Clear the level info (how many points/dollars we've earned this level)
+		GameInfo.levelReset();
 		
 		if(newLevel == null) 
 			Log.d(activitynametag, "newLevel was unexpectedly null! levelNumber = " + levelNumber);
 		else
 			GameInfo.setLevelTime(newLevel.getLevelTime());
+	}
+	
+	/** Return a new instance of a GameLevel sub-class corrsponding to level # levelNumber 
+	 * 
+	 * @param levelNumber The level number to return a GameLevel instance for
+	 * @return GameLevel instance for level levelNumber
+	 */
+	public GameLevel getLevelInstance(int levelNumber) {
+		GameLevel newLevel = null;
+		
+		if(levelNumber == 1) {
+			//Launch level 1!
+			newLevel = new GameLevel_1();
+		}
+		else if(levelNumber == 2) {
+			//Launch level 2!
+			newLevel = new GameLevel_2();
+		}
+		else if(levelNumber == 3) {
+			newLevel = new GameLevel_3();
+		}
+		else if(levelNumber == 4) {
+			newLevel = new GameLevel_4();
+		}
+		else {
+			Log.e(activitynametag, "Invalid level reached!");
+		}
+		
+		return(newLevel);
 	}
 	
 }

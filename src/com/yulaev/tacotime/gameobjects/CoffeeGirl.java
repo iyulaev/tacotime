@@ -96,7 +96,7 @@ public class CoffeeGirl extends GameActor {
 	 * @param item The GameFoodItem's name that we will associate state with
 	 * @param state The index of the state to be associated with item.
 	 */
-	public synchronized void setItemHoldingToStateAssoc(String item, int state) {
+	public void setItemHoldingToStateAssoc(String item, int state) {
 		if(itemToStateMap == null) itemToStateMap = new HashMap<String, State>();
 		itemToStateMap.put(item, validStates.get(state));
 	}

@@ -34,9 +34,12 @@ public class ViewThread extends Thread {
 	public static final int MESSAGE_SET_UNPAUSED = 2;
 	public static final int MESSAGE_NEW_ANNOUNCEMENT = 3;
 	public static final int MESSAGE_STOP_ANNOUNCEMENT = 4;
+	public static final int MESSAGE_SET_SUSPENDED = 5;
+	public static final int MESSAGE_SET_UNSUSPEND = 6;
 	
 	//Define view refresh period in ms
 	public static final int VIEW_REFRESH_PERIOD = 20;
+	public static final int VIEW_SUSPEND_PERIOD = 1000/3;
 
 	// Surface holder that can access the physical surface
 	private SurfaceHolder surfaceHolder;
@@ -68,7 +71,7 @@ public class ViewThread extends Thread {
 	private String announcementMessage;
 
 	/** Constructor for ViewThread. Most of the work is in setting up the Message Handler, which is responsible 
-	 * for receving messages from the GameLogicThread.
+	 * for receiving messages from the GameLogicThread.
 	 * @param surfaceHolder The SurfaceHolder for the canvas that we will be drawing to
 	 * @param gamePanel The MainGamePanel that we will be doing drawing duty for.
 	 */
@@ -105,21 +108,16 @@ public class ViewThread extends Thread {
 				else if (msg.what == MESSAGE_STOP_ANNOUNCEMENT) {
 					draw_announcement_message = false;
 				}
+				
+				else if(msg.what == MESSAGE_SET_SUSPENDED) {
+					setSuspended(true);
+				}
+				else if(msg.what == MESSAGE_SET_UNSUSPEND) {
+					setSuspended(false);
+				}
 			}
 		};		
 	}
-	
-	/** Determines whether the main ViewThread loop should run or not. 
-	 * 
-	 * @param n_running If true, the ViewThread loop will run. If not, the thread will fall out of the loop and finish.
-	 */
-	public void setRunning(boolean n_running) { running = n_running; }
-	
-	/** Allows the ViewThread to be paused. When the ViewThread is paused stuff still gets drawn to the canvas but
-	 * no GameItems get updated and no interactions are allowed to take place.
-	 * @param n_paused
-	 */
-	public void setPaused(boolean n_paused) { paused = n_paused; }
 
 	/** Add a ViewObject to the viewThread viewObjects ArrayList; all ViewObjects are updated and rendered by the ViewThread
 	 * @param nVO New ViewObject to add to this ViewThread's VO list.
@@ -202,50 +200,47 @@ public class ViewThread extends Thread {
 		announcementMessage = newAccouncement;
 	}
 	
+	/** Allows the ViewThread to be paused. When the ViewThread is paused stuff still gets drawn to the canvas but
+	 * no GameItems get updated and no interactions are allowed to take place.
+	 * @param n_paused
+	 */
+	public void setPaused(boolean n_paused) { paused = n_paused; }
+	
 	/** Sets whether or not this ViewThread should be suspended. If we set suspended to false we 
 	 * launch a notification to wake the ViewThread back up.
 	 * @param n_suspended Whether this ViewThread should be suspended.
 	 */
-	public synchronized void setSuspended(boolean n_suspended) {		
-		if(!n_suspended && this.suspended) {
-			this.suspended = n_suspended;
-			notifyAll();
-		}
-		else this.suspended = n_suspended;
+	private void setSuspended(boolean n_suspended) {		
+		this.suspended = n_suspended;
+		if(!suspended) callRefreshDelayed();
 	}
 	
-	private synchronized void checkSuspended() {
-		while(this.suspended) {
-			try { wait(); }
-			catch (InterruptedException e) {}
-		}
+	/**This is the main ViewThread loop. Basically we call refreshView() (if we are not suspended) and then, once again,
+	 * if we are not suspended, we post a callback to handler to call callRefreshDelayed() again in ViewThread.
+	 * VIEW_REFRESH_PERIOD ms. Every time that refreshView() is called the canvas gets redrawn and position-related
+	 * things (like interactions) get evaluated.
+	 */
+	private void callRefreshDelayed() { 
+		handler.postDelayed(
+			new Runnable() {
+				public void run() {
+					
+					if(!suspended) {
+						refreshView();
+						callRefreshDelayed();
+					}
+					
+					//Log.v(activitynametag, "banana");
+				}
+			}, ViewThread.VIEW_REFRESH_PERIOD);
 	}
 
 	
-	/** The ViewThread run() method implements a loop which will attempt to redraw the Canvas
-	 * no more often than every ViewThread.VIEW_REFRESH_PERIOD milliseconds.
+	/** The ViewThread run() method doesn't really do anything anymore except for un-suspend this ViewThread.
 	 */
 	@Override
-	public void run() {
-		
-		long lastViewUpdate = 0L;
-		
-		while(running) {
-			
-			checkSuspended();
-		
-			if(System.currentTimeMillis() > lastViewUpdate + ViewThread.VIEW_REFRESH_PERIOD) {
-				lastViewUpdate = System.currentTimeMillis();
-				refreshView();
-			}
-			
-			try {
-				Thread.sleep(ViewThread.VIEW_REFRESH_PERIOD);
-			}
-			catch (Exception e) {;}
-		
-		}
-
+	public void run() {		
+		MessageRouter.sendSuspendViewThreadMessage(false);
 	}
 	
 }

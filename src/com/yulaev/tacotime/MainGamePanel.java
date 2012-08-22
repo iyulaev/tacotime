@@ -104,17 +104,11 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 	public void surfaceCreated(SurfaceHolder holder) {
 		Log.d(activitynametag, "MainGamePanel surfaceCreated() called!");
 		
-		//Un-suspend the drawing and timer threads
-		timerThread.setSuspended(false);
-		viewThread.setSuspended(false);
-		
 		//If we've not launched all of the Threads then do so
 		if(!threads_launched) {
 			// at this point the surface is created and
 			// we can safely start the game loop
-			timerThread.setRunning(true);
-			viewThread.setRunning(true);
-
+			
 			//Kick off all of the threads
 			viewThread.start();
 			inputThread.start();
@@ -122,6 +116,11 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 			timerThread.start();
 			
 			threads_launched = true;
+		} 
+		//Otherwise just un-suspend the timer and view threads
+		else {
+			MessageRouter.sendSuspendTimerThreadMessage(false);
+			MessageRouter.sendSuspendViewThreadMessage(false);
 		}
 	}
 
@@ -130,8 +129,8 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		Log.d(activitynametag, "MainGamePanel surfaceDestroyed() called!");
 		
 		//Pause the threads that have event loops built in
-		timerThread.setSuspended(true);
-		viewThread.setSuspended(true);
+		MessageRouter.sendSuspendTimerThreadMessage(true);
+		MessageRouter.sendSuspendViewThreadMessage(true);
 		
 		// tell the thread to shut down and wait for it to finish
 		// this is a clean shutdown

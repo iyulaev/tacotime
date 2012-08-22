@@ -28,17 +28,20 @@ public class TimerThread extends Thread {
 	Handler handler;
 	public static final int MESSAGE_SET_PAUSED = 0;
 	public static final int MESSAGE_SET_UNPAUSED = 1;
+	public static final int MESSAGE_SET_SUSPENDED = 2;
+	public static final int MESSAGE_SET_UNSUSPEND = 3;
 
 	// flag to hold game state 
-	private boolean running;
 	private boolean paused;
 	private boolean suspended;
+	
+	long tickCount;
+	long lastTimerTick;
 
 	public TimerThread() {
 		super();
 		
 		paused = false;
-		running = false;
 		suspended = false;
 
 		handler = new Handler() {
@@ -46,12 +49,14 @@ public class TimerThread extends Thread {
 			public void handleMessage(Message msg) {
 				if (msg.what == MESSAGE_SET_PAUSED) setPaused(true);
 				else if (msg.what == MESSAGE_SET_UNPAUSED) setPaused(false);
+				else if (msg.what == MESSAGE_SET_SUSPENDED) setSuspended(true);
+				else if (msg.what == MESSAGE_SET_UNSUSPEND) setSuspended(false);
 				
 			}
 		};
 	}
 	
-	private synchronized void setPaused(boolean n_paused) {
+	private void setPaused(boolean n_paused) {
 		this.paused = n_paused;
 	}
 	
@@ -59,19 +64,39 @@ public class TimerThread extends Thread {
 	 * launch a notification to wake the TimerThread back up.
 	 * @param n_suspended Whether this TimerThread should be suspended.
 	 */
-	public synchronized void setSuspended(boolean n_suspended) {		
-		if(!n_suspended && this.suspended) {
+	private void setSuspended(boolean n_suspended) {		
+		/*if(!n_suspended && this.suspended) {
 			this.suspended = n_suspended;
 			notifyAll();
 		}
-		else this.suspended = n_suspended;
+		else */this.suspended = n_suspended;
+		if(!this.suspended) callRefreshDelayed();
 	}
 	
-	private synchronized void checkSuspended() {
+	/*private synchronized void checkSuspended() {
 		while(this.suspended) {
 			try { wait(); }
 			catch (InterruptedException e) {}
 		}
+	}*/
+	
+	private void callRefreshDelayed() { 
+		handler.postDelayed(
+			new Runnable() {
+				public void run() {	
+					if(!suspended) {
+						if(System.currentTimeMillis() > lastTimerTick + TIMER_GRANULARIY) {
+							if(!paused) MessageRouter.sendTickMessage();
+							lastTimerTick = System.currentTimeMillis();
+							tickCount++;
+						}
+						
+						callRefreshDelayed();
+					}
+					
+					//Log.v(activitynametag, "pineapple");
+				}
+			}, TIMER_GRANULARIY/3);
 	}
 
 	/** The run() methods launched a tick message every TIMER_GRANULARITY milliseconds. It uses Thread.sleep() between
@@ -80,10 +105,12 @@ public class TimerThread extends Thread {
 	 */
 	@Override
 	public void run() {
-		long tickCount = 0L;
-		long lastTimerTick = 0L;
+		tickCount = 0L;
+		lastTimerTick = 0L;
 		
-		while (running) {
+		MessageRouter.sendSuspendTimerThreadMessage(false);
+		
+		/*while (running) {
 			tickCount++;
 			
 			//If we are suspended then this will block until we are no longer
@@ -105,11 +132,7 @@ public class TimerThread extends Thread {
 			//So that we are off by no more than about 30% of a tick (roughly)
 			try {Thread.sleep(TIMER_GRANULARIY/3);}
 			catch (Exception e) {;}
-		}
-	}
-	
-	public void setRunning(boolean running) {
-		this.running = running;
+		}*/
 	}
 	
 }

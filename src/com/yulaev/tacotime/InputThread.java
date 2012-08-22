@@ -105,7 +105,7 @@ public class InputThread extends Thread {
 	/** Clear all VOs by creating a new viewObjects array list
 	 * Done between levels to  "reset" the game
 	 */
-	public void reset() {
+	public synchronized void reset() {
 		viewObjects = new ArrayList<ViewObject>();
 	}
 	

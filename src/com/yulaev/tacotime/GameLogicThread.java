@@ -337,7 +337,7 @@ public class GameLogicThread extends Thread {
 	 * 
 	 * @param n_actor The CoffeeGirl Object that will be this game's Actor, i.e. the player-controlled character
 	 */
-	public void setActor(CoffeeGirl n_actor) {
+	public synchronized void setActor(CoffeeGirl n_actor) {
 		coffeeGirl = n_actor;
 	}
 	
@@ -346,7 +346,7 @@ public class GameLogicThread extends Thread {
 	 * queue and advance it's state machine accordingly, i.e. finish the level when the queue is exhausted.
 	 * @param n_customerQueue
 	 */
-	public void setCustomerQueue(CustomerQueue n_customerQueue) {
+	public synchronized void setCustomerQueue(CustomerQueue n_customerQueue) {
 		customerQueue = n_customerQueue;
 		this.addGameItem(customerQueue);
 	}
@@ -355,7 +355,7 @@ public class GameLogicThread extends Thread {
 	  * so that it's state can be updated when an interaction occurs. 
 	  * @param n_gameItem The GameItem to put into the gameItems map.
 	  */
-	public void addGameItem(GameItem n_gameItem) {
+	public synchronized void addGameItem(GameItem n_gameItem) {
 		gameItems.put(n_gameItem.getName(), n_gameItem);
 	}
 	
@@ -365,7 +365,7 @@ public class GameLogicThread extends Thread {
 	 * @param associated_coffeegirl_state The associated state that CoffeeGirl will be put into when she 
 	 * receives the FoodItem.
 	 */
-	public void addNewFoodItem(GameFoodItem foodItem, int associated_coffeegirl_state) {
+	public synchronized void addNewFoodItem(GameFoodItem foodItem, int associated_coffeegirl_state) {
 		//If this is the first food item that we are adding then have CoffeeGirl be holding that food item
 		//Better hope that the first food item is "nothing"!
 		boolean doSetItemHolding = false;
@@ -387,7 +387,7 @@ public class GameLogicThread extends Thread {
 	 * 
 	 * @return A List of GameFoodItems valid for this game/level/whatever.
 	 */
-	public List<GameFoodItem> getFoodItems() {
+	public synchronized List<GameFoodItem> getFoodItems() {
 		ArrayList<GameFoodItem> retval = new ArrayList<GameFoodItem>();
 		Iterator<String> it = foodItems.keySet().iterator();
 		while(it.hasNext()) retval.add(foodItems.get(it.next()));
@@ -398,7 +398,7 @@ public class GameLogicThread extends Thread {
 	/**Clears all of the gameItems, foodItems, etc in preparation to load a new level.
 	 * 
 	 */
-	public void reset() {
+	public synchronized void reset() {
 		coffeeGirl = null;
 		gameItems = new HashMap<String, GameItem>();
 		foodItems = new HashMap<String, GameFoodItem>();

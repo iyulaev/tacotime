@@ -147,6 +147,26 @@ public class MessageRouter {
 		}
 	}
 	
+	/** TODO add comments */
+	public synchronized static void sendSuspendViewThreadMessage(boolean suspended) {
+		if(viewThread != null) {
+			Message message = Message.obtain();
+			if(suspended) message.what = ViewThread.MESSAGE_SET_SUSPENDED;
+			else message.what = ViewThread.MESSAGE_SET_UNSUSPEND;
+			viewThread.handler.sendMessage(message);
+		}
+	}
+	
+	/** TODO add comments */
+	public synchronized static void sendSuspendTimerThreadMessage(boolean suspended) {
+		if(timerThread != null) {
+			Message message = Message.obtain();
+			if(suspended) message.what = TimerThread.MESSAGE_SET_SUSPENDED;
+			else message.what = TimerThread.MESSAGE_SET_UNSUSPEND;
+			timerThread.handler.sendMessage(message);
+		}
+	}
+	
 	/** Sends  message to the ViewThread telling it to display an announcement. An announcement is displayed
 	 * by overlaying some text on top of the game canvas display.
 	 * 

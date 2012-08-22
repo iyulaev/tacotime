@@ -123,8 +123,8 @@ public class Customer extends GameActor {
 	}
 	
 	/** These methods have to do with getting the position in the queue and advancing the queue */
-	public int getQueuePosition() { return queue_position; }
-	public void decQueuePosition() { queue_position--; } 
+	public synchronized int getQueuePosition() { return queue_position; }
+	public synchronized void decQueuePosition() { queue_position--; } 
 	
 	//Define the starting location of customers, the position if they're first or second,  
 	//and the exit location of customers
@@ -281,7 +281,7 @@ public class Customer extends GameActor {
 	 * 
 	 * @return true if this Customer's order has been satisfies (and he can GTFO), false otherwise
 	 */
-	public boolean orderSatisfied() {
+	public synchronized boolean orderSatisfied() {
 		for(int i = 0; i < customerOrderSize; i++) {
 			if(! customerOrder.get(i).isSatisfied()) return(false);
 		}

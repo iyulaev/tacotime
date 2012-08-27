@@ -1,6 +1,9 @@
 /** This class implements the almost top-level of the TacoTime game engine, which actually
  * displays the game grid and other things. Typically we enter here from the main menu.
- * Mostly all it does is create the MaingamePanel() and set up the window appearance.
+ * Mostly all it does is create the MaingamePanel() and set up the window appearance. Also it
+ * creates and responds to the in-game dialog that gets launched when the users presses the 
+ * back button (see onBackPressed()) and displays the end-of-level dialog (handler gets message 
+ * GameLogicThread.MESSAGE_POSTLEVEL_DIALOG_OPEN)
  * 
  * @author iyulaev
  */
@@ -150,7 +153,6 @@ public class TacoTimeMainGameActivity extends Activity {
 			//void setButton(CharSequence text, DialogInterface.OnClickListener listener)
 			
 			//Maps to "return to main menu"
-			//TODO: should this method directly destroy MainGamePanel and then destroy this Activity?
 			.setPositiveButton("Main Menu", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int id) {
 					MessageRouter.sendInGameDialogResult(InputThread.INGAMEDIALOGRESULT_MAIN_MENU);

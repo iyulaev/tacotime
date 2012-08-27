@@ -13,7 +13,8 @@ import android.graphics.Rect;
 import android.util.Log;
 
 /** CoffeeGirl is the main actor in TacoTime. She is the character controlled by the player. CoffeeGirl has 
- * state managed by GameLogicThread and may interact with all of the GameItems.
+ * state managed by GameLogicThread and may interact with all of the GameItems. Her state is determined by 
+ * what GameFoodItem she carries.
  * @author ivany
  *
  */
@@ -30,6 +31,11 @@ public class CoffeeGirl extends GameActor {
 	public static final int STATE_CARRYING_BLENDEDDRINK = 3;
 	public static final int STATE_CARRYING_PIESLICE = 4;
 	
+	/** Default constructor for a coffeegirl object.
+	 * 
+	 * @param caller The calling Context so that bitmaps may be loaded and such. See GameActor (superclass) constructor
+	 * for more details.
+	 */
 	public CoffeeGirl(Context caller) {
 		super(caller, DEFAULT_COFFEEGIRL_MOVERATE);
 		
@@ -89,9 +95,9 @@ public class CoffeeGirl extends GameActor {
 	// Since CoffeeGirl's state is coupled to what items she is holding, we define these associations below
 	private String itemHolding; //the item that CoffeeGirl holds
 	private HashMap<String, State> itemToStateMap; //A map between GameFoodItems that CoffeeGirl may hold and
-	//the relevant CoffeeGirl states
+		//the relevant CoffeeGirl states
 	
-	/** Set an association between a particular GameFoodItem and a CoffeeGirl state
+	/** Set an association between a particular GameFoodItem and a CoffeeGirl state. Called by the GLT.
 	 * 
 	 * @param item The GameFoodItem's name that we will associate state with
 	 * @param state The index of the state to be associated with item.
@@ -102,7 +108,7 @@ public class CoffeeGirl extends GameActor {
 	}
 	
 	/** Set this CoffeeGirl to be holding the GameFoodItem named newItem. As a side effect CoffeeGirl's 
-	 * state gets set to the state that is assocated with this GameFoodItem (in itemToStateMap).
+	 * state gets set to the state that is associated with this GameFoodItem (in itemToStateMap).
 	 * @param newItem
 	 */
 	public synchronized void setItemHolding(String newItem) {
@@ -116,8 +122,5 @@ public class CoffeeGirl extends GameActor {
 	 */
 	public synchronized String getItemHolding() {
 		return(itemHolding);
-	}
-	
-	
-	
+	}	
 }

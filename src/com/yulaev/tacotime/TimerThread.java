@@ -6,6 +6,7 @@ import com.yulaev.tacotime.gamelogic.GameInfo;
 import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
@@ -38,6 +39,11 @@ public class TimerThread extends Thread {
 	long tickCount;
 	long lastTimerTick;
 
+	/** TimerThread constructor does nothing much except for initializing handler, which will handle messages 
+	 * sent to this timer thread. Mostly these messages pause or suspend (or un-pause/un-suspend) the timer thread.
+	 * When the thread is suspended, no call-backs occur and the thread basically stops cycling. When paused, callbacks
+	 * still occur but no messages are sent out via MessageRouter.
+	 */
 	public TimerThread() {
 		super();
 		
@@ -56,6 +62,10 @@ public class TimerThread extends Thread {
 		};
 	}
 	
+	/** Set whether this TimerThread is paused or now. When paused it does not send out timer tick
+	 * messages.
+	 * @param n_paused
+	 */
 	private void setPaused(boolean n_paused) {
 		this.paused = n_paused;
 	}
@@ -65,43 +75,33 @@ public class TimerThread extends Thread {
 	 * @param n_suspended Whether this TimerThread should be suspended.
 	 */
 	private void setSuspended(boolean n_suspended) {		
-		/*if(!n_suspended && this.suspended) {
-			this.suspended = n_suspended;
-			notifyAll();
-		}
-		else */this.suspended = n_suspended;
+		this.suspended = n_suspended;
 		if(!this.suspended) callRefreshDelayed();
 	}
 	
-	/*private synchronized void checkSuspended() {
-		while(this.suspended) {
-			try { wait(); }
-			catch (InterruptedException e) {}
-		}
-	}*/
-	
+	/** This methods sends out a timer tick and queues itself (via handler) to be called back after a fixed number 
+	 * of milliseconds. It effectively implements the busy loop for TimerThread.
+	 */
 	private void callRefreshDelayed() { 
 		handler.postDelayed(
 			new Runnable() {
 				public void run() {	
 					if(!suspended) {
-						if(System.currentTimeMillis() > lastTimerTick + TIMER_GRANULARIY) {
+						if(SystemClock.uptimeMillis() > lastTimerTick + TIMER_GRANULARIY) {
 							if(!paused) MessageRouter.sendTickMessage();
-							lastTimerTick = System.currentTimeMillis();
+							lastTimerTick = SystemClock.uptimeMillis();
 							tickCount++;
 						}
 						
 						callRefreshDelayed();
 					}
-					
-					//Log.v(activitynametag, "pineapple");
 				}
-			}, TIMER_GRANULARIY/3);
+			}, TIMER_GRANULARIY/3); //CallBack timer thread more often than necessary, just for fun.
+					//Maybe it'll increase the accuracy of each tick? Not sure we care though.
 	}
 
-	/** The run() methods launched a tick message every TIMER_GRANULARITY milliseconds. It uses Thread.sleep() between
-	 * ticks to suspend execution and it uses checkSuspend() with wait()/notifyAll() to suspend this thread between 
-	 * game levels.
+	/** The run() method doesn't do very much anymore; it really just un-suspends itself and then returns. The 
+	 * delayed callback method (callRefreshDelayed()) implements the timer loop now. 
 	 */
 	@Override
 	public void run() {
@@ -109,30 +109,6 @@ public class TimerThread extends Thread {
 		lastTimerTick = 0L;
 		
 		MessageRouter.sendSuspendTimerThreadMessage(false);
-		
-		/*while (running) {
-			tickCount++;
-			
-			//If we are suspended then this will block until we are no longer
-			checkSuspended();
-			
-			//Fire off timers if sufficient time has elapsed
-			//no timers yet!
-			if(System.currentTimeMillis() > lastTimerTick + TIMER_GRANULARIY)
-			{
-				if(!paused)	{
-					
-					MessageRouter.sendTickMessage();
-					
-				}
-				
-				lastTimerTick = System.currentTimeMillis();
-			}
-			
-			//So that we are off by no more than about 30% of a tick (roughly)
-			try {Thread.sleep(TIMER_GRANULARIY/3);}
-			catch (Exception e) {;}
-		}*/
 	}
 	
 }

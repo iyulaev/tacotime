@@ -49,7 +49,6 @@ public class GameLogicThread extends Thread {
 	public static final int MESSAGE_INTERACTION_EVENT = 0;
 	public static final int MESSAGE_TICK_PASSED = 1;
 	public static final int MESSAGE_LOAD_GAME = 2;
-	public static final int MESSAGE_SAVE_GAME = 3;
 	public static final int MESSAGE_NEXT_LEVEL = 4;
 	public static final int MESSAGE_POSTLEVEL_DIALOG_OPEN = 5;
 	public static final int MESSAGE_POSTLEVEL_DIALOG_CLOSED = 6;
@@ -94,7 +93,7 @@ public class GameLogicThread extends Thread {
 		gameItems = new HashMap<String, GameItem>();
 		foodItems = new HashMap<String, GameFoodItem>();
 		
-		if(load_saved) loadSavedGame();
+		if(load_saved) GameInfo.loadSavedGame();
 		
 		//Creates a Handler that will be used to process Interaction and ClockTick messages, and advance the CoffeeGirl and
 		//GameLogicThread state machines
@@ -133,12 +132,6 @@ public class GameLogicThread extends Thread {
 					MessageRouter.sendPauseTimerMessage(false);
 				}
 				
-				//save the current game
-				//TODO remove this isn't used
-				else if(msg.what == MESSAGE_SAVE_GAME) {
-					GameInfo.saveCurrentGame();
-				}
-				
 				//If we are to advance to the next level, set the GameMode appropriately and unpause
 				else if(msg.what == MESSAGE_NEXT_LEVEL) {
 					GameInfo.saveCurrentGame();
@@ -161,11 +154,6 @@ public class GameLogicThread extends Thread {
 	 * @param gameLogicThread
 	 */
 	public void setSelf(GameLogicThread gameLogicThread) { this.gameLogicThread = gameLogicThread; }
-	
-	/** Used to load a saved game */
-	private void loadSavedGame() {
-		GameInfo.loadSavedGame();
-	}
 	
 	/** Since CoffeeGirl interacts with all other game items, describing the CoffeeGirl state machine is done on the global level
 	 * rather than within CoffeeGirl itself. As a side effect GameInfo money and/or points may change depending on how
@@ -414,7 +402,6 @@ public class GameLogicThread extends Thread {
 	public static final int MAX_GAME_LEVEL=4;
 	/** Loads a new level; creates a GameLevel Object corresponding to the new level
 	 * and kicks off (unpauses) all of the threads.
-	 * TODO: Should this really be done in the GameLogicThread or should we have a dedicated loader thread?
 	 * @param levelNumber
 	 */
 	public void loadLevel(int levelNumber) {

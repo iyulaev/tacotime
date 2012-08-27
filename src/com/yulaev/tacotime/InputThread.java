@@ -63,10 +63,14 @@ public class InputThread extends Thread {
 				
 				else if (msg.what == MESSAGE_SET_PAUSED) setPaused(true);
 				else if (msg.what == MESSAGE_SET_UNPAUSED) setPaused(false);
+				//Called when the in-game dialog gets launched
+				//Pauses the game!
 				else if (msg.what == MESSAGE_INGAME_DIALOG_LAUNCHED) {
 					MessageRouter.sendPauseMessage(true);
 					setPaused(true);
 				}
+				//Called when the in-game dialog (back button during game play dialog) finishes
+				//Decides what to do with the result of the dialog
 				else if (msg.what == MESSAGE_INGAME_DIALOG_FINISHED) {
 					setPaused(false);
 					MessageRouter.sendPauseMessage(false);
@@ -109,6 +113,14 @@ public class InputThread extends Thread {
 		viewObjects = new ArrayList<ViewObject>();
 	}
 	
+	/** Toggles the "paused" member variable. When paused is true then no handleTap calls are made and 
+	 * therefore no user interface inputs get propagated to the ViewObjects (various items) of the game.
+	 * @param n_paused The new setting for paused.
+	 */
+	public void setPaused(boolean n_paused) {
+		this.paused = n_paused;
+	}
+	
 	/** This method is called when a HANDLE_ONTAP message is received by this InputThread. It calls 
 	 * handleTap() for all ViewObjects present in the game so that they are aware that user input 
 	 * has occured.
@@ -129,13 +141,4 @@ public class InputThread extends Thread {
 		;
 
 	}
-	
-	/** Toggles the "paused" member variable. When paused is true then no handleTap calls are made and 
-	 * therefore no user interface inputs get propagated to the ViewObjects (various items) of the game.
-	 * @param n_paused The new setting for paused.
-	 */
-	public void setPaused(boolean n_paused) {
-		this.paused = n_paused;
-	}
-	
 }

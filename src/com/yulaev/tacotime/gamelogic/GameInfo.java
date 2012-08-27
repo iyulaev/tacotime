@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.yulaev.tacotime.gameobjects.GameUpgrade;
 
+import android.os.SystemClock;
 import android.util.Log;
 
 /**The GameInfo class keeps track of high-level global game data, such as how many points and how
@@ -22,10 +23,10 @@ public class GameInfo {
 	//The amount of money and points that the player currently has
 	public static int money;
 	public static int points;
-	//The amount of moeny and points that the player has aquired on this level
+	//The amount of money and points that the player has acquired on this level
 	public static int level_money, level_points;
 	
-	//These variables keep track of what level we are on, how many seconds remain on the clock,
+	//These variables keep track of what level we are on, how many game ticks remain on the clock,
 	//and whether the level is in play or not
 	private static int level;
 	private static int levelTime;
@@ -147,7 +148,7 @@ public class GameInfo {
 		level_money = 0;
 		level_points = 0;
 		
-		game_time_millis = 0;
+		game_time_millis = SystemClock.uptimeMillis();
 	}
 	
 	/** Clear level state only; clears level_money and level_points

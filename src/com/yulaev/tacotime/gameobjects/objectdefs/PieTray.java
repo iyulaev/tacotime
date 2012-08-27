@@ -8,6 +8,6 @@ import android.content.Context;
 
 public class PieTray extends GameItem {
 	public PieTray(Context caller, int r_bitmap, int x_pos, int y_pos, int orientation) {
-		super(caller, "PieTray", r_bitmap, x_pos, y_pos, orientation, 15, 15);
+		super(caller, "PieTray", r_bitmap, x_pos, y_pos, orientation, 15, 20);
 	}
 }

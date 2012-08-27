@@ -90,7 +90,8 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 	}
 
 	/** Not sure why this is here right now but I suppose it is to handle changes like a change
-	 * in orientation (which we should suppress anyway!)
+	 * in orientation (which we should suppress anyway!). This is implemented here only because 
+	 * we implement SurfaceHolder.Callback.
 	 */
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
@@ -117,7 +118,7 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 			
 			threads_launched = true;
 		} 
-		//Otherwise just un-suspend the timer and view threads
+		//Otherwise just un-suspend the timer and view threads (since they exist already...right?)
 		else {
 			MessageRouter.sendSuspendTimerThreadMessage(false);
 			MessageRouter.sendSuspendViewThreadMessage(false);
@@ -131,23 +132,6 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		//Pause the threads that have event loops built in
 		MessageRouter.sendSuspendTimerThreadMessage(true);
 		MessageRouter.sendSuspendViewThreadMessage(true);
-		
-		// tell the thread to shut down and wait for it to finish
-		// this is a clean shutdown
-		/*boolean retry = true;
-		while (retry) {
-			try {
-				timerThread.join();
-				viewThread.join();
-				inputThread.join();
-				gameLogicThread.join();
-				retry = false;
-			} catch (InterruptedException e) {
-				// try again shutting down the thread
-			}
-			
-			Log.d(activitynametag, "Threads were shut down cleanly");
-		}*/
 	}
 	
 	/** Responds to a touch event; mostly just sends the tap event to the InputThread via MessageRouter. 
@@ -221,7 +205,6 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		//Draw money, points and display an announcement message IF there is an announcement
 		canvas.drawText(Integer.toString(money), 14, canvas.getHeight()-40, moneyPaint);
 		canvas.drawText(Integer.toString(points), 14, canvas.getHeight()-15, pointsPaint);
-		
 		if(draw_announcement_message) {
 			canvas.drawText(announcementMessage, canvas.getWidth()/2, canvas.getHeight()/2, announcementPaint);
 		}

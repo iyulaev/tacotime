@@ -94,7 +94,7 @@ public class UpgradeMenuActivity extends ListActivity {
 			Toast t = Toast.makeText(me, "Sorry, not enough money to buy " + upgrade.getUpgradeLongName(), Toast.LENGTH_SHORT);
 			t.show();
 		}
-		
+		//If we've already bought the upgrade, inform the user and don't buy it
 		else if(!GameInfo.hasUpgrade(upgrade)) {
 			Toast t = Toast.makeText(me, "You've already bought " + upgrade.getUpgradeLongName() + "!", Toast.LENGTH_SHORT);
 			t.show();

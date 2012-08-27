@@ -32,9 +32,6 @@ public class TacoTimeActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		// requesting to turn the title OFF
-		// requestWindowFeature(Window.FEATURE_NO_TITLE);		
-		
 		// Change content view so that we are using mainmenulayout now!
 		setContentView(R.layout.mainmenulayout);
 		
@@ -58,6 +55,9 @@ public class TacoTimeActivity extends Activity {
 		});
 	}
 	
+	/** Displays an AlertDialog dialog to the user, stating that whatsNotImplemented hasn't been implemented yet. 
+	 * @param whatsNotImplemented String describing what it is that we haven't implemented.
+	 * */
 	private void showUnimplementedError(String whatsNotImplemented) {
        
 		Builder b = new AlertDialog.Builder(this)
@@ -66,7 +66,7 @@ public class TacoTimeActivity extends Activity {
         .setMessage("Sorry! " + whatsNotImplemented + " hasn't been implemented yet.")
         .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
-                        //Put your code in here for a positive response
+                	; //onClick() does nothing, just kills the dialog.
                 }
         });
         

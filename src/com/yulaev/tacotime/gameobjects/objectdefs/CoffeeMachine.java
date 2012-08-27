@@ -32,7 +32,7 @@ public class CoffeeMachine extends GameItem {
 	 * @param orientation
 	 */
 	public CoffeeMachine(Context caller, int r_bitmap, int x_pos, int y_pos, int orientation) {
-		super(caller, "CoffeeMachine" + (++instanceCount), r_bitmap, x_pos, y_pos, orientation, 15, 15);
+		super(caller, "CoffeeMachine" + (++instanceCount), r_bitmap, x_pos, y_pos, orientation, 15, 20);
 		
 		//Add states that describe behavior of coffee machine
 		//super.addState(String stateName, int state_delay_ms, int r_bitmap, boolean input_sensitive, boolean time_sensitive)

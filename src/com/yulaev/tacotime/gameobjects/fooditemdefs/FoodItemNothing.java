@@ -40,13 +40,11 @@ public class FoodItemNothing extends GameFoodItem {
 	
 	@Override
 	public int pointsOnInteraction(String interactedWith, int waitTime) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public int moneyOnInteraction(String interactedWith, int waitTime) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 

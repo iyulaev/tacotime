@@ -7,6 +7,7 @@ import java.util.Iterator;
 import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
@@ -37,9 +38,15 @@ public class ViewThread extends Thread {
 	public static final int MESSAGE_SET_SUSPENDED = 5;
 	public static final int MESSAGE_SET_UNSUSPEND = 6;
 	
-	//Define view refresh period in ms
-	public static final int VIEW_REFRESH_PERIOD = 20;
+	//Define view refresh period in ms (define the bounds also for adjustable frame rate!)
+	public static final int MIN_VIEW_REFRESH_PERIOD = 20;
+	public static final int VIEW_REFRESH_PERIOD = 50;
+	public static final int MAX_VIEW_REFRESH_PERIOD = 250;
+	public static final int VIEW_REFRESH_PERIOD_MAX_INCR = 50;
 	public static final int VIEW_SUSPEND_PERIOD = 1000/3;
+	//Current calculated refresh time. We'll trim this value so that we don't end up over-loading
+	//the phone's graphics subsystem (it causes the phone to flip the fuck out for some reason)
+	private static int current_view_refresh_period;
 
 	// Surface holder that can access the physical surface
 	private SurfaceHolder surfaceHolder;
@@ -57,11 +64,10 @@ public class ViewThread extends Thread {
 	//Here we hold all of the GameItems that are rendered by this ViewThread
 	ArrayList<GameItem> gameItems;
 	
-	//If running is false then we fall out of the event loop and die
-	private boolean running;
 	//If paused is true then, during refreshView(), we do not call onUpdate() BUT we still re-draw the entire canvas
+	//Thus no interactions may occur and nothing moves but rendering still occurs
 	private boolean paused;
-	//If suspended is true then the event loop is stopped and we wait to be un-suspended. THis should be a relateively
+	//If suspended is true then the event loop is stopped and we wait to be un-suspended. THis should be a relatively
 	//low-power and low computational intensity state
 	private boolean suspended;
 	
@@ -79,11 +85,7 @@ public class ViewThread extends Thread {
 		super();
 		this.surfaceHolder = surfaceHolder;
 		this.gamePanel = gamePanel;
-		this.viewObjects = new ArrayList<ViewObject>();
-		this.gameItems = new ArrayList<GameItem>();
-		this.actor = null;
 		
-		running = false;
 		paused = true;
 		suspended = false;
 		
@@ -116,7 +118,9 @@ public class ViewThread extends Thread {
 					setSuspended(false);
 				}
 			}
-		};		
+		};
+		
+		this.reset();
 	}
 
 	/** Add a ViewObject to the viewThread viewObjects ArrayList; all ViewObjects are updated and rendered by the ViewThread
@@ -149,6 +153,7 @@ public class ViewThread extends Thread {
 		this.viewObjects = new ArrayList<ViewObject>();
 		this.gameItems = new ArrayList<GameItem>();
 		this.actor = null;
+		current_view_refresh_period = VIEW_REFRESH_PERIOD;
 	}
 	
 	/** Call onUpdate() on all ViewObjects so that they can calculate their next position. Then re-draw the Canvas.
@@ -156,6 +161,8 @@ public class ViewThread extends Thread {
 	 * to the GameLogicThread if an interaction occurs.
 	 */
 	private void refreshView() {
+		long start_refresh_time = SystemClock.uptimeMillis();
+		
 		//If we are "paused" then no viewObjects should be updated; thier positions should remain static and
 		//no Interactions are to occur
 		if(!paused) {
@@ -187,6 +194,9 @@ public class ViewThread extends Thread {
 		finally {
 			if(canvas != null) surfaceHolder.unlockCanvasAndPost(canvas);
 		}
+		
+		//Update the refresh period based on how long this frame took to render
+		updateViewRefreshPeriod(SystemClock.uptimeMillis() - start_refresh_time);
 	}
 	
 	/** Set whether the announcement message should be displayed or not
@@ -215,6 +225,33 @@ public class ViewThread extends Thread {
 		if(!suspended) callRefreshDelayed();
 	}
 	
+	/** Used to dynamically change the view refresh period. Basically, we adjust by (at most)
+	 * VIEW_REFRESH_PERIOD_MAX_INCR. If the last refresh took longer than the default timer then we increase
+	 * the period to the next refresh. We never allow the period to be less than MIN_VIEW_REFRESH_PERIOD nor
+	 * greater than MAX_VIEW_REFRESH_PERIOD.
+	 * 
+	 * @param last_update_time
+	 */
+	private void updateViewRefreshPeriod(long last_update_time) {
+		long period_change = (last_update_time - current_view_refresh_period)/2;
+		
+		if(period_change > VIEW_REFRESH_PERIOD_MAX_INCR) period_change = VIEW_REFRESH_PERIOD_MAX_INCR;
+		if(period_change < -1 * VIEW_REFRESH_PERIOD_MAX_INCR) period_change = -1 * VIEW_REFRESH_PERIOD_MAX_INCR;
+		
+		int period_change_int = (int) period_change;
+		
+		if(current_view_refresh_period + period_change_int > MAX_VIEW_REFRESH_PERIOD) 
+			current_view_refresh_period = MAX_VIEW_REFRESH_PERIOD;
+		else if(current_view_refresh_period + period_change_int < MIN_VIEW_REFRESH_PERIOD) 
+			current_view_refresh_period = MIN_VIEW_REFRESH_PERIOD;
+		else current_view_refresh_period = current_view_refresh_period + period_change_int;
+	}
+	
+	/** Get the current view refresh period. */
+	private int getViewRefreshPeriod() {
+		return current_view_refresh_period;
+	}
+	
 	/**This is the main ViewThread loop. Basically we call refreshView() (if we are not suspended) and then, once again,
 	 * if we are not suspended, we post a callback to handler to call callRefreshDelayed() again in ViewThread.
 	 * VIEW_REFRESH_PERIOD ms. Every time that refreshView() is called the canvas gets redrawn and position-related
@@ -229,10 +266,8 @@ public class ViewThread extends Thread {
 						refreshView();
 						callRefreshDelayed();
 					}
-					
-					//Log.v(activitynametag, "banana");
 				}
-			}, ViewThread.VIEW_REFRESH_PERIOD);
+			}, getViewRefreshPeriod());
 	}
 
 	

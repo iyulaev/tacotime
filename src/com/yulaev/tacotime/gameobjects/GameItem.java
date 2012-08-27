@@ -163,16 +163,11 @@ public class GameItem implements ViewObject {
 		int new_x = GameGrid.gameGridX(new_x_canvas);
 		int new_y = GameGrid.gameGridY(new_y_canvas);
 		
-		setLocked();
-		
-		/*if(inSensitivityArea(new_x, new_y)) 
-			Log.d(activitynametag+"."+this.getName(), "Saw tap at (" + new_x + ", " + new_y + ") this was in the sensitivity area");
-		else
-			Log.d(activitynametag+"."+this.getName(), "Saw tap at (" + new_x + ", " + new_y + ") this was NOT in the sensitivity area");*/
+		//setLocked();
 		
 		if(inSensitivityArea(new_x, new_y)) queueEvent();
 		else clearEvents();
-		unLock();
+		//unLock();
 	}
 	
 	/** Called when an interaction event is inserted into this GameItem's event queue. This generally occurs when the
@@ -182,7 +177,7 @@ public class GameItem implements ViewObject {
 		interactionQueue[interactionQueueLength] = EVENT_DEFAULT;
 		interactionQueueLength++;
 		
-		Log.v(activitynametag+"."+this.getName(), "Queued interaction event.");
+		//Log.v(activitynametag+"."+this.getName(), "Queued interaction event.");
 	}
 	
 	/** Clears the events in this GameItem's event queue; typically occurs when the user taps 
@@ -191,8 +186,6 @@ public class GameItem implements ViewObject {
 	 */
 	private void clearEvents() {
 		interactionQueueLength = 0;
-		
-		//Log.v(activitynametag+"."+this.getName(), "Cleared interaction events.");
 	}
 	
 	/** 
@@ -204,16 +197,14 @@ public class GameItem implements ViewObject {
 	public int consumeEvent() {
 		if(interactionQueueLength > 0) {
 			interactionQueueLength--;
-			//Log.v(activitynametag+"."+this.getName(), "Consumed interaction event (not null).");
 			return(EVENT_DEFAULT);
 		}
 		else return EVENT_NULL;
 	}
 	
-	/** These methods are used to lock and unlock the GameItem's internal variables, like position 
-	 * TODO use wait() and notifyAll() to do this properly*/
-	public synchronized boolean setLocked(){ while(locked); locked = true; return(locked); }	
-	public synchronized void unLock() { locked = false; }
+	/** These methods are used to lock and unlock the GameItem's internal variables, like position*/
+	/*public synchronized boolean setLocked(){ while(locked); locked = true; return(locked); }	
+	public synchronized void unLock() { locked = false; }*/
 	
 	/** For documentation see ViewObject interface */
 	public boolean isActor() {return false;}
@@ -228,9 +219,15 @@ public class GameItem implements ViewObject {
 	 */
 	public void onUpdate() { tryChangeState(false); }
 	
+	
+	
+	
+	
+	
 	/* THIS SECTION USED TO DEFINE THE STATE MACHINE FOR THIS GAMEITEM
 	 * The state machine is accessed by the GameLogic thread, to attempt to change this GameItem's state
-	 * 
+	 * Also it deals with returning the results of interactions (i.e. when the state has changed as a
+	 * result of an interaction with a GameActor)
 	 */
 	
 	
@@ -320,20 +317,9 @@ public class GameItem implements ViewObject {
 	 * @param new_state The index of the new state to set this GameItem's State to.
 	 */
 	protected synchronized void setState(int new_state) {
-		setLocked(); 
-		
 		currentState = validStates.get(new_state);
 		current_state_idx = new_state;
 		time_of_state_transition = GameInfo.currentTimeMillis();
 		this.bitmap = currentState.bitmap;
-		
-		unLock();
 	}
-	
-	/** Get the index of the state that this GameItem is in 
-	 * UNUSED, MARK FOR DELETION*/
-	/*public synchronized int getStateIdx() { 
-		return current_state_idx;
-	}*/
-	
 }

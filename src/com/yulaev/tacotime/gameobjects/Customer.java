@@ -118,7 +118,6 @@ public class Customer extends GameActor {
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "customer";
 	}
 	
@@ -192,7 +191,9 @@ public class Customer extends GameActor {
 		
 		//If we have been served and have advanced to the exit location then set state to finished
 		if(this.getState() == STATE_SERVED) {
-			if(x == locations_exit_x && y == locations_exit_y) setState(STATE_FINISHED);
+			if(x == locations_exit_x && y == locations_exit_y) {
+				setState(STATE_FINISHED);
+			}
 		}
 		
 		//If the customer has advanced to the finished state then do nothing
@@ -246,6 +247,10 @@ public class Customer extends GameActor {
 			}
 			
 		}
+		
+		/*if(!isVisible()) Log.v ("Customer", "Customer " + getQueuePosition() + "no longer visible! State is " + (getState()==STATE_FINISHED?"FINISHED":"INLINE"));
+		else Log.v ("Customer", "Customer " + getQueuePosition() + "is visible! x+" + x +  ", y=" + y +
+				", target_x = " + target_x + ", target_y=" + target_y);*/
 	}
 	
 	int customerOrderSize;

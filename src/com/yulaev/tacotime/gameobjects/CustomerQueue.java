@@ -28,7 +28,7 @@ public class CustomerQueue extends GameItem {
 	//Number of customers that are in states INLINE to SERVED
 	public static final int QUEUE_VISIBLE_LENGTH = 2;
 	//Time between customer appearance
-	public static final int TIME_BETWEEN_CUSTOMERS_MS = 3000;
+	public static final int TIME_BETWEEN_CUSTOMERS_MS = 2000;
 	private long time_since_last_customer;
 	
 	private static final String activitynametag = "CustomerQueue";
@@ -116,7 +116,7 @@ public class CustomerQueue extends GameItem {
 		
 		//Advance the queue if customer at position 0 has finished
 		if(head().getState() == Customer.STATE_SERVED || head().getState() == Customer.STATE_FINISHED) {
-			advanceQueue();
+			advanceQueue(); 
 		}
 				
 		
@@ -125,15 +125,16 @@ public class CustomerQueue extends GameItem {
 			if(customerList.get(i).getQueuePosition() < 0 &&
 					customerList.get(i).getState() == Customer.STATE_FINISHED) 
 				customerList.get(i).setVisible(false);
+					
 			
 			//Set the next customer that should be visible to visible IF sufficient time has passed
 			//and the customer's position is between 0 (front of the line) and the last visilbe position
 			if(!customerList.get(i).isVisible() && 
 					(customerList.get(i).getQueuePosition()>=0 && 
 					customerList.get(i).getQueuePosition()<QUEUE_VISIBLE_LENGTH) && 
-					System.currentTimeMillis() > time_since_last_customer+TIME_BETWEEN_CUSTOMERS_MS){
+					GameInfo.currentTimeMillis() > time_since_last_customer+TIME_BETWEEN_CUSTOMERS_MS){
 				customerList.get(i).setVisible(true);
-				time_since_last_customer = System.currentTimeMillis();
+				time_since_last_customer = GameInfo.currentTimeMillis();
 				
 				i = queue_length; //end loop
 			}

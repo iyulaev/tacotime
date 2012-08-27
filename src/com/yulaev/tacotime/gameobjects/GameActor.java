@@ -11,6 +11,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.os.SystemClock;
+import android.util.Log;
 
 /** A GameActor is any ViewObject in the Game that moves about and can interact with (or through) GameItems. GameActors
  * are for now limited to CoffeeGirl (the player character) and Customers, who interact with CoffeeGirl through the
@@ -40,10 +42,9 @@ public abstract class GameActor implements ViewObject {
 	//define whether this GameActor should be drawn
 	protected boolean visible;
 	
-	/** These methods are used to lock and unlock the GameActor's internal variables, like position 
-	 * TODO Should be done using wait() and notifyAll() */
-	public synchronized boolean setLocked(){ while(locked); locked = true; return(locked); }	
-	public synchronized void unLock() { locked = false; }
+	/** These methods are used to lock and unlock the GameActor's internal variables, like position */
+	protected synchronized boolean setLocked(){ while(locked); locked = true; return(locked); }	
+	protected synchronized void unLock() { locked = false; }
 	
 	/** Creates a new GameActor. Strating location is set to the center of the game grid
 	 * 
@@ -89,38 +90,56 @@ public abstract class GameActor implements ViewObject {
 		unLock();
 		
 		/* =-=-= CALCULATE MOTION VECTOR AND APPLY IT TO CHANGE POSITION! =-=-= */
-		int max_dist_moved; //the maximum distance we can move this onUpdate()
+		float max_dist_moved; //the maximum distance we can move this onUpdate()
+		
+		final double UNIT_INTERVAL_MS = 100.0; 
 		
 		//If we haven't even moved yet then just assume we can only move move_rate pixels
 		if(time_of_last_update < 0)	max_dist_moved = move_rate;
 		//Otherwise, assume we can move move_rate * (time since last update / 100ms) pixels
 		else {
-			double unit_intervals_since_moved = ( (double)System.currentTimeMillis() - time_of_last_update ) / 100.0;
-			max_dist_moved = (int) ( unit_intervals_since_moved * ((double)move_rate) );
+			double unit_intervals_since_moved = ( (double)(SystemClock.uptimeMillis() - time_of_last_update) ) / UNIT_INTERVAL_MS;
+			max_dist_moved = (float) ( unit_intervals_since_moved * ((float)move_rate) );
 		}
-		time_of_last_update = System.currentTimeMillis();
 		
 		//If we're not at our target position move towards it at move_rate
 		if(target_x != x || target_y != y) {
 			//Calculate distance to target
-			int distance = (int) Math.sqrt((target_x - x)*(target_x - x) + (target_y - y)*(target_y - y));
+			float distance = (int) Math.sqrt((target_x - x)*(target_x - x) + (target_y - y)*(target_y - y));
 			
 			//Calculate the length of our vector motion
-			int vector_length = Math.min( max_dist_moved, distance );
+			float vector_length = Math.min( max_dist_moved, distance );
 			
-			if(vector_length < max_dist_moved) {
+			//If the distance to the target is less than the maximum distance we're allowed to move, just
+			//move straight to the target
+			if(distance <= max_dist_moved) {
 				x = target_x;
 				y = target_y;
 			} else {
-				int vector_x, vector_y;
+				float vector_x, vector_y;
 				//Scale vectors by the distance that we are to traverse
-				vector_x = (target_x - x) * vector_length/distance;
-				vector_y = (target_y - y) * vector_length/distance;
+				vector_x = ((float)(target_x - x)) * vector_length/distance;
+				vector_y = ((float)(target_y - y)) * vector_length/distance;
 				
-				x+=vector_x;
-				y+=vector_y;
+				/*if(vector_x==0 && vector_y==0 ) {
+					if(Math.abs(target_x - x) > Math.abs(target_y - y)) {
+						vector_x = (target_x - x) > 0 ? 1 : -1;
+					} else {
+						vector_y = (target_y - y) > 0 ? 1 : -1;
+					}
+				}*/
+				
+				x+=(int) vector_x;
+				y+=(int) vector_y;
+				
+				//If we moved the actor, then log this update as having occured
+				//If the actor hasn't moved (because not enough time has elapsed) then don't move the actor!
+				if(! ( ((int) vector_x == 0) && ((int) vector_y == 0) ))
+					time_of_last_update = SystemClock.uptimeMillis();
 			}
 		}
+		else 
+			time_of_last_update = -1;
 	}
 
 	/** handleTap() is called by InputThread on user input, it does nothing for GameActor */

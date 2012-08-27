@@ -114,7 +114,7 @@ public class MessageRouter {
 	 * 
 	 * @param paused Whether to pause or un-pause view and input threads
 	 */
-	public synchronized static void sendPauseUIMessage(boolean paused) {
+	/*public synchronized static void sendPauseUIMessage(boolean paused) {
 		if(inputThread != null) {
 			Message message = Message.obtain();
 			if(paused) message.what = InputThread.MESSAGE_SET_PAUSED;
@@ -128,7 +128,7 @@ public class MessageRouter {
 			else message.what = ViewThread.MESSAGE_SET_UNPAUSED;
 			viewThread.handler.sendMessage(message);
 		}
-	}
+	}*/
 	
 	/** Pause the timer and prevent GameLogicThread from updating game state. Mostly used to un-pause the
 	 * game after a Level gets loaded or a (saved) game gets loaded, since the game will have been puased by
@@ -147,7 +147,10 @@ public class MessageRouter {
 		}
 	}
 	
-	/** TODO add comments */
+	/** Sends a "suspend" message to the ViewThread. 
+	 * 
+	 * @param suspended if true, the ViewThread stops drawing the screen and exits its busy loop.
+	 */
 	public synchronized static void sendSuspendViewThreadMessage(boolean suspended) {
 		if(viewThread != null) {
 			Message message = Message.obtain();
@@ -157,7 +160,11 @@ public class MessageRouter {
 		}
 	}
 	
-	/** TODO add comments */
+	/** Sends a "suspend" message to the TimerThread. 
+	 * 
+	 * @param suspended if true, the TimerThread stops sending out tick messages to the rest of the program. This causes
+	 * the GLT state machien to stop advancing and the GameInfo game time to stop advancing also.
+	 */
 	public synchronized static void sendSuspendTimerThreadMessage(boolean suspended) {
 		if(timerThread != null) {
 			Message message = Message.obtain();
@@ -218,19 +225,6 @@ public class MessageRouter {
 			gameLogicThread.handler.sendMessage(message);
 			
 			Log.v("MessageRouter", "Sent Load Game message");
-		}
-	}
-	
-	/** Called when we are asked to save the current game to our saved game db 
-	 * TODO unused, remove at some point.
-	 * */
-	public synchronized static void sendSaveGameMessage() {
-		if(gameLogicThread != null) {
-			Message message = Message.obtain();
-			message.what = GameLogicThread.MESSAGE_SAVE_GAME;
-			gameLogicThread.handler.sendMessage(message);
-			
-			Log.v("MessageRouter", "Sent Save Game message");
 		}
 	}
 	

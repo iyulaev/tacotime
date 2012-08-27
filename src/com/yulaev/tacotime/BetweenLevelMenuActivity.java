@@ -2,7 +2,7 @@
  * is shown to the user between levels (upon completing a level) and allows the user to buy upgrades and
  * save & continue, or to retry the level.
  * 
- * @author iyulaev
+ * @author iyulaev (ivan@yulaev.com)
  */
 
 package com.yulaev.tacotime;
@@ -23,13 +23,10 @@ public class BetweenLevelMenuActivity extends Activity {
 	
 	private static final String activitynametag = "BetweenLevelMenuActivity";
 	
-	/** Called when the activity is first created. */
+	/** Called when the activity is first created. Just sets up button listeners and stuff.*/
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		
-		// requesting to turn the title OFF
-		// requestWindowFeature(Window.FEATURE_NO_TITLE);		
+		super.onCreate(savedInstanceState);		
 		
 		// Change content view so that we are using mainmenulayout now!
 		setContentView(R.layout.betweenlevelmenu);
@@ -64,27 +61,9 @@ public class BetweenLevelMenuActivity extends Activity {
 		});
 	}
 	
+	/** When back is pressed between levels, assume the user means "save and continue" */
 	public void onBackPressed() {
 		MessageRouter.sendNextLevelMessage();
 		finish();
-	}
-	
-	/** This method creates an AlertDialog, telling the user that something hasn't been implemented yet
-	 * 
-	 * @param whatsNotImplemented String describing the thing that hasn't been implemented.
-	 */
-	private void showUnimplementedError(String whatsNotImplemented) {
-       
-		Builder b = new AlertDialog.Builder(this)
-        .setTitle("Not Implemented")
-        .setIcon(R.drawable.fooditem_coffee )
-        .setMessage("Sorry! " + whatsNotImplemented + " hasn't been implemented yet.")
-        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                        //Put your code in here for a positive response
-                }
-        });
-        
-        b.show();
 	}
 }

@@ -166,7 +166,6 @@ public class Customer extends GameActor {
 		if(this.isVisible() && getState() == STATE_HIDDEN) {
 			setState(STATE_INLINE_HAPPY);
 			mood_last_updated = GameInfo.currentTimeMillis() / 1000;
-			//Log.d(activitynametag, "Customer advanced to STATE_INLINE");
 		}
 		
 		//If state is "in line" make sure that we are standing in the appropriate part of the line
@@ -181,7 +180,7 @@ public class Customer extends GameActor {
 			if(orderSatisfied()) setState(STATE_SERVED);
 			
 			//Update mood?
-			if(mood_last_updated + seconds_between_pissed_off < (GameInfo.currentTimeMillis()/1000)) {
+			if(mood_last_updated + seconds_between_pissed_off < GameInfo.currentTimeMillis()/1000) {
 				mood_last_updated = GameInfo.currentTimeMillis()/1000;
 				
 				if(this.getState() == STATE_INLINE_HAPPY) setState(STATE_INLINE_OK);
@@ -198,7 +197,6 @@ public class Customer extends GameActor {
 		
 		//If the customer has advanced to the finished state then do nothing
 		if(this.getState() == STATE_FINISHED) ;
-		
 	}
 	
 	/** Called when the customer needs to be drawn. Apart from drawing the customer icon we also
@@ -214,7 +212,9 @@ public class Customer extends GameActor {
 			int BUBBLE_WIDTH = 54;
 			int BUBBLE_HEIGHT = 32;
 			
-			//TODO: this might not be great for performance (due to GC performance?)
+			/*TODO: this might not be great for performance (due to GC performance?)
+			We can probably avoid re-drawing the speechBubble if no order items have been fulfilled AND the Customer
+			hasn't moved since the last time draw() was called.*/
 			NinePatchDrawable speechBubble = (NinePatchDrawable)caller.getResources().getDrawable(R.drawable.speech_bubble_sm);
 
 			int bubble_left =  GameGrid.canvasX(this.x) + this.bitmap.getWidth()/2 + 2; //+2 at the end for padding :)
@@ -239,6 +239,7 @@ public class Customer extends GameActor {
 				else 
 					foodBitmap = customerOrder.get(i).getBitmapActive();
 				
+				//Calculate adjusted positions based on the size of the icons
 				int foodicon_adjusted_x = foodicon_x - customerOrder.get(i).getBitmapInactive().getWidth()/2;
 				int foodicon_adjusted_y = foodicon_y - customerOrder.get(i).getBitmapInactive().getHeight()/2;				
 				canvas.drawBitmap(foodBitmap,foodicon_adjusted_x,foodicon_adjusted_y,null);
@@ -247,20 +248,18 @@ public class Customer extends GameActor {
 			}
 			
 		}
-		
-		/*if(!isVisible()) Log.v ("Customer", "Customer " + getQueuePosition() + "no longer visible! State is " + (getState()==STATE_FINISHED?"FINISHED":"INLINE"));
-		else Log.v ("Customer", "Customer " + getQueuePosition() + "is visible! x+" + x +  ", y=" + y +
-				", target_x = " + target_x + ", target_y=" + target_y);*/
 	}
 	
+	//Customer order tracking variables
 	int customerOrderSize;
 	ArrayList<GameFoodItem> customerOrder;
 	float moneyMultiplier;
 	float pointsMultiplier;
 	
-	/** 
-	 * @return true if the interaction filled a dependency i.e. fufilled a customer's order request,
-	 * otherwise false
+	/** Called when an interaction occurs with this Customer
+	 * @param itemInteracted the name of the FoodItem that the interacter (CoffeeGirl) held when interacting with
+	 * this customer.
+	 * @return true if the interaction filled a dependency i.e. fufilled a customer's order request, otherwise false
 	 */
 	public Interaction onInteraction(String itemInteracted) {
 		for(int i = 0; i < customerOrderSize; i++) {
@@ -279,6 +278,7 @@ public class Customer extends GameActor {
 			}
 		}
 		
+		//If no dependency was filled (we haven't returned yet) return a new, failed (by default) Interaction
 		return(new Interaction());
 	}
 	

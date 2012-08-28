@@ -1,4 +1,5 @@
-/** Describe the "fast shoes" upgrade */
+/** Describe the "fast shoes" upgrade. See GameUpgrade class for details on what the 
+ * class variables mean.  */
 
 package com.yulaev.tacotime.gameobjects.upgradedefs;
 

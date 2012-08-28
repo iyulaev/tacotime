@@ -1,8 +1,9 @@
 package com.yulaev.tacotime.gamelogic;
 
 /** This class is used to return information about interactions between CoffeeGirl and the
- * CustomerQueue, or rather between CoffeeGirl and the head of the CustomerQueue. It is 
- * really just used as a struct-like data container class.
+ * GameItem, or between CoffeeGirl and the head of the CustomerQueue. It is 
+ * really just used as a struct-like data container class. most of the class members are 
+ * accessed directly and set by the interactee GameItem
  * @author ivany
  *
  */

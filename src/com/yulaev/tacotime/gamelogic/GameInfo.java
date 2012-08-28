@@ -151,6 +151,8 @@ public class GameInfo {
 		game_time_millis = SystemClock.uptimeMillis();
 	}
 	
+	
+	
 	/** Clear level state only; clears level_money and level_points
 	 * 
 	 */
@@ -169,6 +171,9 @@ public class GameInfo {
 	public static synchronized void saveCurrentGame() {
 		Log.d(activitynametag, "GameInfo got saveCurrentGame() call, but not implemented yet.");
 	}
+	
+	
+	
 	
 	/** Adds an upgrade that we've acquired to the list of bought upgrades (upgradesBought)
 	 * 
@@ -202,6 +207,10 @@ public class GameInfo {
 		
 		return(false);
 	}
+	
+	
+	
+	
 	
 	/** Return the current total ACTIVE play time for this game, in milliseconds */
 	public static synchronized long currentTimeMillis() {

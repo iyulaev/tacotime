@@ -19,6 +19,8 @@ public abstract class GameFoodItem {
 	/** Constructor for this GameFoodItem; just set the name.
 	 * 
 	 * @param name The name of this GameFoodItem.
+	 * @param n_is_satisfied Whether this GameFoodItem has been satisfied (in the context of a Customer
+	 * order that has been satisfied by CoffeeGirl).
 	 */
 	public GameFoodItem(String name) {
 		this(name, false);
@@ -55,6 +57,7 @@ public abstract class GameFoodItem {
 	public void setSatisfied() { is_satisfied = true; }
 	public boolean isSatisfied() { return is_satisfied; }
 	
+	/** Create a deep copy of the existing GameFoodItem */
 	public abstract GameFoodItem clone() ;
 	
 	/** Returns a bitmap representation of this food item (for drawing to the screen, f.ex.) when

@@ -111,6 +111,4 @@ public class CounterTop extends GameItem {
 	 * @return The previous state IF we transitioned to a new state, else (-1). */
 	@Override
 	public Interaction onInteraction(String coffeeGirlHeldItem) { return tryChangeState(true, coffeeGirlHeldItem); }
-	@Override
-	public Interaction onInteraction() { return tryChangeState(true, "nothing"); }
 }

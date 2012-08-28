@@ -45,7 +45,7 @@ public class GameLogicThread extends Thread {
 	
 	private static final String activitynametag = "GameLogicThread";
 	
-	//Define types of messages accepted by ViewThread
+	//Define types of messages accepted by GameLogicThread
 	public static final int MESSAGE_INTERACTION_EVENT = 0;
 	public static final int MESSAGE_TICK_PASSED = 1;
 	public static final int MESSAGE_LOAD_GAME = 2;
@@ -60,21 +60,26 @@ public class GameLogicThread extends Thread {
 	//This message handler will receive messages, probably from the UI Thread, and
 	//update the data objects and do other things that are related to handling
 	//game-specific input
-	public Handler handler;
+	public static Handler handler;
 	
+	//Keep track of the CoffeeGirl instance in this game
 	public CoffeeGirl coffeeGirl;
+	//Keep track of the customerQueue instance; only used to determine if the level has been finished
 	public CustomerQueue customerQueue;
+	//Keep track of all of the GameItems, by a name -> instance map
 	public HashMap<String, GameItem> gameItems;
+	//Keep track of all of the GameFoodItems, by a name -> instance map
 	public HashMap<String, GameFoodItem> foodItems;
 	
+	/*Keeps track of all of the threads; mostly just used for loading a level (since the level loader populates
+	the threads' data structures with GameItems and such */
 	ViewThread viewThread;
 	TimerThread timerThread;
 	InputThread inputThread;
 	GameLogicThread gameLogicThread;
-	Context caller;
 	
-	//Used to time various things, like pre-level and post-level "announcements"
-	int message_timer;
+	//Mostly used for loading resources and such
+	Context caller;
 	
 	/** Mostly just initializes the Handler that receives and acts on in-game interactions that occur */
 	public GameLogicThread(ViewThread viewThread, TimerThread timerThread, InputThread inputThread, Context caller, boolean load_saved) {
@@ -104,15 +109,12 @@ public class GameLogicThread extends Thread {
 				//a GameItem has occured
 				if(msg.what == MESSAGE_INTERACTION_EVENT) {
 					String interactee = (String)msg.obj;
-					Log.d(activitynametag, "Got interaction event message! Actor interacted with " + interactee);
-					
 					//Attempt interaction and see if interactee changed state
 					Interaction interactionResult = gameItems.get(interactee).onInteraction(coffeeGirl.getItemHolding());
 					
 					//If the interaction resulted in a state change, OR was successful (when interacting with CustomerQueue),
 					//change coffeegirl state
 					if(interactionResult.previous_state != -1 || interactionResult.was_success) {
-						//coffeeGirl.setState(coffeeGirlNextState(coffee_girl_prev_state, interactee, interactee_state));
 						coffeeGirlNextState(coffeeGirl.getState(), interactee, interactionResult);
 					}
 				}
@@ -132,7 +134,8 @@ public class GameLogicThread extends Thread {
 					MessageRouter.sendPauseTimerMessage(false);
 				}
 				
-				//If we are to advance to the next level, set the GameMode appropriately and unpause
+				//If we are to advance to the next level, set the GameMode appropriately and un-pause the
+				//game to being gameplay
 				else if(msg.what == MESSAGE_NEXT_LEVEL) {
 					GameInfo.saveCurrentGame();
 					GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_PREPLAY);
@@ -150,14 +153,16 @@ public class GameLogicThread extends Thread {
 	}
 	
 	/** Used to provide a reference to this GameLogicThread instance. Mostly just used when we load a level, so that the 
-	 * GameLevel class that we create can add GameItems and other such things to this GameLogicThread instance.
+	 * GameLevel class that we create can add GameItems and other such things to this GameLogicThread instance. Called by
+	 * MainGamePanel when it instantiates GameLogicThread.
 	 * @param gameLogicThread
 	 */
 	public void setSelf(GameLogicThread gameLogicThread) { this.gameLogicThread = gameLogicThread; }
 	
 	/** Since CoffeeGirl interacts with all other game items, describing the CoffeeGirl state machine is done on the global level
 	 * rather than within CoffeeGirl itself. As a side effect GameInfo money and/or points may change depending on how
-	 * CoffeeGirl's state has changed
+	 * CoffeeGirl's state has changed. Effectively this method implements the CoffeeGirl state machine instead of having it be
+	 * encapsulated within the CoffeeGirl class.
 	 * @param old_state The previous state of coffee girl
 	 * @param interactedWith The ID of the GameItem CoffeeGirl interacted with
 	 * @param interactee_state The state of the GameItem that CoffeeGirl interacted with
@@ -222,6 +227,10 @@ public class GameLogicThread extends Thread {
 		
 		//Default case - don't change state!
 	}
+	
+	//Used to time various things, like pre-level and post-level "announcements"
+	//Only used within stateMachineClockTick()
+	int message_timer;
 
 	/** Updates this GameLogicThread's state machine. Should be called every time a clock tick (nominally one
 	 * real-time second) occurs
@@ -230,6 +239,7 @@ public class GameLogicThread extends Thread {
 	 * about the updates in the game state.
 	 */
 	public void stateMachineClockTick() {
+		//Pre-play state - this is the state we are in before gameplay begins
 		//IF we are viewing the main panel AND we are ready to play a level, this means the
 		//game is ready for another level - load one!
 		if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_PREPLAY) {
@@ -244,6 +254,7 @@ public class GameLogicThread extends Thread {
 			GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_PREPLAY_MESSAGE);
 		}
 		
+		//Pre-play message - this is the state we are in when we display the Level Start countdown message
 		//If we are in the pre-play message, update the message we display (indicating to the user when we
 		//are to start the level). Start the level when the count gets to zero.
 		else if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_PREPLAY_MESSAGE) {
@@ -259,12 +270,14 @@ public class GameLogicThread extends Thread {
 			}
 		}
 		
-		
+		//In-game state - we are in this state when the user is playing the level
 		//If we are in play check to see if we should finish the level
 		else if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_INPLAY) {
+			//Update the game time in GameInfo
+			GameInfo.setAndGetGameTimeMillis(TimerThread.TIMER_GRANULARIY);
+			
 			GameInfo.decrementLevelTime();
 			Log.v(activitynametag, GameInfo.getLevelTime() + " seconds remaining in this level!");
-			GameInfo.setAndGetGameTimeMillis(TimerThread.TIMER_GRANULARIY);
 			
 			//If we've run out of time on this level, or customerQueue has run out, then kill the level
 			if(GameInfo.getLevelTime() <= 0 || customerQueue.isFinished()) {
@@ -282,8 +295,8 @@ public class GameLogicThread extends Thread {
 			}
 		}
 		
-		//Display the level end message for a while and then display the level-end dialog, summarizing
-		//the progress for this level
+		//Post-play state: we enter this state as soon as the level finished - we display a message indicating that
+		//the level is over and detail the level result (points aquired, etc)
 		else if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_POSTPLAY_MESSAGE) {
 			if(message_timer > 0) {
 				message_timer--;
@@ -307,8 +320,8 @@ public class GameLogicThread extends Thread {
 			}
 		}
 		
-		//Finally, we either pause the game and send a level end message, going into a between-level menu
-		//Or we send a game over message and end this game
+		//Post-play state: exit the level and either pause the game & display the BetweenLevelMenu or display
+		//that the game is over
 		else if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_POSTPLAY) {
 			//
 			if(GameInfo.getLevel() < MAX_GAME_LEVEL) {
@@ -320,6 +333,11 @@ public class GameLogicThread extends Thread {
 			}
 		}
 	}
+	
+	
+	
+	//Game object setter methods - since GTL with access lots of game objects, we give references to GLT so that
+	//it might more easily access them
 	
 	/** Sets the actor associated with this GameLogicThread
 	 * 
@@ -399,12 +417,15 @@ public class GameLogicThread extends Thread {
 
 	}
 	
-	public static final int MAX_GAME_LEVEL=4;
+	
+	// Level loader methods
+	
+	private static final int MAX_GAME_LEVEL=4;
 	/** Loads a new level; creates a GameLevel Object corresponding to the new level
-	 * and kicks off (unpauses) all of the threads.
+	 * and loads the level. Also resets game state and level max time.
 	 * @param levelNumber
 	 */
-	public void loadLevel(int levelNumber) {
+	private void loadLevel(int levelNumber) {
 		GameLevel newLevel = getLevelInstance(levelNumber);
 		if(newLevel != null)
 			newLevel.loadLevel(viewThread, gameLogicThread, inputThread, this.caller);
@@ -426,7 +447,7 @@ public class GameLogicThread extends Thread {
 	 * @param levelNumber The level number to return a GameLevel instance for
 	 * @return GameLevel instance for level levelNumber
 	 */
-	public GameLevel getLevelInstance(int levelNumber) {
+	private GameLevel getLevelInstance(int levelNumber) {
 		GameLevel newLevel = null;
 		
 		if(levelNumber == 1) {

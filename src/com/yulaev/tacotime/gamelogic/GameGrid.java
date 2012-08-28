@@ -20,8 +20,9 @@ public class GameGrid {
 	public static final int GAMEGRID_WIDTH = 80+(GAMEGRID_PADDING_LEFT+GAMEGRID_PADDING_RIGHT);
 	public static final int GAMEGRID_HEIGHT = 70+(GAMEGRID_PADDING_TOP+GAMEGRID_PADDING_BOTTOM);
 	
-	
+	//Determines canvas size in real pixel terms
 	private static int canvas_width, canvas_height;
+	//Determines canvas center in real pizel terms
 	private static int canvas_anchor_x, canvas_anchor_y;
 	//scaling factor when going from real canvas points to game grid points
 	private static float scaling_factor; 

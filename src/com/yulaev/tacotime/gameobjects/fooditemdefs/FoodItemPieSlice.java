@@ -8,7 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
-/** Describes the Cupcake food item. Mostly we just define the number of points and amount of money that
+/** Describes the Pie Slice food item. Mostly we just define the number of points and amount of money that
  * this FoodItem is worth; for a detailed description of the methods and their purpose please see the GameFoodItem 
  * class documentation.*/
 

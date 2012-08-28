@@ -57,13 +57,21 @@ public class GameLevel {
 		return this.time_limit_sec;
 	}
 	
+	/** Return the bonus point total for this level, given that the level was cleared in time (iff 
+	 * cleared_level_in_time was true)
+	 * @param cleared_level_in_time Was the level cleared in time?
+	 * @return Level end bonus points
+	 */
 	public int getBonusPoints(boolean cleared_level_in_time) { 
 		return (cleared_level_in_time ? point_bonus : ((int) (point_bonus * point_bonus_derating) )); 
 	}
 	
+	/** Return the bonus money total for this level, given that the level was cleared in time (iff 
+	 * cleared_level_in_time was true)
+	 * @param cleared_level_in_time Was the level cleared in time?
+	 * @return Level end bonus money
+	 */
 	public int getBonusMoney(boolean cleared_level_in_time) { 
 		return (cleared_level_in_time ? money_bonus : ((int) (money_bonus * money_bonus_derating) )); 
 	}
-	
-
 }

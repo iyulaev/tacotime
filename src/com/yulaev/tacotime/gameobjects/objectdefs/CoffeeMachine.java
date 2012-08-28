@@ -19,7 +19,7 @@ public class CoffeeMachine extends GameItem {
 	public static final int STATE_BREWING=1;
 	public static final int STATE_DONE=2;
 	
-	//keep track of how many coffee machines are instantiated
+	//keep track of how many coffee machines are instantiated (so we can name them appropriately)
 	public static int instanceCount = 0;
 	
 	/** Constructor for CoffeeMachine mostly mimics a game items, except it sets the name by itself. Also it sets up

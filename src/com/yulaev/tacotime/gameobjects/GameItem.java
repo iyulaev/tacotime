@@ -236,7 +236,6 @@ public class GameItem implements ViewObject {
 	 * @param coffeeGirlHendItem The name of the GameFoodItem that CoffeeGirl currently holds
 	 * @return The previous state IF we transitioned to a new state, else (-1). */
 	public Interaction onInteraction(String coffeeGirlHeldItem) { return tryChangeState(true, coffeeGirlHeldItem); }
-	public Interaction onInteraction() { return tryChangeState(true, "nothing"); }
 	
 	//Valid states of this GameItem
 	protected ArrayList<State> validStates;

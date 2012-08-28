@@ -67,6 +67,7 @@ public abstract class GameActor implements ViewObject {
 		x = starting_x;
 		y = starting_y;
 		target_x=x; target_y=y;
+		
 		time_of_last_update = -1;
 		locked = false;
 		this.caller = caller;
@@ -121,18 +122,10 @@ public abstract class GameActor implements ViewObject {
 				vector_x = ((float)(target_x - x)) * vector_length/distance;
 				vector_y = ((float)(target_y - y)) * vector_length/distance;
 				
-				/*if(vector_x==0 && vector_y==0 ) {
-					if(Math.abs(target_x - x) > Math.abs(target_y - y)) {
-						vector_x = (target_x - x) > 0 ? 1 : -1;
-					} else {
-						vector_y = (target_y - y) > 0 ? 1 : -1;
-					}
-				}*/
-				
 				x+=(int) vector_x;
 				y+=(int) vector_y;
 				
-				//If we moved the actor, then log this update as having occured
+				//If we moved the actor, then log this update as having occurred
 				//If the actor hasn't moved (because not enough time has elapsed) then don't move the actor!
 				if(! ( ((int) vector_x == 0) && ((int) vector_y == 0) ))
 					time_of_last_update = SystemClock.uptimeMillis();
@@ -225,10 +218,18 @@ public abstract class GameActor implements ViewObject {
 		return(current_state_idx);
 	}
 	
+	/** Set whether this GameActor is visible.
+	 * 
+	 * @param visibility new visibility setting
+	 */
 	public void setVisible(boolean visibility) {
 		visible = visibility;
 	}
 	
+	/** Determine whether this GameActor is currently visible (and will be drawn to the canvas)
+	 * 
+	 * @return Whether this GameActor is visible.
+	 */
 	public boolean isVisible() {
 		return(visible);
 	}

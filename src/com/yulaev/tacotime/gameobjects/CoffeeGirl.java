@@ -79,11 +79,6 @@ public class CoffeeGirl extends GameActor {
 	
 	
 	
-	/** Called by ViewThread when this CoffeeGirl needs to be updated. Mostly calculates and executes the
-	 * motion vector.
-	 */
-	public void onUpdate() { super.onUpdate(); }
-	
 	/** For documentation see ViewObject interface */
 	public String getName() {return "CoffeeGirl";}
 	

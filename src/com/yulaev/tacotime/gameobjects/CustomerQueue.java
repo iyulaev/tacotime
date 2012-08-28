@@ -72,7 +72,6 @@ public class CustomerQueue extends GameItem {
 					foodItemMenu));
 		}
 		
-		Log.v(activitynametag, "Created new CustomerQueue with " + queue_length + " customers.");
 		for(int i = 0; i < queue_length; i++) {
 			Log.v(activitynametag, customerList.get(i).toString());
 		}
@@ -128,7 +127,7 @@ public class CustomerQueue extends GameItem {
 					
 			
 			//Set the next customer that should be visible to visible IF sufficient time has passed
-			//and the customer's position is between 0 (front of the line) and the last visilbe position
+			//and the customer's position is between 0 (front of the line) and the last visible position
 			if(!customerList.get(i).isVisible() && 
 					(customerList.get(i).getQueuePosition()>=0 && 
 					customerList.get(i).getQueuePosition()<QUEUE_VISIBLE_LENGTH) && 

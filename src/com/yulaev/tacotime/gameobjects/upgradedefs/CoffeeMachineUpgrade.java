@@ -1,4 +1,5 @@
-/** Describe the (2nd) CoffeeMachine upgrade */
+/** Describe the (2nd) CoffeeMachine upgrade. See GameUpgrade class for details on what the 
+ * class variables mean. */
 
 package com.yulaev.tacotime.gameobjects.upgradedefs;
 

@@ -6,7 +6,7 @@
  * 
  * Generally the effects of various upgrades are handled in other classes; CoffeeGirl, for example,
  * will check the upgradesBought list in GameItem and change walking speed if the FastShoesUpgrade 
- * has been aquired. Thus, the GameUpgrade class doesn't really do much as a class by itself.
+ * has been acquired. Thus, the GameUpgrade class doesn't really do much as a class by itself.
  */
 
 package com.yulaev.tacotime.gameobjects;

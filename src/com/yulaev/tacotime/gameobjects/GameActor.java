@@ -3,27 +3,30 @@ package com.yulaev.tacotime.gameobjects;
 import java.util.ArrayList;
 import com.yulaev.tacotime.R;
 import com.yulaev.tacotime.gamelogic.GameGrid;
-import com.yulaev.tacotime.gamelogic.GameInfo;
 import com.yulaev.tacotime.gamelogic.State;
+import com.yulaev.tacotime.utility.CircularList;
+import com.yulaev.tacotime.utility.DirectionBitmapMap;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Rect;
 import android.os.SystemClock;
-import android.util.Log;
 
 /** A GameActor is any ViewObject in the Game that moves about and can interact with (or through) GameItems. GameActors
  * are for now limited to CoffeeGirl (the player character) and Customers, who interact with CoffeeGirl through the
  * CustomerQueue structure/GameItem.
+ * 
+ * GameActor uses a DirectionBitmapMap, containing multiple CircularLists, to draw the sprite representing this GameActor. 
+ * The drawn sprite will vary depending on the heading of this GameActor. 
+ * 
  * @author ivany
  *
  */
 
 public abstract class GameActor implements ViewObject {
 	//Bitmap of this CoffeeGirl
-	protected Bitmap bitmap;
+	protected DirectionBitmapMap bitmapmap;
 
 	//represents current position (on the GameGrid)
 	protected int x;
@@ -34,6 +37,12 @@ public abstract class GameActor implements ViewObject {
 	protected int move_rate;
 	//Represents the last time we performed an onUpdate() operation
 	protected long time_of_last_update;
+	//Represents the last time that we DREW this GameActor
+	protected long last_time_drawn;
+	//Number of ms between sprite frames
+	protected long SPRITE_FRAME_PERIOD_MS = 250;
+	
+	
 	//lock
 	private boolean locked;
 	//Calling context, for getting resources later on
@@ -74,8 +83,11 @@ public abstract class GameActor implements ViewObject {
 		
 		this.move_rate = move_rate;
 		visible = true;
+		last_time_drawn = -1;
 		
-		bitmap = BitmapFactory.decodeResource(caller.getResources(), R.drawable.coffeegirl);
+		bitmapmap = new DirectionBitmapMap(false);
+		bitmapmap.setDirectionList(0, new CircularList<Bitmap>(1,
+				BitmapFactory.decodeResource(caller.getResources(), R.drawable.coffeegirl)));
 	}
 
 	/** onUpdate() gets called when GameActor needs to be updated by ViewThread
@@ -147,6 +159,16 @@ public abstract class GameActor implements ViewObject {
 		if(isVisible()) {
 			int drawn_x = GameGrid.canvasX(x);
 			int drawn_y = GameGrid.canvasY(y);
+			
+			Bitmap bitmap;
+			
+			if(SystemClock.uptimeMillis() > last_time_drawn + SPRITE_FRAME_PERIOD_MS ) {
+				bitmap = bitmapmap.getDirectionList(target_x - x, target_y - y).getNext();
+				last_time_drawn = SystemClock.uptimeMillis();
+			} else {
+				bitmap = bitmapmap.getDirectionList(target_x - x, target_y - y).getCurrent();
+			}
+			
 			canvas.drawBitmap(bitmap, drawn_x - (bitmap.getWidth() / 2), drawn_y - (bitmap.getHeight() / 2), null);
 		}
 	}
@@ -169,9 +191,9 @@ public abstract class GameActor implements ViewObject {
 	
 	
 	//represents the state of GameActor
-	protected ArrayList<State> validStates; //An ArrayList of valid states for CoffeeGirl
+	protected ArrayList<State<DirectionBitmapMap>> validStates; //An ArrayList of valid states for CoffeeGirl
 	protected int current_state_idx; //the index of the current state
-	protected State currentState; //The actual State object
+	protected State <DirectionBitmapMap> currentState; //The actual State object
 	
 	/** Used when this GameItem is constructed, to add states to this GameItem 
 	 * Assumption is that this is called during construction not from all of the various threads
@@ -180,12 +202,12 @@ public abstract class GameActor implements ViewObject {
 	 * @param r_bitmap the resource representing the Bitmap that is to be drawn to represent CoffeeGirl 
 	 * when she is in the state named stateName.
 	 * */
-	public void addState(String stateName, int r_bitmap) {
-		if(validStates == null) validStates = new ArrayList<State>();
+	public void addState(String stateName, DirectionBitmapMap bitmapList) {
+		if(validStates == null) validStates = new ArrayList<State<DirectionBitmapMap>>();
 		
-		State newState = new State();
+		State <DirectionBitmapMap> newState = new State<DirectionBitmapMap>();
 		newState.stateName = stateName;
-		newState.bitmap = BitmapFactory.decodeResource(caller.getResources(), r_bitmap);
+		newState.bitmap = bitmapList;
 		newState.state_delay_ms = 0; //all coffeegirl states are interaction-sensitive only
 		newState.input_sensitive = true; //all states are input sensitive only for coffeegirl
 		newState.time_sensitive = false; //all coffeegirl states are interaction-sensitive only
@@ -205,7 +227,7 @@ public abstract class GameActor implements ViewObject {
 		
 		currentState = validStates.get(new_state);
 		current_state_idx = new_state;
-		this.bitmap = currentState.bitmap;
+		this.bitmapmap = currentState.bitmap;
 		
 		unLock();
 	}

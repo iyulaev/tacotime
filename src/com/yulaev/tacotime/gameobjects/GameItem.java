@@ -238,11 +238,11 @@ public class GameItem implements ViewObject {
 	public Interaction onInteraction(String coffeeGirlHeldItem) { return tryChangeState(true, coffeeGirlHeldItem); }
 	
 	//Valid states of this GameItem
-	protected ArrayList<State> validStates;
+	protected ArrayList<State<Bitmap>> validStates;
 	//The index of the current state of this GameItem
 	protected int current_state_idx;
 	//The current State that this game item is in
-	protected State currentState;
+	protected State <Bitmap> currentState;
 	//The time that the current state was entered; mostly used to determine when the State can be transitioned of
 	//of if the State is delay sensitive
 	private long time_of_state_transition;
@@ -260,9 +260,9 @@ public class GameItem implements ViewObject {
 	 * 
 	 * */
 	protected void addState(String stateName, int state_delay_ms, int r_bitmap, boolean input_sensitive, String requiredInput, boolean time_sensitive) {
-		if(validStates == null) validStates = new ArrayList<State>();
+		if(validStates == null) validStates = new ArrayList<State<Bitmap>>();
 		
-		State newState = new State();
+		State <Bitmap> newState = new State<Bitmap>();
 		newState.stateName = stateName;
 		newState.bitmap = BitmapFactory.decodeResource(caller.getResources(), r_bitmap);
 		newState.state_delay_ms = state_delay_ms;

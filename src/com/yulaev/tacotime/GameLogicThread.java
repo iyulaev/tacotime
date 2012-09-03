@@ -6,13 +6,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.SurfaceHolder;
-
 import com.yulaev.tacotime.gamelogic.GameInfo;
 import com.yulaev.tacotime.gamelogic.GameLevel;
 import com.yulaev.tacotime.gamelogic.Interaction;
@@ -23,7 +19,6 @@ import com.yulaev.tacotime.gamelogic.leveldefs.GameLevel_4;
 import com.yulaev.tacotime.gameobjects.CoffeeGirl;
 import com.yulaev.tacotime.gameobjects.CustomerQueue;
 import com.yulaev.tacotime.gameobjects.GameFoodItem;
-import com.yulaev.tacotime.gameobjects.ViewObject;
 import com.yulaev.tacotime.gameobjects.GameItem;
 import com.yulaev.tacotime.gameobjects.objectdefs.Blender;
 import com.yulaev.tacotime.gameobjects.objectdefs.CoffeeMachine;

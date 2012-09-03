@@ -7,8 +7,12 @@ import com.yulaev.tacotime.gamelogic.GameGrid;
 import com.yulaev.tacotime.gamelogic.GameInfo;
 import com.yulaev.tacotime.gamelogic.State;
 import com.yulaev.tacotime.gameobjects.upgradedefs.FastShoesUpgrade;
+import com.yulaev.tacotime.utility.CircularList;
+import com.yulaev.tacotime.utility.DirectionBitmapMap;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.util.Log;
 
@@ -50,11 +54,22 @@ public class CoffeeGirl extends GameActor {
 		//Add a state for each thing that CoffeeGirl may carry
 		//Annoyingly a line must be added to MainGamePanel for each GameFoodItem that we add into
 		//this game.
-		this.addState("default", R.drawable.coffeegirl);
-		this.addState("carrying_coffee", R.drawable.coffeegirl_w_coffee);
-		this.addState("carrying_cupcake", R.drawable.coffeegirl_w_cupcake);
-		this.addState("carrying_blended_drink", R.drawable.coffeegirl_w_blended_drink);
-		this.addState("carrying_pie_slice", R.drawable.coffeegirl_w_cake_slice);
+		Bitmap tempBitmap;
+		
+		tempBitmap = BitmapFactory.decodeResource(caller.getResources(), R.drawable.coffeegirl);
+		this.addState("default", new DirectionBitmapMap(new CircularList<Bitmap>(1,tempBitmap)));
+		
+		tempBitmap = BitmapFactory.decodeResource(caller.getResources(), R.drawable.coffeegirl_w_coffee);
+		this.addState("carrying_coffee", new DirectionBitmapMap(new CircularList<Bitmap>(1,tempBitmap)));
+		
+		tempBitmap = BitmapFactory.decodeResource(caller.getResources(), R.drawable.coffeegirl_w_cupcake);
+		this.addState("carrying_cupcake", new DirectionBitmapMap(new CircularList<Bitmap>(1,tempBitmap)));
+		
+		tempBitmap = BitmapFactory.decodeResource(caller.getResources(), R.drawable.coffeegirl_w_blended_drink);
+		this.addState("carrying_blended_drink", new DirectionBitmapMap(new CircularList<Bitmap>(1,tempBitmap)));
+		
+		tempBitmap = BitmapFactory.decodeResource(caller.getResources(), R.drawable.coffeegirl_w_cake_slice);
+		this.addState("carrying_pie_slice", new DirectionBitmapMap(new CircularList<Bitmap>(1,tempBitmap)));
 	}
 	
 	/** This method is called by the InputThread when a user input (a tap) occurs somewhere on the screen. We convert

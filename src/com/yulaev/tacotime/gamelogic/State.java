@@ -10,7 +10,7 @@ import android.graphics.Bitmap;
  *
  */
 
-public class State {
+public class State <T> {
 	/**the name of this state*/
 	public String stateName; 
 	
@@ -19,7 +19,7 @@ public class State {
 	public int state_delay_ms; 
 	
 	/**The Bitmap that the Object uses to draw itself while in this state*/
-	public Bitmap bitmap; 
+	public T bitmap; 
 	
 	/**input_sensitive: when set to true, the state can only advance once interaction has cocured
 	/time_sensitive: when set to true, the state can only advance when state_delay_ms have passed

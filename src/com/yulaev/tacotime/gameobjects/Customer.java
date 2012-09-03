@@ -8,6 +8,8 @@ import com.yulaev.tacotime.R;
 import com.yulaev.tacotime.gamelogic.GameInfo;
 import com.yulaev.tacotime.gamelogic.Interaction;
 import com.yulaev.tacotime.gamelogic.GameGrid;
+import com.yulaev.tacotime.utility.CircularList;
+import com.yulaev.tacotime.utility.DirectionBitmapMap;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -107,12 +109,26 @@ public class Customer extends GameActor {
 		seconds_between_pissed_off = (int) (((float)SECONDS_BW_PO_STARTING) / seconds_between_po_divisor);
 		
 		//Initialize all of the states that this Customer can have
-		this.addState("hidden", R.drawable.customer_waiting);
-		this.addState("inline_happy", R.drawable.customer_waiting);
-		this.addState("inline_ok", R.drawable.customer_waiting_ok);
-		this.addState("inline_angry", R.drawable.customer_waiting_angry);
-		this.addState("served", R.drawable.customer_happy);
-		this.addState("finished", R.drawable.customer_waiting);
+		Bitmap tempBitmap;
+		
+		tempBitmap = BitmapFactory.decodeResource(caller.getResources(), R.drawable.customer_waiting);
+		this.addState("hidden", new DirectionBitmapMap(new CircularList<Bitmap>(1,tempBitmap)));
+		
+		tempBitmap = BitmapFactory.decodeResource(caller.getResources(), R.drawable.customer_waiting);
+		this.addState("inline_happy", new DirectionBitmapMap(new CircularList<Bitmap>(1,tempBitmap)));
+		
+		tempBitmap = BitmapFactory.decodeResource(caller.getResources(), R.drawable.customer_waiting_ok);
+		this.addState("inline_ok", new DirectionBitmapMap(new CircularList<Bitmap>(1,tempBitmap)));
+		
+		tempBitmap = BitmapFactory.decodeResource(caller.getResources(), R.drawable.customer_waiting_angry);
+		this.addState("inline_angry", new DirectionBitmapMap(new CircularList<Bitmap>(1,tempBitmap)));
+		
+		tempBitmap = BitmapFactory.decodeResource(caller.getResources(), R.drawable.customer_happy);
+		this.addState("served", new DirectionBitmapMap(new CircularList<Bitmap>(1,tempBitmap)));
+		
+		tempBitmap = BitmapFactory.decodeResource(caller.getResources(), R.drawable.customer_waiting);
+		this.addState("finished", new DirectionBitmapMap(new CircularList<Bitmap>(1,tempBitmap)));
+		
 		setState(STATE_HIDDEN);
 	}
 
@@ -205,6 +221,8 @@ public class Customer extends GameActor {
 	public void draw(Canvas canvas) {
 		super.draw(canvas);
 		
+		Bitmap bitmap = bitmapmap.getDirectionList(target_x - x, target_y - y).getCurrent();
+		
 		//draw the order using a 9patch speech bubble, if this Customer is visible and is waiting for their order
 		//to be fulfilled
 		if(isVisible() && (this.getState() == STATE_INLINE_HAPPY || this.getState() == STATE_INLINE_OK || this.getState() == STATE_INLINE_ANGRY)) {
@@ -217,7 +235,7 @@ public class Customer extends GameActor {
 			hasn't moved since the last time draw() was called.*/
 			NinePatchDrawable speechBubble = (NinePatchDrawable)caller.getResources().getDrawable(R.drawable.speech_bubble_sm);
 
-			int bubble_left =  GameGrid.canvasX(this.x) + this.bitmap.getWidth()/2 + 2; //+2 at the end for padding :)
+			int bubble_left =  GameGrid.canvasX(this.x) + bitmap.getWidth()/2 + 2; //+2 at the end for padding :)
 			int bubble_top = GameGrid.canvasY(this.y) - speechBubble.getMinimumHeight()/2;
 			int bubble_right = bubble_left + BUBBLE_WIDTH + (ICON_WIDTH*(customerOrderSize-1));
 			int bubble_bottom = bubble_top + BUBBLE_HEIGHT;

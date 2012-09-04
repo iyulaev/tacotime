@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.yulaev.tacotime.gameobjects.GameUpgrade;
 
+import android.content.Context;
 import android.os.SystemClock;
 import android.util.Log;
 
@@ -18,7 +19,11 @@ public class GameInfo {
 	
 	//The name of the "character" that the player has chosen. Should be used to load and save games to
 	//the saved game database.
-	public static String characterName = "null";
+	public static String characterName = "John Test";
+	//The current character that we are playing
+	private static SavedCharacter myCharacter;
+	//The database used to load and save games
+	private static GameDatabase gameDB = null;
 	
 	//The amount of money and points that the player currently has
 	public static int money;
@@ -161,15 +166,77 @@ public class GameInfo {
 		level_points = 0;
 	}
 	
-	/** Loads the saved game for this character. Not implemented yet. */
-	public static synchronized void loadSavedGame() {
-		Log.d(activitynametag, "GameInfo got loadSavedGame() call, but not implemented yet. Restarting the level instead...");
-		level -= 1;
+	/** Initializes the database and either loads the SavedCharacter keyed by GameInfo.characterName 
+	 * from the database or creates a new SavedCharacter.
+	 * @param context The calling context, for gameDB creation.
+	 */
+	public static synchronized void initDB(Context context) {
+		Log.d(activitynametag, "GameInfo got initDB() call!");
+		
+		if(gameDB == null) {
+			gameDB = new GameDatabase(context);
+		}
+		
+		gameDB.open();
+		gameDB.loadDatabase();
+		
+		myCharacter = gameDB.databaseCache.get(characterName);
+		
+		if(myCharacter == null) {
+			gameDB.saveCharacterToDatabase(new SavedCharacter(characterName, "boy"));
+			myCharacter = gameDB.databaseCache.get(characterName);
+		}
+		
+		gameDB.close();
 	}
 	
-	/** Saves game state for this character. Not implemented yet. */
+	/** Reset the character parameters. If GameInfo.characterName has a valid save in the database but
+	 * we want to start a new game, we must reset the parameters for the character. Note that these parameters
+	 * are only written back into the DB when saveCurrentGame() gets called (this is by design, since we don't
+	 * want to save the game until the user completes the first level and hits "Save & Continue")
+	 */
+	public static synchronized void resetCharacter() {
+		myCharacter.level = 0;
+		myCharacter.money = 0;
+		myCharacter.points = 0;
+		myCharacter.upgrades = "";
+	}
+	
+	/** Loads the saved game for this character. Since myCharacter should have already been loaded from the
+	 * database in initDB() we simply re-load the data in myCharacter to the GameInfo data. */
+	public static synchronized void loadSavedGame() {
+		/*Log.d(activitynametag, "GameInfo got loadSavedGame() call, but not implemented yet. Restarting the level instead...");
+		level -= 1;*/
+		
+		Log.d(activitynametag, "GameInfo got loadSavedGame() call!");
+				
+		level = myCharacter.level;
+		points = myCharacter.points;
+		money = myCharacter.money;
+		
+		String [] upgradesLoaded = myCharacter.upgrades.split(",");
+		upgradesBought = new ArrayList<String>();
+		for(String s : upgradesLoaded) {
+			if(s!=null && s.length()>1) upgradesBought.add(s);
+		}
+	}
+	
+	/** Saves game state for this character. Takes the GameInfo data, puts it into myCharacter, and saves
+	 * the data into gameDB. */
 	public static synchronized void saveCurrentGame() {
-		Log.d(activitynametag, "GameInfo got saveCurrentGame() call, but not implemented yet.");
+		Log.d(activitynametag, "GameInfo got saveCurrentGame() call!");
+		
+		//if(myCharacter == null) myCharacter = new SavedCharacter(characterName, "boy");
+		myCharacter.level = level;
+		myCharacter.points = points;
+		myCharacter.money = money;
+		String upgrades = new String("");
+		for(int i = 0; i < upgradesBought.size(); i++) upgrades += upgradesBought.get(i)+",";
+		myCharacter.upgrades = upgrades;
+		
+		gameDB.open();
+		gameDB.saveCharacterToDatabase(myCharacter);
+		gameDB.close();
 	}
 	
 	

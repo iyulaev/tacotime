@@ -93,7 +93,9 @@ public class GameLogicThread extends Thread {
 		gameItems = new HashMap<String, GameItem>();
 		foodItems = new HashMap<String, GameFoodItem>();
 		
+		GameInfo.initDB(caller);
 		if(load_saved) GameInfo.loadSavedGame();
+		else GameInfo.resetCharacter();
 		
 		//Creates a Handler that will be used to process Interaction and ClockTick messages, and advance the CoffeeGirl and
 		//GameLogicThread state machines
@@ -243,7 +245,6 @@ public class GameLogicThread extends Thread {
 			
 			//For three seconds tell the user that the evel is about to start
 			message_timer = 3;
-			MessageRouter.sendAnnouncementMessage("Level Start in " + message_timer, true);
 			
 			Log.v(activitynametag, "GLT is loading a new level!");
 			GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_PREPLAY_MESSAGE);
@@ -255,7 +256,7 @@ public class GameLogicThread extends Thread {
 		else if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_PREPLAY_MESSAGE) {
 			if(message_timer > 0) {
 				message_timer--;
-				MessageRouter.sendAnnouncementMessage("Level Start in " + message_timer, true);
+				MessageRouter.sendAnnouncementMessage("Level " + GameInfo.getLevel() + " Start in " + message_timer, true);
 			}
 			else {
 				GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_INPLAY);

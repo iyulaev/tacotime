@@ -275,7 +275,11 @@ public class GameInfo {
 		return(false);
 	}
 	
-	
+	public static synchronized ArrayList<String> getUpgradesBoughtCopy() {
+		ArrayList<String> returned = new ArrayList<String>(upgradesBought.size());
+		for(String upgrade : upgradesBought) returned.add(upgrade);	
+		return(returned);
+	}
 	
 	
 	

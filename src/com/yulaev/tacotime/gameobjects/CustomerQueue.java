@@ -56,7 +56,7 @@ public class CustomerQueue extends GameItem {
 			float impatience, int max_items_in_order, 
 			List<GameFoodItem> foodItemMenu) {
 		//public GameItem(Context caller, String name, int r_bitmap, int x_pos, int y_pos, int orientation, int gg_width, int gg_height)
-		super(caller, "CustomerQueue", R.drawable.countertop, x_pos, y_pos, orientation, 10, 10);
+		super(caller, "CustomerQueue", R.drawable.countertop, x_pos, y_pos, orientation, 20, 17);
 		
 		//Create and fill up the CustomerQueue
 		this.queue_length = queue_length;

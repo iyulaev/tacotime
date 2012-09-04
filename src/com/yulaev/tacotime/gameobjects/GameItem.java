@@ -11,6 +11,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.util.Log;
 
 /** GameItems in general are non-player interactive items, like CoffeeMachine. They are ViewObjects so
@@ -29,6 +31,9 @@ public class GameItem implements ViewObject {
 	//Enum for event types
 	public static final int EVENT_NULL = 0;
 	public static final int EVENT_DEFAULT = 1;
+	
+	//Determine whether to draw the sensitivity area
+	public static final boolean DRAW_SENSITIVITY_AREA = true;
 	
 	static final String activitynametag = "GameItem";
 	
@@ -96,14 +101,33 @@ public class GameItem implements ViewObject {
 		this.setOrientation(orientation);
 		//Calculate sensitivity area (using orientation to determine where it is placed relative to the 
 		//position of this GameItem)
+		
+		final float SENSITIVITY_EXPANSION_FACTOR_RIGHTSIDE = 0.75f;
+		final float SENSITIVITY_EXPANSION_FACTOR_OTHERSIDE = 0.25f;
+		
 		sensitivity_xmin = x - width/2;
 		sensitivity_ymin = y - height/2;
 		sensitivity_xmax = x + width/2;
 		sensitivity_ymax = y + height/2;
-		if(orientation == ORIENTATION_SOUTH) sensitivity_ymin -= height;
-		else if(orientation == ORIENTATION_NORTH) sensitivity_ymax += height;
-		else if(orientation == ORIENTATION_EAST) sensitivity_xmin -= width;
-		else if(orientation == ORIENTATION_WEST) sensitivity_xmax += width;
+		if(orientation == ORIENTATION_SOUTH) { 
+			sensitivity_ymin -= (SENSITIVITY_EXPANSION_FACTOR_RIGHTSIDE*height); 
+			sensitivity_ymax += (SENSITIVITY_EXPANSION_FACTOR_OTHERSIDE*height); 
+		}
+		else if(orientation == ORIENTATION_NORTH) {
+			sensitivity_ymax += (SENSITIVITY_EXPANSION_FACTOR_RIGHTSIDE*height);
+			sensitivity_ymin -= (SENSITIVITY_EXPANSION_FACTOR_OTHERSIDE*height); 
+		} 
+		else if(orientation == ORIENTATION_EAST) {
+			sensitivity_xmin -= (SENSITIVITY_EXPANSION_FACTOR_RIGHTSIDE*width);
+			sensitivity_xmax += (SENSITIVITY_EXPANSION_FACTOR_OTHERSIDE*width);
+		}
+		else if(orientation == ORIENTATION_WEST) {
+			sensitivity_xmax += (SENSITIVITY_EXPANSION_FACTOR_RIGHTSIDE*width);
+			sensitivity_xmin -= (SENSITIVITY_EXPANSION_FACTOR_OTHERSIDE*width);
+		}
+		
+		Log.d(activitynametag, "Item: " + name + ", sensitivity = (" + sensitivity_xmin + ", " + sensitivity_xmax + 
+				", " + sensitivity_ymin + ", " + sensitivity_ymax + ")");
 		
 		//Initialize the interaction queue
 		interactionQueue = new int[INTERACTION_QUEUE_SIZE];
@@ -147,9 +171,24 @@ public class GameItem implements ViewObject {
 	 * @param canvas The Canvas to draw this GameItem onto
 	 */
 	public void draw(Canvas canvas) {
+		if(DRAW_SENSITIVITY_AREA) {
+			int draw_max_x = GameGrid.canvasX(sensitivity_xmax);
+			int draw_min_x = GameGrid.canvasX(sensitivity_xmin);
+			int draw_min_y = GameGrid.canvasY(sensitivity_ymin);
+			int draw_max_y = GameGrid.canvasY(sensitivity_ymax);
+			
+			Paint linePaint = new Paint();
+			linePaint.setColor(Color.BLUE);
+			linePaint.setStrokeWidth(3);
+			
+			canvas.drawLine(draw_min_x, draw_min_y, draw_min_x, draw_max_y, linePaint);
+			canvas.drawLine(draw_min_x, draw_min_y, draw_max_x, draw_min_y, linePaint);
+			canvas.drawLine(draw_max_x, draw_max_y, draw_max_x, draw_min_y, linePaint);
+			canvas.drawLine(draw_max_x, draw_max_y, draw_min_x, draw_max_y, linePaint);
+		}
+		
 		int draw_x = GameGrid.canvasX(x);
 		int draw_y = GameGrid.canvasY(y);
-		
 		canvas.drawBitmap(bitmap, draw_x - (bitmap.getWidth() / 2), draw_y - (bitmap.getHeight() / 2), null);
 	}
 	

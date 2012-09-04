@@ -12,6 +12,8 @@ import com.yulaev.tacotime.gameobjects.GameUpgrade;
 import com.yulaev.tacotime.gameobjects.upgradedefs.CoffeeMachineUpgrade;
 import com.yulaev.tacotime.gameobjects.upgradedefs.CounterTopUpgrade;
 import com.yulaev.tacotime.gameobjects.upgradedefs.FastShoesUpgrade;
+import com.yulaev.tacotime.gameobjects.upgradedefs.FasterShoesUpgrade;
+import com.yulaev.tacotime.gameobjects.upgradedefs.QuickBrewingUpgrade;
 
 import android.app.ListActivity;
 import android.os.Bundle;
@@ -41,6 +43,8 @@ public class UpgradeMenuActivity extends ListActivity {
 		upgradesList.add(new FastShoesUpgrade());
 		upgradesList.add(new CoffeeMachineUpgrade());
 		upgradesList.add(new CounterTopUpgrade());
+		upgradesList.add(new FasterShoesUpgrade());
+		upgradesList.add(new QuickBrewingUpgrade());
 		
 		theListAdapter = new IconicAdapter(this);
 		setListAdapter(theListAdapter);
@@ -58,13 +62,18 @@ public class UpgradeMenuActivity extends ListActivity {
 			TextView name=(TextView)v.findViewById(R.id.upgrade_name);
 			name.setTextColor(0xFF666666);
 			
-			//Update the cost colors for all (other) upgrades
+			//Update the cost colors for all (other) upgrades and also see if the pre-requs
+			//have changed at all
 			for(int i = 0; i<=parent.getCount()-1; i++) {
 				try {
 					View otherPosition = parent.getChildAt(i);
 					TextView cost=(TextView)otherPosition.findViewById(R.id.upgrade_cost);
 					if(Integer.parseInt(cost.getText().toString()) > GameInfo.money)
 						cost.setTextColor(0xFFFF0000);
+					
+					if(upgradesList.get(i).prerequisitesSatisfied(GameInfo.getUpgradesBoughtCopy()) &&
+							!(upgradesList.get(i).getUpgradeLevel() > GameInfo.getLevel()))
+						otherPosition.setVisibility(View.VISIBLE);
 					
 				} catch (NullPointerException npe) {
 					// Iteration weirdness here! Android bug.
@@ -153,6 +162,10 @@ public class UpgradeMenuActivity extends ListActivity {
 			
 			//Remove upgrades that we aren't allowed to buy yet
 			if(upgradesList.get(position).getUpgradeLevel() > GameInfo.getLevel())
+				row.setVisibility(View.GONE);
+			
+			//Remove upgrades for which prereqs aren't satisfied
+			if(!upgradesList.get(position).prerequisitesSatisfied(GameInfo.getUpgradesBoughtCopy()))
 				row.setVisibility(View.GONE);
 			
 			return(row);

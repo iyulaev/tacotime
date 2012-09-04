@@ -7,6 +7,7 @@ import com.yulaev.tacotime.gamelogic.GameGrid;
 import com.yulaev.tacotime.gamelogic.GameInfo;
 import com.yulaev.tacotime.gamelogic.State;
 import com.yulaev.tacotime.gameobjects.upgradedefs.FastShoesUpgrade;
+import com.yulaev.tacotime.gameobjects.upgradedefs.FasterShoesUpgrade;
 import com.yulaev.tacotime.utility.CircularList;
 import com.yulaev.tacotime.utility.DirectionBitmapMap;
 
@@ -46,9 +47,13 @@ public class CoffeeGirl extends GameActor {
 		//Check if we have the "fast shoes" upgrade and change moverate if necessary
 		if(GameInfo.hasUpgrade(FastShoesUpgrade.UPGRADE_NAME)) {
 			Log.d(activitynametag, "CoffeeGirl detected that " + FastShoesUpgrade.UPGRADE_NAME + " has been bought.");
-			this.move_rate = (int) (((double) this.move_rate) * 1.2);
+			this.move_rate = (int) (((double) this.move_rate) * 1.21);
 		} else {
 			Log.d(activitynametag, "CoffeeGirl did not detect that " + FastShoesUpgrade.UPGRADE_NAME + " has been bought.");
+		}
+		
+		if(GameInfo.hasUpgrade(FasterShoesUpgrade.UPGRADE_NAME)) {
+			this.move_rate = (int) (((double) this.move_rate) * 1.41);
 		}
 		
 		//Add a state for each thing that CoffeeGirl may carry

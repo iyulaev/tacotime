@@ -1,6 +1,7 @@
 package com.yulaev.tacotime.gameobjects.objectdefs;
 
 import com.yulaev.tacotime.R;
+import com.yulaev.tacotime.gamelogic.GameInfo;
 import com.yulaev.tacotime.gamelogic.Interaction;
 import com.yulaev.tacotime.gameobjects.GameItem;
 
@@ -19,6 +20,9 @@ public class CoffeeMachine extends GameItem {
 	public static final int STATE_BREWING=1;
 	public static final int STATE_DONE=2;
 	
+	//Define state delays
+	public static final int BREW_TIME_MS = 2500;
+	
 	//keep track of how many coffee machines are instantiated (so we can name them appropriately)
 	public static int instanceCount = 0;
 	
@@ -34,10 +38,13 @@ public class CoffeeMachine extends GameItem {
 	public CoffeeMachine(Context caller, int r_bitmap, int x_pos, int y_pos, int orientation) {
 		super(caller, "CoffeeMachine" + (++instanceCount), r_bitmap, x_pos, y_pos, orientation, 15, 20);
 		
+		int brew_time = BREW_TIME_MS;
+		if(GameInfo.hasUpgrade("quickbrewing")) brew_time -= 1000;
+		
 		//Add states that describe behavior of coffee machine
 		//super.addState(String stateName, int state_delay_ms, int r_bitmap, boolean input_sensitive, boolean time_sensitive)
 		this.addState("idle", 0, R.drawable.coffeemachine_idle, true, false);
-		this.addState("brewing", 2000, R.drawable.coffeemachine_brewing, false, true);
+		this.addState("brewing", brew_time, R.drawable.coffeemachine_brewing, false, true);
 		this.addState("done", 0, R.drawable.coffeemachine_done, true, "nothing", false);
 	}
 }

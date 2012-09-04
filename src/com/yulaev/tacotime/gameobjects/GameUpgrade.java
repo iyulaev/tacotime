@@ -11,6 +11,8 @@
 
 package com.yulaev.tacotime.gameobjects;
 
+import java.util.ArrayList;
+
 public class GameUpgrade {
 	//The String that gets used to represent this upgrade; alphanumeric only
 	protected String upgradeName;
@@ -24,9 +26,25 @@ public class GameUpgrade {
 	protected int upgradeCost;
 	//The minimum level for this upgrade (upgrade can be bought after upgradeLevel is complete)
 	protected int upgradeLevel;
+	//The prerequisite upgrades for this to be available (uses the upgradeName String of other upgrades)
+	protected String [] prerequisiteUpgrades = null;
 	
 	public String getName() {
 		return upgradeName;
+	}
+	
+	/** Checks to see if all of the prerequisites (stored in prerequisiteUpgrades) have 
+	 * been satisfied.
+	 * @param upgradesBought The upgrades that the player has already bought.
+	 * @return true if all prerequisites are satisfied by upgradesBought
+	 */
+	public boolean prerequisitesSatisfied(ArrayList<String> upgradesBought) {
+		if(prerequisiteUpgrades == null) return true;
+		
+		for(int i = 0; i < prerequisiteUpgrades.length; i++) 
+			if(!upgradesBought.contains(prerequisiteUpgrades[i])) return false;
+		
+		return true;
 	}
 	
 	//Accessor methods for GameUpgrade fields

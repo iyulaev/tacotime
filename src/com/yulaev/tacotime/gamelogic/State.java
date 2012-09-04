@@ -1,7 +1,5 @@
 package com.yulaev.tacotime.gamelogic;
 
-import android.graphics.Bitmap;
-
 /** State is simply a container class representing State information for GameItems and other things in the TacoTime
  * game engine. In particular we store the Bitmap associated with the state, the minimum delay before transitioning
  * to the next state, and whether or not the GameItem must get an interaction event before we can transition to the

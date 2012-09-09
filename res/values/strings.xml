@@ -3,5 +3,10 @@
 
     <string name="hello">Coffee Time</string>
     <string name="app_name">Coffee Time</string>
+    
+    <string-array name="character_types">
+        <item>Boy</item>
+        <item>Girl</item>
+    </string-array>
 
 </resources>

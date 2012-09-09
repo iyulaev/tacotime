@@ -70,6 +70,8 @@ public class TacoTimeActivity extends Activity {
 				}
 			}
 		});
+		
+		Log.v(activitynametag, "By the way, we are playing character " + GameInfo.characterName);
 	}
 	
 	/** Displays an AlertDialog dialog to the user, stating that whatsNotImplemented hasn't been implemented yet. 

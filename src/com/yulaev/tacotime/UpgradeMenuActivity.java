@@ -32,6 +32,9 @@ public class UpgradeMenuActivity extends ListActivity {
 	ArrayList<GameUpgrade> upgradesList; //holds a list of ALL GameUpgrades in this game
 	IconicAdapter theListAdapter; //Used to populate this ListLayout with the contents of upgradesList
 	
+	static final int COLOR_GREYED_OUT = 0xFF555555;
+	static final int COLOR_RED = 0xFFFF0000;
+	
 	@Override
 	public void onCreate(Bundle bundle) {
 		me=this;
@@ -60,21 +63,14 @@ public class UpgradeMenuActivity extends ListActivity {
 		if(tryBuyUpgrade(upgradesList.get(position))) {
 			//grey out the title text for v, and append " (bought)" to it
 			TextView name=(TextView)v.findViewById(R.id.upgrade_name);
-			name.setTextColor(0xFF666666);
+			name.setTextColor(COLOR_GREYED_OUT);
 			
 			//Update the cost colors for all (other) upgrades and also see if the pre-requs
 			//have changed at all
-			for(int i = 0; i<=parent.getCount()-1; i++) {
+			for(int i = 0; i < parent.getCount(); i++) {
 				try {
 					View otherPosition = parent.getChildAt(i);
-					TextView cost=(TextView)otherPosition.findViewById(R.id.upgrade_cost);
-					if(Integer.parseInt(cost.getText().toString()) > GameInfo.money)
-						cost.setTextColor(0xFFFF0000);
-					
-					if(upgradesList.get(i).prerequisitesSatisfied(GameInfo.getUpgradesBoughtCopy()) &&
-							!(upgradesList.get(i).getUpgradeLevel() > GameInfo.getLevel()))
-						otherPosition.setVisibility(View.VISIBLE);
-					
+					updateListView(i, otherPosition);					
 				} catch (NullPointerException npe) {
 					// Iteration weirdness here! Android bug.
 				}
@@ -112,7 +108,7 @@ public class UpgradeMenuActivity extends ListActivity {
 		return(false);
 	}
 	
-	/** Buy GameUpgrad upgrade. Changes GameInfo.money and adds the upgarde to the upgradesBought list in
+	/** Buy GameUpgrad upgrade. Changes GameInfo.money and adds the upgrade to the upgradesBought list in
 	 * GameInfo
 	 * @param upgrade The GameUpgrade to buy.
 	 */
@@ -143,9 +139,6 @@ public class UpgradeMenuActivity extends ListActivity {
 			//Fill in name for this ListItem
 			TextView name=(TextView)row.findViewById(R.id.upgrade_name);
 			name.setText(upgradesList.get(position).getUpgradeLongName());
-			//Color upgrades Grey for the ones we have
-			if(GameInfo.hasUpgrade(upgradesList.get(position)))
-				name.setTextColor(0xFF666666);
 			
 			//Fill in description for this ListItem
 			TextView description=(TextView)row.findViewById(R.id.upgrade_description);
@@ -154,21 +147,41 @@ public class UpgradeMenuActivity extends ListActivity {
 			//Fill in ListItem's cost
 			TextView cost=(TextView)row.findViewById(R.id.upgrade_cost);
 			cost.setText(Integer.toString(upgradesList.get(position).getUpgradeCost()));
-			//Color costs RED for upgrades that we can't afford
-			if(upgradesList.get(position).getUpgradeCost() > GameInfo.money)
-				cost.setTextColor(0xFFFF0000);
 			
-			
-			
-			//Remove upgrades that we aren't allowed to buy yet
-			if(upgradesList.get(position).getUpgradeLevel() > GameInfo.getLevel())
-				row.setVisibility(View.GONE);
-			
-			//Remove upgrades for which prereqs aren't satisfied
-			if(!upgradesList.get(position).prerequisitesSatisfied(GameInfo.getUpgradesBoughtCopy()))
-				row.setVisibility(View.GONE);
-			
+			updateListView(position, row);
 			return(row);
 		}
+	}
+	
+	public void updateListView(int position, View row) {
+		if(row==null) return;		
+		
+		TextView name=(TextView)row.findViewById(R.id.upgrade_name);
+		TextView cost=(TextView)row.findViewById(R.id.upgrade_cost);
+		TextView description=(TextView)row.findViewById(R.id.upgrade_description);
+		
+		//Grey out things we already have
+		if(GameInfo.hasUpgrade(upgradesList.get(position))) {
+			cost.setTextColor(COLOR_GREYED_OUT);
+			name.setTextColor(COLOR_GREYED_OUT);
+			description.setText(upgradesList.get(position).getUpgradeDescription() + " (bought");
+		}
+		//Color costs RED for upgrades that we can't afford
+		else if(upgradesList.get(position).getUpgradeCost() > GameInfo.money) {
+			cost.setTextColor(COLOR_RED); 
+		}
+		
+		//Remove upgrades that we aren't allowed to buy yet
+		if(upgradesList.get(position).getUpgradeLevel() > GameInfo.getLevel())
+			row.setVisibility(View.GONE);
+		
+		//Remove upgrades for which prereqs aren't satisfied
+		if(!upgradesList.get(position).prerequisitesSatisfied(GameInfo.getUpgradesBoughtCopy()))
+			row.setVisibility(View.GONE);
+		
+		//Display upgrades where the requirements are satisfied
+		if(upgradesList.get(position).prerequisitesSatisfied(GameInfo.getUpgradesBoughtCopy()) &&
+				upgradesList.get(position).getUpgradeLevel() <= GameInfo.getLevel())
+			row.setVisibility(View.VISIBLE);
 	}
 }

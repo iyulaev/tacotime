@@ -56,6 +56,10 @@ public class GameDatabase {
 		ready = true;
 	}
 	
+	public synchronized void flushCache() {
+		databaseCache = null;
+	}
+	
 	/** Save a provided SavedCharacter to the database, updating the cache along the way 
 	 * 
 	 * @param sc The SavedCharacter to save into our database. Its _id member variable will be updated after
@@ -79,6 +83,18 @@ public class GameDatabase {
 		}
 		
 		databaseCache.put(sc.name, sc);
+	}
+	
+	/** Deletes a given character from the database 
+	 * 
+	 * @param sc The SavedCharacter to delete from our database.
+	 * */
+	public synchronized void deleteCharacterFromDatabase(SavedCharacter sc) {		
+		//If sc already has a valid ID, then we need to delete the existing entry first
+		if(sc.id_set) 
+			db.delete(SavedCharacter.TABLE_NAME, SavedCharacter.COLUMN_ID + " = " + sc._id, null);
+		
+		if(databaseCache != null) databaseCache.remove(sc.name);
 	}
 	
 	/** This method is used to print the contents of the database cache to Log.v. Usually used for 

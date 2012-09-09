@@ -31,7 +31,7 @@ public class GameLevel_2 extends GameLevel {
 		this.point_mult = 1.3f;
 		this.money_mult = 1.3f;
 		this.customer_impatience = 1.0f;
-		this.time_limit_sec = 90;
+		this.time_limit_sec = 80;
 		this.customer_max_order_size = 2;
 		
 		this.point_bonus = 30;

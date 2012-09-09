@@ -175,6 +175,8 @@ public class GameInfo {
 		
 		if(gameDB == null) {
 			gameDB = new GameDatabase(context);
+		} else {
+			gameDB.flushCache();
 		}
 		
 		gameDB.open();
@@ -182,9 +184,11 @@ public class GameInfo {
 		
 		myCharacter = gameDB.databaseCache.get(characterName);
 		
+		//Shouldn't ever happen now that CharacterSelectActivity ensures the character exists in the database
 		if(myCharacter == null) {
 			gameDB.saveCharacterToDatabase(new SavedCharacter(characterName, "boy"));
 			myCharacter = gameDB.databaseCache.get(characterName);
+			Log.e(activitynametag, "GameInfo entered invalid code (myCharacter == null");
 		}
 		
 		gameDB.close();

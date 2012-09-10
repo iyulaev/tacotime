@@ -57,7 +57,7 @@ public class GameItem implements ViewObject {
 	static final int INTERACTION_QUEUE_SIZE = 8;
 	
 	//bitmap (what this GameItem looks like) (may be modified when state changes)
-	Bitmap bitmap;
+	protected Bitmap bitmap;
 	
 	//Context where we were called from, only used to load bitmaps and other resources
 	Context caller;

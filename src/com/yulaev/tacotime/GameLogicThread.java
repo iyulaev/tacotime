@@ -16,6 +16,9 @@ import com.yulaev.tacotime.gamelogic.leveldefs.GameLevel_1;
 import com.yulaev.tacotime.gamelogic.leveldefs.GameLevel_2;
 import com.yulaev.tacotime.gamelogic.leveldefs.GameLevel_3;
 import com.yulaev.tacotime.gamelogic.leveldefs.GameLevel_4;
+import com.yulaev.tacotime.gamelogic.leveldefs.GameLevel_5;
+import com.yulaev.tacotime.gamelogic.leveldefs.GameLevel_6;
+import com.yulaev.tacotime.gamelogic.leveldefs.GameLevel_7;
 import com.yulaev.tacotime.gameobjects.CoffeeGirl;
 import com.yulaev.tacotime.gameobjects.CustomerQueue;
 import com.yulaev.tacotime.gameobjects.GameFoodItem;
@@ -23,6 +26,8 @@ import com.yulaev.tacotime.gameobjects.GameItem;
 import com.yulaev.tacotime.gameobjects.objectdefs.Blender;
 import com.yulaev.tacotime.gameobjects.objectdefs.CoffeeMachine;
 import com.yulaev.tacotime.gameobjects.objectdefs.CounterTop;
+import com.yulaev.tacotime.gameobjects.objectdefs.EspressoMachine;
+import com.yulaev.tacotime.gameobjects.objectdefs.Microwave;
 
 
 /**
@@ -172,6 +177,16 @@ public class GameLogicThread extends Thread {
 		if(old_state == CoffeeGirl.STATE_NORMAL && 
 				interactedWith.contains("CoffeeMachine") && 
 				interactee_state == CoffeeMachine.STATE_DONE) coffeeGirl.setItemHolding("coffee");
+		
+		//CoffeeGirl's hands are empty, she interacts with a microwave that is done -> she is now carrying sandwich
+		if(old_state == CoffeeGirl.STATE_NORMAL && 
+				interactedWith.contains("Microwave") && 
+				interactee_state == Microwave.STATE_DONE) coffeeGirl.setItemHolding("sandwich");
+		
+		//CoffeeGirl's hands are empty, she interacts with a microwave that is done -> she is now carrying sandwich
+		if(old_state == CoffeeGirl.STATE_NORMAL && 
+				interactedWith.contains("EspressoMachine") && 
+				interactee_state == EspressoMachine.STATE_DONE) coffeeGirl.setItemHolding("espresso");
 		
 		//CoffeeGirl's hands are empty, she interacts with a cupcake tray -> she is now carrying a cupcake
 		if(old_state == CoffeeGirl.STATE_NORMAL && 
@@ -416,7 +431,7 @@ public class GameLogicThread extends Thread {
 	
 	// Level loader methods
 	
-	private static final int MAX_GAME_LEVEL=4;
+	private static final int MAX_GAME_LEVEL=7;
 	/** Loads a new level; creates a GameLevel Object corresponding to the new level
 	 * and loads the level. Also resets game state and level max time.
 	 * @param levelNumber
@@ -448,7 +463,7 @@ public class GameLogicThread extends Thread {
 		
 		if(levelNumber == 1) {
 			//Launch level 1!
-			newLevel = new GameLevel_1();
+			newLevel = new GameLevel_1(); //TODO FIX ME
 		}
 		else if(levelNumber == 2) {
 			//Launch level 2!
@@ -459,6 +474,15 @@ public class GameLogicThread extends Thread {
 		}
 		else if(levelNumber == 4) {
 			newLevel = new GameLevel_4();
+		}
+		else if(levelNumber == 5) {
+			newLevel = new GameLevel_5();
+		}
+		else if(levelNumber == 6) {
+			newLevel = new GameLevel_6();
+		}
+		else if(levelNumber == 7) {
+			newLevel = new GameLevel_7();
 		}
 		else {
 			Log.e(activitynametag, "Invalid level reached!");

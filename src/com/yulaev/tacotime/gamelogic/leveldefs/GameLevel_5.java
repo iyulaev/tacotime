@@ -31,20 +31,20 @@ import com.yulaev.tacotime.gameobjects.objectdefs.TrashCan;
 
 /** Describes level #3 for the Coffee Time game! */
 
-public class GameLevel_3 extends GameLevel {
-	public GameLevel_3() {
-		this.level_number = 3;
-		this.customerQueue_length = 18;
-		this.point_mult = 1.4f;
-		this.money_mult = 1.4f;
-		this.customer_impatience = 0.65f;
-		this.time_limit_sec = 110;
-		this.customer_max_order_size = 2;
+public class GameLevel_5 extends GameLevel {
+	public GameLevel_5() {
+		this.level_number = 5;
+		this.customerQueue_length = 30;
+		this.point_mult = 1.5f;
+		this.money_mult = 1.5f;
+		this.customer_impatience = 0.6f;
+		this.time_limit_sec = 3 * 60 - 10;
+		this.customer_max_order_size = 3;
 		
-		this.point_bonus = 40;
-		this.money_bonus = 20;
-		this.point_bonus_derating = 0.3f;
-		this.money_bonus_derating = 0.3f;
+		this.point_bonus = 75;
+		this.money_bonus = 40;
+		this.point_bonus_derating = 0.25f;
+		this.money_bonus_derating = 0.25f;
 	}
 	
 	/** Set up this level; add all GameItems and such to the Threads, set up the Customers and such
@@ -117,6 +117,13 @@ public class GameLevel_3 extends GameLevel {
 		inputThread.addViewObject(blender);
 		gameLogicThread.addGameItem(blender);
 		
+		Microwave microwave = new Microwave(caller, R.drawable.microwave_inactive, 
+				Microwave.DEFAULT_XPOS, Microwave.DEFAULT_YPOS, GameItem.ORIENTATION_EAST);
+		//viewThread.addViewObject(blender);
+		viewThread.addGameItem(microwave);
+		inputThread.addViewObject(microwave);
+		gameLogicThread.addGameItem(microwave);
+		
 		if(GameInfo.hasUpgrade("soundsystem")) {
 			SoundSystem soundsystem = new SoundSystem(caller);
 			//viewThread.addViewObject(blender);
@@ -133,6 +140,7 @@ public class GameLevel_3 extends GameLevel {
 		gameLogicThread.addNewFoodItem(new FoodItemCupcake(caller), CoffeeGirl.STATE_CARRYING_CUPCAKE);
 		gameLogicThread.addNewFoodItem(new FoodItemBlendedDrink(caller), CoffeeGirl.STATE_CARRYING_BLENDEDDRINK);
 		gameLogicThread.addNewFoodItem(new FoodItemPieSlice(caller), CoffeeGirl.STATE_CARRYING_PIESLICE);
+		gameLogicThread.addNewFoodItem(new FoodItemSandwich(caller), CoffeeGirl.STATE_CARRYING_SANDWICH);
 		
 		//Magic numbers: 40 - x-position of Customers, (GameGrid.GAMEGRID_HEIGHT-45) - y-position of customers
 		//1 - starting customer queue length, 

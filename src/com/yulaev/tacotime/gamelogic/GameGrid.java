@@ -13,12 +13,12 @@ public class GameGrid {
 	//Set padding areas for this gamegrid; this is areas where CoffeeGirl can't go
 	public static final int GAMEGRID_PADDING_LEFT = 30;
 	public static final int GAMEGRID_PADDING_RIGHT = 40;
-	public static final int GAMEGRID_PADDING_TOP = 30;
+	public static final int GAMEGRID_PADDING_TOP = 35;
 	public static final int GAMEGRID_PADDING_BOTTOM = 55;
 		
 	//Set constraints for gameGrid
 	public static final int GAMEGRID_WIDTH = 70+(GAMEGRID_PADDING_LEFT+GAMEGRID_PADDING_RIGHT);
-	public static final int GAMEGRID_HEIGHT = 70+(GAMEGRID_PADDING_TOP+GAMEGRID_PADDING_BOTTOM);
+	public static final int GAMEGRID_HEIGHT = 65+(GAMEGRID_PADDING_TOP+GAMEGRID_PADDING_BOTTOM);
 	
 	//Determines canvas size in real pixel terms
 	private static int canvas_width, canvas_height;

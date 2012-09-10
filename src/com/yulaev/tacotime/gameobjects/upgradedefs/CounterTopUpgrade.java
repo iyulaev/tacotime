@@ -12,7 +12,7 @@ public class CounterTopUpgrade extends GameUpgrade {
 	public static final String UPGRADE_NAME = "countertop";
 
 	public CounterTopUpgrade() {
-		this.upgradeCost = 50;
+		this.upgradeCost = 100;
 		this.upgradeDescription = "Add a counter top that can store an item temporarily";
 		this.upgradeName = UPGRADE_NAME;
 		this.upgradeLongName = "Counter Top";

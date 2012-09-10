@@ -35,6 +35,8 @@ public class CoffeeGirl extends GameActor {
 	public static final int STATE_CARRYING_CUPCAKE = 2;
 	public static final int STATE_CARRYING_BLENDEDDRINK = 3;
 	public static final int STATE_CARRYING_PIESLICE = 4;
+	public static final int STATE_CARRYING_SANDWICH = 5;
+	public static final int STATE_CARRYING_ESPRESSO = 6;
 	
 	/** Default constructor for a coffeegirl object.
 	 * 
@@ -53,7 +55,7 @@ public class CoffeeGirl extends GameActor {
 		}
 		
 		if(GameInfo.hasUpgrade(FasterShoesUpgrade.UPGRADE_NAME)) {
-			this.move_rate = (int) (((double) this.move_rate) * 1.41);
+			this.move_rate = (int) (((double) this.move_rate) * 1.21);
 		}
 		
 		//Add a state for each thing that CoffeeGirl may carry
@@ -75,6 +77,12 @@ public class CoffeeGirl extends GameActor {
 		
 		tempBitmap = BitmapFactory.decodeResource(caller.getResources(), R.drawable.coffeegirl_w_cake_slice);
 		this.addState("carrying_pie_slice", new DirectionBitmapMap(new CircularList<Bitmap>(1,tempBitmap)));
+		
+		tempBitmap = BitmapFactory.decodeResource(caller.getResources(), R.drawable.coffeegirl_w_sandwich);
+		this.addState("carrying_sandwich", new DirectionBitmapMap(new CircularList<Bitmap>(1,tempBitmap)));
+		
+		tempBitmap = BitmapFactory.decodeResource(caller.getResources(), R.drawable.coffeegirl_w_espresso);
+		this.addState("carrying_espresso", new DirectionBitmapMap(new CircularList<Bitmap>(1,tempBitmap)));
 	}
 	
 	/** This method is called by the InputThread when a user input (a tap) occurs somewhere on the screen. We convert

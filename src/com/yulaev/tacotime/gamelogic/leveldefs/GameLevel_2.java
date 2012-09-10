@@ -15,11 +15,18 @@ import com.yulaev.tacotime.gameobjects.GameItem;
 import com.yulaev.tacotime.gameobjects.fooditemdefs.FoodItemBlendedDrink;
 import com.yulaev.tacotime.gameobjects.fooditemdefs.FoodItemCoffee;
 import com.yulaev.tacotime.gameobjects.fooditemdefs.FoodItemCupcake;
+import com.yulaev.tacotime.gameobjects.fooditemdefs.FoodItemEspresso;
 import com.yulaev.tacotime.gameobjects.fooditemdefs.FoodItemNothing;
+import com.yulaev.tacotime.gameobjects.fooditemdefs.FoodItemPieSlice;
+import com.yulaev.tacotime.gameobjects.fooditemdefs.FoodItemSandwich;
 import com.yulaev.tacotime.gameobjects.objectdefs.Blender;
 import com.yulaev.tacotime.gameobjects.objectdefs.CoffeeMachine;
 import com.yulaev.tacotime.gameobjects.objectdefs.CounterTop;
 import com.yulaev.tacotime.gameobjects.objectdefs.CupCakeTray;
+import com.yulaev.tacotime.gameobjects.objectdefs.EspressoMachine;
+import com.yulaev.tacotime.gameobjects.objectdefs.Microwave;
+import com.yulaev.tacotime.gameobjects.objectdefs.PieTray;
+import com.yulaev.tacotime.gameobjects.objectdefs.SoundSystem;
 import com.yulaev.tacotime.gameobjects.objectdefs.TrashCan;
 
 /** Describes level #2 for the Coffee Time game! */
@@ -50,8 +57,6 @@ public class GameLevel_2 extends GameLevel {
 	public void loadLevel(ViewThread viewThread, GameLogicThread gameLogicThread, InputThread inputThread, Context caller) {
 		super.loadLevel(viewThread, gameLogicThread, inputThread, caller);
 		
-		
-		
 		//Setup coffeegirl (actor)
 		CoffeeGirl coffeegirl = new CoffeeGirl(caller);
 		viewThread.addViewObject(coffeegirl);
@@ -60,7 +65,8 @@ public class GameLevel_2 extends GameLevel {
 		gameLogicThread.setActor(coffeegirl);
 		
 		//Create and add objects to viewThread containers (UPDATE FOR NEW GAMEITEM)
-		CoffeeMachine coffeeMachine = new CoffeeMachine(caller, R.drawable.coffeemachine, 16, 40, GameItem.ORIENTATION_WEST);
+		CoffeeMachine coffeeMachine = new CoffeeMachine(caller, R.drawable.coffeemachine, 
+				CoffeeMachine.DEFAULT_XPOS, CoffeeMachine.DEFAULT_YPOS, GameItem.ORIENTATION_WEST);
 		//GameItem coffeeMachine = new GameItem(caller, "CoffeeMachine", R.drawable.coffeemachine, 100, 50, GameItem.ORIENTATION_NORTH);
 		//viewThread.addViewObject(coffeeMachine);
 		viewThread.addGameItem(coffeeMachine);
@@ -68,36 +74,51 @@ public class GameLevel_2 extends GameLevel {
 		gameLogicThread.addGameItem(coffeeMachine);	
 		
 		if(GameInfo.hasUpgrade("secondcoffeemachine")) {
-			coffeeMachine = new CoffeeMachine(caller, R.drawable.coffeemachine, 16, 60, GameItem.ORIENTATION_WEST);
+			coffeeMachine = new CoffeeMachine(caller, R.drawable.coffeemachine, 
+					CoffeeMachine.DEFAULT_XPOS, CoffeeMachine.DEFAULT_YPOS+20, GameItem.ORIENTATION_WEST);
 			viewThread.addGameItem(coffeeMachine);
 			inputThread.addViewObject(coffeeMachine);
 			gameLogicThread.addGameItem(coffeeMachine);
 		}
 		
 		if(GameInfo.hasUpgrade("countertop")) {
-			CounterTop counterTop = new CounterTop(caller, R.drawable.countertop_grey, 50, 20, GameItem.ORIENTATION_NORTH);
+			CounterTop counterTop = new CounterTop(caller, R.drawable.countertop_grey, 
+					CounterTop.DEFAULT_XPOS, CounterTop.DEFAULT_YPOS, GameItem.ORIENTATION_NORTH);
 			viewThread.addGameItem(counterTop);
 			inputThread.addViewObject(counterTop);
 			gameLogicThread.addGameItem(counterTop);
 		}
 		
-		TrashCan trashCan = new TrashCan(caller, R.drawable.trashcan, 110, 40, GameItem.ORIENTATION_EAST);
+		TrashCan trashCan = new TrashCan(caller, R.drawable.trashcan, 
+				TrashCan.DEFAULT_XPOS, TrashCan.DEFAULT_YPOS, GameItem.ORIENTATION_EAST);
 		//viewThread.addViewObject(trashCan);
 		viewThread.addGameItem(trashCan);
 		inputThread.addViewObject(trashCan);
 		gameLogicThread.addGameItem(trashCan);
 		
-		CupCakeTray cupcakeTray = new CupCakeTray(caller, R.drawable.cupcake_tray, 113, 60, GameItem.ORIENTATION_EAST);
+		CupCakeTray cupcakeTray = new CupCakeTray(caller, R.drawable.cupcake_tray, 
+				CupCakeTray.DEFAULT_XPOS, CupCakeTray.DEFAULT_YPOS, GameItem.ORIENTATION_EAST);
 		//viewThread.addViewObject(cupcakeTray);
 		viewThread.addGameItem(cupcakeTray);
 		inputThread.addViewObject(cupcakeTray);
 		gameLogicThread.addGameItem(cupcakeTray);
 		
-		Blender blender = new Blender(caller, R.drawable.blender_idle, 16, 80, GameItem.ORIENTATION_WEST);
+		Blender blender = new Blender(caller, R.drawable.blender_idle, 
+				Blender.DEFAULT_XPOS, Blender.DEFAULT_YPOS, GameItem.ORIENTATION_WEST);
 		//viewThread.addViewObject(blender);
 		viewThread.addGameItem(blender);
 		inputThread.addViewObject(blender);
 		gameLogicThread.addGameItem(blender);
+		
+		if(GameInfo.hasUpgrade("soundsystem")) {
+			SoundSystem soundsystem = new SoundSystem(caller);
+			//viewThread.addViewObject(blender);
+			viewThread.addGameItem(soundsystem);
+			inputThread.addViewObject(soundsystem);
+			gameLogicThread.addGameItem(soundsystem);
+			
+			this.customer_impatience *= 0.9;
+		}
 		
 		//Set up all Food Items (UPDATE FOR NEW FOODITEM)
 		gameLogicThread.addNewFoodItem(new FoodItemNothing(caller), CoffeeGirl.STATE_NORMAL);

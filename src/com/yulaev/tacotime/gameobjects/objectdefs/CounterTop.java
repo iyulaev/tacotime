@@ -25,6 +25,10 @@ public class CounterTop extends GameItem {
 	//keep track of how many coffee machines are instantiated
 	public static int instanceCount = 0;
 	
+	//Defines for default X and Y positions;
+	public static int DEFAULT_XPOS = 50;
+	public static int DEFAULT_YPOS = 20;
+	
 	/** Constructor for CoffeeMachine mostly mimics a game items, except it sets the name by itself. Also it sets up
 	 * all of the CoffeeMachine states and the associated bitmaps; the bitmap provided as an argument is just a "default" bitmap
 	 * that probably never gets used.
@@ -35,7 +39,10 @@ public class CounterTop extends GameItem {
 	 * @param orientation
 	 */
 	public CounterTop(Context caller, int r_bitmap, int x_pos, int y_pos, int orientation) {
-		super(caller, "CounterTop" + (++instanceCount), r_bitmap, x_pos, y_pos, orientation, 25, 25);
+		super(caller, "CounterTop" + (++instanceCount), r_bitmap, x_pos, y_pos, orientation, 20, 15);
+		
+		this.DEFAULT_XPOS = 50;
+		this.DEFAULT_YPOS = 20;
 		
 		//Add states that describe behavior of coffee machine
 		//super.addState(String stateName, int state_delay_ms, int r_bitmap, boolean input_sensitive, boolean time_sensitive)

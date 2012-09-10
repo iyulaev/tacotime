@@ -2,8 +2,7 @@ package com.yulaev.tacotime;
 
 
 import java.util.ArrayList;
-import java.util.Iterator;
-
+import android.annotation.SuppressLint;
 import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.Message;
@@ -25,6 +24,7 @@ import com.yulaev.tacotime.gameobjects.ViewObject;
  * VIEW_REFRESH_PERIOD the ViewThread will call the onUpdate() method for every GameItem, and
  * then will draw the GameItem to the Canvas.
  */
+
 public class ViewThread extends Thread {
 	
 	private static final String activitynametag = "ViewThread";
@@ -92,6 +92,7 @@ public class ViewThread extends Thread {
 		draw_announcement_message = false;
 		
 		handler = new Handler() {
+			@SuppressLint({ "HandlerLeak" })
 			@Override
 			public void handleMessage(Message msg) {
 				if(msg.what == MESSAGE_REFRESH_VIEW) {
@@ -188,7 +189,8 @@ public class ViewThread extends Thread {
 			canvas = this.surfaceHolder.lockCanvas();
 			this.gamePanel.onDraw(canvas, viewObjects, 
 					GameInfo.setAndReturnMoney(0), GameInfo.setAndReturnPoints(0),
-					draw_announcement_message, announcementMessage);
+					draw_announcement_message, announcementMessage,
+					GameInfo.getLevelTime());
 
 		} catch(Exception e) {;} 
 		finally {

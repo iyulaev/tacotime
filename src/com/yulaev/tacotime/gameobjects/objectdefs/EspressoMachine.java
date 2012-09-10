@@ -1,7 +1,6 @@
 package com.yulaev.tacotime.gameobjects.objectdefs;
 
 import com.yulaev.tacotime.R;
-import com.yulaev.tacotime.gamelogic.GameInfo;
 import com.yulaev.tacotime.gameobjects.GameItem;
 
 import android.content.Context;
@@ -12,7 +11,7 @@ import android.content.Context;
  *
  */
 
-public class CoffeeMachine extends GameItem {
+public class EspressoMachine extends GameItem {
 	
 	//Define all of the state indices
 	public static final int STATE_IDLE=0;
@@ -22,12 +21,12 @@ public class CoffeeMachine extends GameItem {
 	//Define state delays
 	public static final int BREW_TIME_MS = 2500;
 	
-	//Defines for default X and Y positions;
-	public static int DEFAULT_XPOS = 16;
-	public static int DEFAULT_YPOS = 40;
-	
 	//keep track of how many coffee machines are instantiated (so we can name them appropriately)
 	public static int instanceCount = 0;
+	
+	//Defines for default X and Y positions;
+	public static int DEFAULT_XPOS = 80;
+	public static int DEFAULT_YPOS = 20;
 	
 	/** Constructor for CoffeeMachine mostly mimics a game items, except it sets the name by itself. Also it sets up
 	 * all of the CoffeeMachine states and the associated bitmaps; the bitmap provided as an argument is just a "default" bitmap
@@ -38,19 +37,15 @@ public class CoffeeMachine extends GameItem {
 	 * @param y_pos
 	 * @param orientation
 	 */
-	public CoffeeMachine(Context caller, int r_bitmap, int x_pos, int y_pos, int orientation) {
-		super(caller, "CoffeeMachine" + (++instanceCount), r_bitmap, x_pos, y_pos, orientation, 15, 20);
+	public EspressoMachine(Context caller, int r_bitmap, int x_pos, int y_pos, int orientation) {
+		super(caller, "EspressoMachine" + (++instanceCount), r_bitmap, x_pos, y_pos, orientation, 20, 17);
 		
 		int brew_time = BREW_TIME_MS;
-		if(GameInfo.hasUpgrade("quickbrewing")) brew_time -= 1000;
-		
-		this.DEFAULT_XPOS = 16;
-		this.DEFAULT_YPOS = 40;
 		
 		//Add states that describe behavior of coffee machine
 		//super.addState(String stateName, int state_delay_ms, int r_bitmap, boolean input_sensitive, boolean time_sensitive)
-		this.addState("idle", 0, R.drawable.coffeemachine_idle, true, false);
-		this.addState("brewing", brew_time, R.drawable.coffeemachine_brewing, false, true);
-		this.addState("done", 0, R.drawable.coffeemachine_done, true, "nothing", false);
+		this.addState("idle", 0, R.drawable.espresso_machine_inactive, true, false);
+		this.addState("brewing", brew_time, R.drawable.espresso_machine_active, false, true);
+		this.addState("done", 0, R.drawable.espresso_machine_done, true, "nothing", false);
 	}
 }

@@ -31,18 +31,18 @@ import com.yulaev.tacotime.gameobjects.objectdefs.TrashCan;
 
 /** Describes level #3 for the Coffee Time game! */
 
-public class GameLevel_3 extends GameLevel {
-	public GameLevel_3() {
-		this.level_number = 3;
-		this.customerQueue_length = 18;
-		this.point_mult = 1.4f;
-		this.money_mult = 1.4f;
-		this.customer_impatience = 0.65f;
-		this.time_limit_sec = 110;
-		this.customer_max_order_size = 2;
+public class GameLevel_7 extends GameLevel {
+	public GameLevel_7() {
+		this.level_number = 7;
+		this.customerQueue_length = 40;
+		this.point_mult = 1.6f;
+		this.money_mult = 1.6f;
+		this.customer_impatience = 0.55f;
+		this.time_limit_sec = 3 * 60 + 20;
+		this.customer_max_order_size = 3;
 		
-		this.point_bonus = 40;
-		this.money_bonus = 20;
+		this.point_bonus = 125;
+		this.money_bonus = 100;
 		this.point_bonus_derating = 0.3f;
 		this.money_bonus_derating = 0.3f;
 	}
@@ -117,6 +117,20 @@ public class GameLevel_3 extends GameLevel {
 		inputThread.addViewObject(blender);
 		gameLogicThread.addGameItem(blender);
 		
+		Microwave microwave = new Microwave(caller, R.drawable.microwave_inactive, 
+				Microwave.DEFAULT_XPOS, Microwave.DEFAULT_YPOS, GameItem.ORIENTATION_EAST);
+		//viewThread.addViewObject(blender);
+		viewThread.addGameItem(microwave);
+		inputThread.addViewObject(microwave);
+		gameLogicThread.addGameItem(microwave);
+		
+		EspressoMachine espressomachine = new EspressoMachine(caller, R.drawable.espresso_machine_inactive, 
+				EspressoMachine.DEFAULT_XPOS, EspressoMachine.DEFAULT_YPOS, GameItem.ORIENTATION_NORTH);
+		//viewThread.addViewObject(blender);
+		viewThread.addGameItem(espressomachine);
+		inputThread.addViewObject(espressomachine);
+		gameLogicThread.addGameItem(espressomachine);
+		
 		if(GameInfo.hasUpgrade("soundsystem")) {
 			SoundSystem soundsystem = new SoundSystem(caller);
 			//viewThread.addViewObject(blender);
@@ -133,6 +147,8 @@ public class GameLevel_3 extends GameLevel {
 		gameLogicThread.addNewFoodItem(new FoodItemCupcake(caller), CoffeeGirl.STATE_CARRYING_CUPCAKE);
 		gameLogicThread.addNewFoodItem(new FoodItemBlendedDrink(caller), CoffeeGirl.STATE_CARRYING_BLENDEDDRINK);
 		gameLogicThread.addNewFoodItem(new FoodItemPieSlice(caller), CoffeeGirl.STATE_CARRYING_PIESLICE);
+		gameLogicThread.addNewFoodItem(new FoodItemSandwich(caller), CoffeeGirl.STATE_CARRYING_SANDWICH);
+		gameLogicThread.addNewFoodItem(new FoodItemEspresso(caller), CoffeeGirl.STATE_CARRYING_ESPRESSO);
 		
 		//Magic numbers: 40 - x-position of Customers, (GameGrid.GAMEGRID_HEIGHT-45) - y-position of customers
 		//1 - starting customer queue length, 

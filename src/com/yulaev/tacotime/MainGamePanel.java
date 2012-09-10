@@ -9,32 +9,12 @@ package com.yulaev.tacotime;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
-
 import com.yulaev.tacotime.gamelogic.GameGrid;
-import com.yulaev.tacotime.gamelogic.GameInfo;
-import com.yulaev.tacotime.gamelogic.leveldefs.GameLevel_1;
-import com.yulaev.tacotime.gameobjects.CoffeeGirl;
-import com.yulaev.tacotime.gameobjects.CustomerQueue;
-import com.yulaev.tacotime.gameobjects.GameFoodItem;
-import com.yulaev.tacotime.gameobjects.GameItem;
 import com.yulaev.tacotime.gameobjects.ViewObject;
-import com.yulaev.tacotime.gameobjects.fooditemdefs.FoodItemBlendedDrink;
-import com.yulaev.tacotime.gameobjects.fooditemdefs.FoodItemCoffee;
-import com.yulaev.tacotime.gameobjects.fooditemdefs.FoodItemCupcake;
-import com.yulaev.tacotime.gameobjects.fooditemdefs.FoodItemNothing;
-import com.yulaev.tacotime.gameobjects.objectdefs.Blender;
-import com.yulaev.tacotime.gameobjects.objectdefs.CoffeeMachine;
-import com.yulaev.tacotime.gameobjects.objectdefs.CupCakeTray;
-import com.yulaev.tacotime.gameobjects.objectdefs.TrashCan;
-
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -149,6 +129,7 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 	Paint gridPaint;
 	Paint moneyPaint;
 	Paint pointsPaint;
+	Paint levelTimePaint;
 	Paint announcementPaint;
 	
 	@Override
@@ -171,7 +152,8 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 	 */
 	protected void onDraw(Canvas canvas, ArrayList<ViewObject> voAr, 
 			int money, int points, 
-			boolean draw_announcement_message, String announcementMessage) {
+			boolean draw_announcement_message, String announcementMessage,
+			int level_time) {
 		if(gridPaint == null) {
 			gridPaint = new Paint();
 			gridPaint.setColor(Color.GRAY);
@@ -192,10 +174,13 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		if(moneyPaint == null || pointsPaint == null || announcementPaint == null) {
 			moneyPaint = new Paint();
 			moneyPaint.setColor(Color.GREEN);
-			moneyPaint.setTextSize(14);
+			moneyPaint.setTextSize(16);
 			pointsPaint = new Paint();
 			pointsPaint.setColor(Color.BLUE);
-			pointsPaint.setTextSize(14);
+			pointsPaint.setTextSize(16);
+			levelTimePaint = new Paint();
+			levelTimePaint.setColor(Color.RED);
+			levelTimePaint.setTextSize(16);
 			announcementPaint = new Paint();
 			announcementPaint.setColor(Color.RED);
 			announcementPaint.setTextSize(24);
@@ -203,8 +188,10 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		}
 		
 		//Draw money, points and display an announcement message IF there is an announcement
-		canvas.drawText(Integer.toString(money), 14, canvas.getHeight()-40, moneyPaint);
+		canvas.drawText(Integer.toString(level_time), 14, canvas.getHeight()-85, levelTimePaint);
+		canvas.drawText(Integer.toString(money), 14, canvas.getHeight()-50, moneyPaint);
 		canvas.drawText(Integer.toString(points), 14, canvas.getHeight()-15, pointsPaint);
+		
 		if(draw_announcement_message) {
 			canvas.drawText(announcementMessage, canvas.getWidth()/2, canvas.getHeight()/2, announcementPaint);
 		}

@@ -1,18 +1,18 @@
 package com.yulaev.tacotime.gameobjects.objectdefs;
 
 import com.yulaev.tacotime.R;
-import com.yulaev.tacotime.gamelogic.GameInfo;
 import com.yulaev.tacotime.gameobjects.GameItem;
 
 import android.content.Context;
 
-/** This class describes the Coffee Machine used in the TacoTime game
+/** This class describes the microwave used in the TacoTime game.
+ * The microwave makes sandwiches
  * 
  * @author ivany
  *
  */
 
-public class CoffeeMachine extends GameItem {
+public class Microwave extends GameItem {
 	
 	//Define all of the state indices
 	public static final int STATE_IDLE=0;
@@ -20,14 +20,14 @@ public class CoffeeMachine extends GameItem {
 	public static final int STATE_DONE=2;
 	
 	//Define state delays
-	public static final int BREW_TIME_MS = 2500;
-	
-	//Defines for default X and Y positions;
-	public static int DEFAULT_XPOS = 16;
-	public static int DEFAULT_YPOS = 40;
+	public static final int BAKE_TIME_MS = 4000;
 	
 	//keep track of how many coffee machines are instantiated (so we can name them appropriately)
 	public static int instanceCount = 0;
+	
+	//Defines for default X and Y positions;
+	public static int DEFAULT_XPOS = 113;
+	public static int DEFAULT_YPOS = 40;
 	
 	/** Constructor for CoffeeMachine mostly mimics a game items, except it sets the name by itself. Also it sets up
 	 * all of the CoffeeMachine states and the associated bitmaps; the bitmap provided as an argument is just a "default" bitmap
@@ -38,19 +38,16 @@ public class CoffeeMachine extends GameItem {
 	 * @param y_pos
 	 * @param orientation
 	 */
-	public CoffeeMachine(Context caller, int r_bitmap, int x_pos, int y_pos, int orientation) {
-		super(caller, "CoffeeMachine" + (++instanceCount), r_bitmap, x_pos, y_pos, orientation, 15, 20);
+	public Microwave(Context caller, int r_bitmap, int x_pos, int y_pos, int orientation) {
+		super(caller, "Microwave" + (++instanceCount), r_bitmap, x_pos, y_pos, orientation, 15, 20);
 		
-		int brew_time = BREW_TIME_MS;
-		if(GameInfo.hasUpgrade("quickbrewing")) brew_time -= 1000;
-		
-		this.DEFAULT_XPOS = 16;
-		this.DEFAULT_YPOS = 40;
-		
+		int bake_time = BAKE_TIME_MS;
+		//if(GameInfo.hasUpgrade("quickbrewing")) brew_time -= 1000;
+
 		//Add states that describe behavior of coffee machine
 		//super.addState(String stateName, int state_delay_ms, int r_bitmap, boolean input_sensitive, boolean time_sensitive)
-		this.addState("idle", 0, R.drawable.coffeemachine_idle, true, false);
-		this.addState("brewing", brew_time, R.drawable.coffeemachine_brewing, false, true);
-		this.addState("done", 0, R.drawable.coffeemachine_done, true, "nothing", false);
+		this.addState("idle", 0, R.drawable.microwave_inactive, true, false);
+		this.addState("baking", bake_time, R.drawable.microwave_active, false, true);
+		this.addState("done", 0, R.drawable.microwave_done, true, "nothing", false);
 	}
 }

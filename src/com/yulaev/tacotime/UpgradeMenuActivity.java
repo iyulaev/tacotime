@@ -14,6 +14,7 @@ import com.yulaev.tacotime.gameobjects.upgradedefs.CounterTopUpgrade;
 import com.yulaev.tacotime.gameobjects.upgradedefs.FastShoesUpgrade;
 import com.yulaev.tacotime.gameobjects.upgradedefs.FasterShoesUpgrade;
 import com.yulaev.tacotime.gameobjects.upgradedefs.QuickBrewingUpgrade;
+import com.yulaev.tacotime.gameobjects.upgradedefs.SoundSystemUpgrade;
 
 import android.app.ListActivity;
 import android.os.Bundle;
@@ -48,6 +49,7 @@ public class UpgradeMenuActivity extends ListActivity {
 		upgradesList.add(new CounterTopUpgrade());
 		upgradesList.add(new FasterShoesUpgrade());
 		upgradesList.add(new QuickBrewingUpgrade());
+		upgradesList.add(new SoundSystemUpgrade());
 		
 		theListAdapter = new IconicAdapter(this);
 		setListAdapter(theListAdapter);
@@ -62,19 +64,22 @@ public class UpgradeMenuActivity extends ListActivity {
 		
 		if(tryBuyUpgrade(upgradesList.get(position))) {
 			//grey out the title text for v, and append " (bought)" to it
-			TextView name=(TextView)v.findViewById(R.id.upgrade_name);
-			name.setTextColor(COLOR_GREYED_OUT);
+			//TextView name=(TextView)v.findViewById(R.id.upgrade_name);
+			//name.setTextColor(COLOR_GREYED_OUT);
 			
 			//Update the cost colors for all (other) upgrades and also see if the pre-requs
 			//have changed at all
-			for(int i = 0; i < parent.getCount(); i++) {
+			/*for(int i = 0; i < parent.getCount(); i++) {
 				try {
 					View otherPosition = parent.getChildAt(i);
 					updateListView(i, otherPosition);					
 				} catch (NullPointerException npe) {
 					// Iteration weirdness here! Android bug.
 				}
-			}
+			}*/
+			
+			theListAdapter.notifyDataSetInvalidated();
+			theListAdapter.notifyDataSetChanged();
 		}
 		
 	}
@@ -164,7 +169,7 @@ public class UpgradeMenuActivity extends ListActivity {
 		if(GameInfo.hasUpgrade(upgradesList.get(position))) {
 			cost.setTextColor(COLOR_GREYED_OUT);
 			name.setTextColor(COLOR_GREYED_OUT);
-			description.setText(upgradesList.get(position).getUpgradeDescription() + " (bought");
+			description.setText(upgradesList.get(position).getUpgradeDescription() + " (bought)");
 		}
 		//Color costs RED for upgrades that we can't afford
 		else if(upgradesList.get(position).getUpgradeCost() > GameInfo.money) {
@@ -173,11 +178,11 @@ public class UpgradeMenuActivity extends ListActivity {
 		
 		//Remove upgrades that we aren't allowed to buy yet
 		if(upgradesList.get(position).getUpgradeLevel() > GameInfo.getLevel())
-			row.setVisibility(View.GONE);
+			row.setVisibility(View.INVISIBLE);
 		
 		//Remove upgrades for which prereqs aren't satisfied
 		if(!upgradesList.get(position).prerequisitesSatisfied(GameInfo.getUpgradesBoughtCopy()))
-			row.setVisibility(View.GONE);
+			row.setVisibility(View.INVISIBLE);
 		
 		//Display upgrades where the requirements are satisfied
 		if(upgradesList.get(position).prerequisitesSatisfied(GameInfo.getUpgradesBoughtCopy()) &&

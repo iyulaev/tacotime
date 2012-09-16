@@ -33,9 +33,10 @@ public class GameLevel {
 	//what is the maximum number of items a customer can order
 	//should never be greater than 3
 	protected int customer_max_order_size;
+
+	protected int customer_dissatisfaction_penalty = 10;
 	
-	//upgrades available (not yet implemented)
-	protected String [] upgradesAvailable;
+	protected float proportion_customers_until_bonus = 0.8f;
 	
 	/** Set up this level; add all GameItems and such to the Threads, set up the Customers and such
 	 * with the per-level parameters.
@@ -62,8 +63,8 @@ public class GameLevel {
 	 * @param cleared_level_in_time Was the level cleared in time?
 	 * @return Level end bonus points
 	 */
-	public int getBonusPoints(boolean cleared_level_in_time) { 
-		return (cleared_level_in_time ? point_bonus : ((int) (point_bonus * point_bonus_derating) )); 
+	public int getBonusPoints(int customers_served) { 
+		return ((customers_served >= customersUntilBonus()) ? point_bonus : ((int) (point_bonus * point_bonus_derating) )); 
 	}
 	
 	/** Return the bonus money total for this level, given that the level was cleared in time (iff 
@@ -71,7 +72,15 @@ public class GameLevel {
 	 * @param cleared_level_in_time Was the level cleared in time?
 	 * @return Level end bonus money
 	 */
-	public int getBonusMoney(boolean cleared_level_in_time) { 
-		return (cleared_level_in_time ? money_bonus : ((int) (money_bonus * money_bonus_derating) )); 
+	public int getBonusMoney(int customers_served) { 
+		return ((customers_served >= customersUntilBonus()) ? money_bonus : ((int) (money_bonus * money_bonus_derating) )); 
+	}
+	
+	public int getCustomerDissatisfactionPenalty(int customers_unsatisfied) {
+		return (-1 * customers_unsatisfied * customer_dissatisfaction_penalty);
+	}
+	
+	public int customersUntilBonus() {
+		return ((int)(proportion_customers_until_bonus * customerQueue_length));
 	}
 }

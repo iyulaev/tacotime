@@ -11,6 +11,7 @@ import com.yulaev.tacotime.gamelogic.GameInfo;
 import com.yulaev.tacotime.gameobjects.GameUpgrade;
 import com.yulaev.tacotime.gameobjects.upgradedefs.CoffeeMachineUpgrade;
 import com.yulaev.tacotime.gameobjects.upgradedefs.CounterTopUpgrade;
+import com.yulaev.tacotime.gameobjects.upgradedefs.EspressoMachineUpgrade;
 import com.yulaev.tacotime.gameobjects.upgradedefs.FastShoesUpgrade;
 import com.yulaev.tacotime.gameobjects.upgradedefs.FasterShoesUpgrade;
 import com.yulaev.tacotime.gameobjects.upgradedefs.QuickBrewingUpgrade;
@@ -50,6 +51,7 @@ public class UpgradeMenuActivity extends ListActivity {
 		upgradesList.add(new FasterShoesUpgrade());
 		upgradesList.add(new QuickBrewingUpgrade());
 		upgradesList.add(new SoundSystemUpgrade());
+		upgradesList.add(new EspressoMachineUpgrade());
 		
 		theListAdapter = new IconicAdapter(this);
 		setListAdapter(theListAdapter);

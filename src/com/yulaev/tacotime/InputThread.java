@@ -28,6 +28,7 @@ public class InputThread extends Thread {
 	public static final int MESSAGE_SET_UNPAUSED = 2;
 	public static final int MESSAGE_INGAME_DIALOG_LAUNCHED = 3;
 	public static final int MESSAGE_INGAME_DIALOG_FINISHED = 4;
+	public static final int MESSAGE_HANDLE_SIMTAP = 5;
 	
 	//Define the possible results for the in-game dialog
 	public static final int INGAMEDIALOGRESULT_MAIN_MENU = 0;
@@ -61,8 +62,20 @@ public class InputThread extends Thread {
 					if(!paused) handleTap(msg.arg1, msg.arg2);
 				}
 				
-				else if (msg.what == MESSAGE_SET_PAUSED) setPaused(true);
-				else if (msg.what == MESSAGE_SET_UNPAUSED) setPaused(false);
+				//Handle a simulated tap; don't care if we're paused or not
+				else if(msg.what == MESSAGE_HANDLE_SIMTAP) {
+					Log.d(activitynametag, "Got SIMULATED input message!");
+					handleTap(msg.arg1, msg.arg2);
+				}
+				
+				else if (msg.what == MESSAGE_SET_PAUSED) {
+					setPaused(true);
+					Log.d(activitynametag, "InputThread got set paused message");
+				}
+				else if (msg.what == MESSAGE_SET_UNPAUSED) {
+					setPaused(false);
+					Log.d(activitynametag, "InputThread got set un-paused message");
+				}
 				//Called when the in-game dialog gets launched
 				//Pauses the game!
 				else if (msg.what == MESSAGE_INGAME_DIALOG_LAUNCHED) {

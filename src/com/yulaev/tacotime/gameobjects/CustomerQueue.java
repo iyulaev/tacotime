@@ -35,6 +35,10 @@ public class CustomerQueue extends GameItem {
 	
 	int queue_length;
 	ArrayList<Customer> customerList;
+	//Customers processed indicates how many customers go through the queue
+	int customers_processed;
+	//Customers_satisfied indicates how many customers had their orders satisfied
+	int customers_satisfied;
 	
 	/** Create a new CustomerQueue. We will probably only be creating one queue per game level.
 	 * 
@@ -76,7 +80,18 @@ public class CustomerQueue extends GameItem {
 			Log.v(activitynametag, customerList.get(i).toString());
 		}
 		
-		time_since_last_customer = 0;		
+		time_since_last_customer = 0;
+		
+		customers_satisfied = 0;
+		customers_processed = 0;
+	}
+	
+	/** Used to set the food item order for a particular customer. Tutorial uses this method to set 
+	 * the customer orders to something predictable.
+	 * 
+	 */
+	public void setCustomerOrder(int customer_index, GameFoodItem theItem) {
+		customerList.get(customer_index).setCustomerOrder(theItem);
 	}
 	
 	/** Decrement the queue position for each customer, effective advancing the line */
@@ -84,6 +99,8 @@ public class CustomerQueue extends GameItem {
 		for(int i = 0; i < queue_length; i++) {
 			customerList.get(i).decQueuePosition();
 		}
+		
+		customers_processed++;
 	}
 	
 	/** Get the customer at the front of the queue
@@ -114,11 +131,13 @@ public class CustomerQueue extends GameItem {
 		}
 		
 		//Advance the queue if customer at position 0 has finished
-		if(head().getState() == Customer.STATE_SERVED || head().getState() == Customer.STATE_FINISHED) {
+		if(head().getState() == Customer.STATE_ANGRY || head().getState() == Customer.STATE_SERVED || head().getState() == Customer.STATE_FINISHED) {
+			if(head().getState() == Customer.STATE_SERVED) customers_satisfied++;
 			advanceQueue(); 
 		}
 				
 		
+		//Toggle customer visibility
 		for(int i = 0; i < queue_length; i++) {
 			//Hide everything with queue position <0
 			if(customerList.get(i).getQueuePosition() < 0 &&
@@ -168,4 +187,15 @@ public class CustomerQueue extends GameItem {
 		if(customerList.get(queue_length-1).orderSatisfied()) return true;
 		return false;
 	}
+	/** Returns the number of customers that left the queue not because their order was satisfied, but because
+	 * they lost patience 
+	 * @return
+	 */
+	public int numberOfCustomersIgnored() { return (customers_processed - customers_satisfied); }
+	
+	/** Return the number of customers that were satisfied */
+	public int numberOfCustomersServed() { return (customers_satisfied); }
+	
+	/** Return how many customers are remaining in the queue */
+	public int numberOfCustomersLeft() { return queue_length - customers_processed; }
 }

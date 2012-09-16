@@ -329,25 +329,31 @@ public class GameItem implements ViewObject {
 		if(validStates == null) return(new Interaction(0));
 		//by default we do not change state; we first check to see if all conditions for changing state were met
 		
-		if(currentState.input_sensitive && !has_interacted) return(new Interaction(-1));
-		
 		long time_since_state_transition = GameInfo.currentTimeMillis()-time_of_state_transition;
-		if(currentState.time_sensitive && (time_since_state_transition < currentState.state_delay_ms)) return(new Interaction(-1));
+		if(currentState.time_sensitive && (time_since_state_transition > currentState.state_delay_ms)) return(doChangeState());
 		
-		//If the current state requires an input item, the required input isn't "null", and the required input isn't what's provided
-		//then we do not change state
-		if(currentState.input_sensitive && 
-				(!currentState.requiredInput.equals("null")) && 
-				(!currentState.requiredInput.equals(input))) return(new Interaction(-1));
-		
+		if(currentState.input_sensitive && has_interacted) {
+			//If the current state requires an input item and the provided item is what is required
+			//OR no input is required, the change state
+			if((currentState.requiredInput.equals("null")) || (currentState.requiredInput.equals(input))) 
+				return(doChangeState());
+		}
+
+		return(new Interaction(-1));		
+	}
+	private synchronized Interaction tryChangeState(boolean has_interacted) {
+		return(tryChangeState(has_interacted, "null"));
+	}
+	
+	/** Change the state of this GameItem to the next valid state and return the relevant
+	 * Interaction object describing the state change.
+	 */
+	private synchronized Interaction doChangeState() {
 		//At this point we've determined that a state change can occur
 		int next_state = (current_state_idx+1 < validStates.size()) ? current_state_idx+1 : 0;
 		int old_state = current_state_idx;
 		setState(next_state);
 		return(new Interaction(old_state));
-	}
-	private synchronized Interaction tryChangeState(boolean has_interacted) {
-		return(tryChangeState(has_interacted, "null"));
 	}
 	
 	/** Change the state to something else.

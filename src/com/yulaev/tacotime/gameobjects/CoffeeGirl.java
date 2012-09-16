@@ -27,7 +27,7 @@ public class CoffeeGirl extends GameActor {
 	private static final String activitynametag = "CoffeeGirl";
 	
 	/*The default moverate, in terms of the GameGrid vector length that may be traversed during each 100ms */  
-	private static int DEFAULT_COFFEEGIRL_MOVERATE = 5;
+	private static int DEFAULT_COFFEEGIRL_MOVERATE = 8;
 	
 	//Defines for states that CoffeeGirl can be in
 	public static final int STATE_NORMAL = 0;
@@ -49,7 +49,7 @@ public class CoffeeGirl extends GameActor {
 		//Check if we have the "fast shoes" upgrade and change moverate if necessary
 		if(GameInfo.hasUpgrade(FastShoesUpgrade.UPGRADE_NAME)) {
 			Log.d(activitynametag, "CoffeeGirl detected that " + FastShoesUpgrade.UPGRADE_NAME + " has been bought.");
-			this.move_rate = (int) (((double) this.move_rate) * 1.21);
+			this.move_rate = (int) (((double) this.move_rate) * 1.11);
 		} else {
 			Log.d(activitynametag, "CoffeeGirl did not detect that " + FastShoesUpgrade.UPGRADE_NAME + " has been bought.");
 		}

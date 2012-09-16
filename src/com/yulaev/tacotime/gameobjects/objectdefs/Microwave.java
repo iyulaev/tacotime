@@ -48,6 +48,6 @@ public class Microwave extends GameItem {
 		//super.addState(String stateName, int state_delay_ms, int r_bitmap, boolean input_sensitive, boolean time_sensitive)
 		this.addState("idle", 0, R.drawable.microwave_inactive, true, false);
 		this.addState("baking", bake_time, R.drawable.microwave_active, false, true);
-		this.addState("done", 0, R.drawable.microwave_done, true, "nothing", false);
+		this.addState("done", 10000, R.drawable.microwave_done, true, "nothing", true);
 	}
 }

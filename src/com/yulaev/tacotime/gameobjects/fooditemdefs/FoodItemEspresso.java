@@ -38,8 +38,8 @@ public class FoodItemEspresso extends GameFoodItem {
 
 	@Override
 	public int pointsOnInteraction(String interactedWith, int waitTime) {
-		if(interactedWith.equals("TrashCan")) return(-5);
-		if(interactedWith.equals("Customer")) return(12);
+		if(interactedWith.equals("TrashCan")) return(-10);
+		if(interactedWith.equals("Customer")) return(25);
 		
 		Log.e("FoodItemCoffee", "Tried to do pointsOnInteraction but interactedWith not recognized => " + interactedWith);
 		return(0);

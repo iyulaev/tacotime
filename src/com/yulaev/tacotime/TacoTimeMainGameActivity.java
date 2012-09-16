@@ -12,11 +12,14 @@ package com.yulaev.tacotime;
 
 import java.util.ArrayList;
 
+import com.yulaev.tacotime.gamelogic.GameDatabase;
 import com.yulaev.tacotime.gamelogic.GameGrid;
 import com.yulaev.tacotime.gamelogic.GameInfo;
+import com.yulaev.tacotime.gamelogic.SavedCharacter;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -25,14 +28,22 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 public class TacoTimeMainGameActivity extends Activity {
 	
 	private static final String activitynametag = "TacoTimeMainGameActivity";
 	
 	private TacoTimeMainGameActivity me;
+	
+	public static final int ASK_TUTORIAL_DIALOG = 0; 
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -50,15 +61,18 @@ public class TacoTimeMainGameActivity extends Activity {
 		
 		//Determine whether to load a saved game or not
 		boolean load_saved_game = false;
+		boolean watch_tutorial = false;
+		
 		Intent i = getIntent();
 		load_saved_game = i.getBooleanExtra("LoadSavedGame", false);
+		watch_tutorial = i.getBooleanExtra("WatchTutorial", false);
 		
 		// Setup game grid, by giving it window dimensions
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 		GameGrid.setupGameGrid(dm.widthPixels, dm.heightPixels);
 		
-		MainGamePanel mgpView = new MainGamePanel(this, load_saved_game);
+		MainGamePanel mgpView = new MainGamePanel(this, load_saved_game, watch_tutorial);
 		
 		//Used only for allocating an intent to be launched from 
 		final Context ttmgaContext = mgpView.getContext(); //this seems wrong...
@@ -162,7 +176,8 @@ public class TacoTimeMainGameActivity extends Activity {
 				}
 			})
 			//Maps to "retry level"
-			.setNeutralButton("Retry Level", new DialogInterface.OnClickListener() {
+			.setNeutralButton(GameInfo.getLevel() > 0 ? "Retry Level" : "Next Level", 
+						new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int id) {
 					MessageRouter.sendInGameDialogResult( InputThread.INGAMEDIALOGRESULT_RETRY_LEVEL);
 				}
@@ -187,4 +202,5 @@ public class TacoTimeMainGameActivity extends Activity {
 		
 	}
 
+	
 }

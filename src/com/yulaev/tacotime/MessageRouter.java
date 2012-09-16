@@ -21,6 +21,8 @@ public class MessageRouter {
 	public static GameLogicThread gameLogicThread;
 	public static Handler ttaHandler;
 	
+	public static final String activitynametag = "MessageRouter";
+	
 	/** Called when a View Update should occur (not used) 
 	 * 
 	 */
@@ -42,6 +44,22 @@ public class MessageRouter {
 		if(inputThread != null) {
 			Message message = Message.obtain();
 			message.what = InputThread.MESSAGE_HANDLE_ONTAP;
+			message.arg1 = x;
+			message.arg2 = y;
+			inputThread.handler.sendMessage(message);
+		}
+	}
+	
+	/** Called to simulate a user tap. The difference between this and a REAL user tap is that simulated
+	 * taps go through InputThread even if InputThread is paused
+	 * 
+	 * @param x The x co-ordinate of the simulated tap
+	 * @param y The y co-ordinate of the simulated tap
+	 */
+	public synchronized static void sendSimulatedTapMessage(int x, int y) {
+		if(inputThread != null) {
+			Message message = Message.obtain();
+			message.what = InputThread.MESSAGE_HANDLE_SIMTAP;
 			message.arg1 = x;
 			message.arg2 = y;
 			inputThread.handler.sendMessage(message);
@@ -107,28 +125,22 @@ public class MessageRouter {
 		}
 	}
 	
-	/** Send a message to inputThread and viewThread that the UI should be paused; prevents any
-	 * ViewObjects from being updated and any input from affecting game state WHEN paused is true
-	 * 
-	 * TODO: unused
+	/** Send a message to inputThread  that the UI should be paused; prevents any
+	 * input from affecting game state WHEN paused is true. Used by the TutorialThread
+	 * to ignore user input and 
 	 * 
 	 * @param paused Whether to pause or un-pause view and input threads
 	 */
-	/*public synchronized static void sendPauseUIMessage(boolean paused) {
+	public synchronized static void sendPauseUIMessage(boolean paused) {
 		if(inputThread != null) {
 			Message message = Message.obtain();
 			if(paused) message.what = InputThread.MESSAGE_SET_PAUSED;
 			else message.what = InputThread.MESSAGE_SET_UNPAUSED;
 			inputThread.handler.sendMessage(message);
+			
+			Log.d(activitynametag, "MessageRouter sendPauseUIMessage(" + paused + ")");
 		}
-		
-		if(viewThread != null) {
-			Message message = Message.obtain();
-			if(paused) message.what = ViewThread.MESSAGE_SET_PAUSED;
-			else message.what = ViewThread.MESSAGE_SET_UNPAUSED;
-			viewThread.handler.sendMessage(message);
-		}
-	}*/
+	}
 	
 	/** Pause the timer and prevent GameLogicThread from updating game state. Mostly used to un-pause the
 	 * game after a Level gets loaded or a (saved) game gets loaded, since the game will have been puased by

@@ -15,10 +15,16 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
+import android.os.SystemClock;
 import android.util.Log;
+import android.view.Display;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.WindowManager;
+import android.widget.Toast;
 
 public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -29,17 +35,25 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 	ViewThread viewThread;
 	InputThread inputThread;
 	GameLogicThread gameLogicThread;
+	TutorialThread tutorialThread;
 	
 	//Make sure we don't double-make the threads
 	boolean threads_launched;
+	
+	//Parent Activity context
+	Context context;
+	
+	//Will be used for positioning toasts
+	//int toast_position_y;
 
 	/** Constructor for MainGamePanel. Mostly this sets up and launches all of the game threads.
 	 * 
 	 * @param context The context that creates this MainGamePanel
 	 * @param load_saved_game Whether to load a saved game or not
 	 */
-	public MainGamePanel(Context context, boolean load_saved_game) {
+	public MainGamePanel(Context context, boolean load_saved_game, boolean watch_tutorial) {
 		super(context);
+		this.context = context;
 		
 		Log.d(activitynametag, "MainGamePanel constructor called!");
 		
@@ -59,11 +73,24 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		MessageRouter.inputThread = inputThread;
 		
 		//create the Game Logic Thread
-		gameLogicThread = new GameLogicThread(viewThread, timerThread, inputThread, this.getContext(), load_saved_game);
+		gameLogicThread = new GameLogicThread(viewThread, timerThread, inputThread, this.getContext(), load_saved_game,
+					watch_tutorial ? -1 : 0);
 		gameLogicThread.setSelf(gameLogicThread);
 		MessageRouter.gameLogicThread = gameLogicThread;
 		
+		//Create the tutorial thread IF NECESSARY
+		if(watch_tutorial)
+			tutorialThread = new TutorialThread();
+		
 		threads_launched = false;
+		
+		//Calculate the position that we should use to place announcements
+		//Shoudl be placed below the game grid
+		//CURRENTLY WE AREN'T USING THE TOASTS TO DISPLAY ANNOUNCEMENTS
+		/* WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+		Display display = wm.getDefaultDisplay();
+		int display_height = display.getHeight();
+		toast_position_y = display_height - GameGrid.canvasX(GameGrid.GAMEGRID_HEIGHT); */
 		
 		// make the GamePanel focusable so it can handle events
 		setFocusable(true);
@@ -95,6 +122,8 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 			inputThread.start();
 			gameLogicThread.start();
 			timerThread.start();
+			if(tutorialThread != null)
+				tutorialThread.start();
 			
 			threads_launched = true;
 		} 
@@ -130,7 +159,14 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 	Paint moneyPaint;
 	Paint pointsPaint;
 	Paint levelTimePaint;
+	Paint customersLeftPaint;
 	Paint announcementPaint;
+	
+	//Used for displaying toasts
+	private Toast t;
+	private int toast_trim = 40;
+	private long time_since_last_toast = -1;
+	private final int TIME_BETWEEN_TOASTS = 1000;
 	
 	@Override
 	protected void onDraw(Canvas canvas) {
@@ -150,13 +186,16 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 	 * @param announcementMessage The announcement message to draw; will not be drawn (and may be null) if
 	 * draw_announcement_message is set to false
 	 */
+	
 	protected void onDraw(Canvas canvas, ArrayList<ViewObject> voAr, 
 			int money, int points, 
 			boolean draw_announcement_message, String announcementMessage,
-			int level_time) {
+			int level_time,
+			int customers_left,
+			int customers_until_bonus) {
 		if(gridPaint == null) {
 			gridPaint = new Paint();
-			gridPaint.setColor(Color.GRAY);
+			gridPaint.setColor(0xFF2f2f2f);
 		}
 		
 		canvas.drawColor(Color.BLACK);
@@ -182,18 +221,39 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 			levelTimePaint.setColor(Color.RED);
 			levelTimePaint.setTextSize(16);
 			announcementPaint = new Paint();
-			announcementPaint.setColor(Color.RED);
+			announcementPaint.setColor(0xFFDFDFDF);
 			announcementPaint.setTextSize(24);
 			announcementPaint.setTextAlign(Paint.Align.CENTER);
+			customersLeftPaint = new Paint();
+			customersLeftPaint.setColor(0xFFDFDFDF);
+			customersLeftPaint.setTextSize(16);
 		}
 		
+		//Draw information regarding how many customers are left
+		String customersLeftStr = new String("Customers Left: " + Integer.toString(customers_left));
+		if(customers_until_bonus<=0) customersLeftStr += " (BONUS ACHIEVED)";
+		canvas.drawText(customersLeftStr, 14, canvas.getHeight()-85-30, customersLeftPaint);
+		
 		//Draw money, points and display an announcement message IF there is an announcement
-		canvas.drawText(Integer.toString(level_time), 14, canvas.getHeight()-85, levelTimePaint);
-		canvas.drawText(Integer.toString(money), 14, canvas.getHeight()-50, moneyPaint);
-		canvas.drawText(Integer.toString(points), 14, canvas.getHeight()-15, pointsPaint);
+		canvas.drawText("Time Left: " + Integer.toString(level_time), 14, canvas.getHeight()-85, levelTimePaint);
+		canvas.drawText("Money: $" + Integer.toString(money), 14, canvas.getHeight()-50, moneyPaint);
+		canvas.drawText("Points: " + Integer.toString(points), 14, canvas.getHeight()-15, pointsPaint);
 		
 		if(draw_announcement_message) {
-			canvas.drawText(announcementMessage, canvas.getWidth()/2, canvas.getHeight()/2, announcementPaint);
+			canvas.drawText(announcementMessage, canvas.getWidth()/2, 24 + 40, announcementPaint);
+			
+			/*if(time_since_last_toast + TIME_BETWEEN_TOASTS < SystemClock.uptimeMillis()) {
+				time_since_last_toast = SystemClock.uptimeMillis();
+				
+				if(t != null) {
+					t.cancel();
+					t = null;
+				}
+				
+				t = Toast.makeText(context, announcementMessage, Toast.LENGTH_SHORT);
+				t.setGravity(Gravity.BOTTOM, 0, -1 * toast_position_y + toast_trim);
+				t.show();
+			}*/
 		}
 		
 	}

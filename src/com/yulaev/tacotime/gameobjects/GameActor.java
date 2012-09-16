@@ -7,6 +7,7 @@ import com.yulaev.tacotime.gamelogic.State;
 import com.yulaev.tacotime.utility.CircularList;
 import com.yulaev.tacotime.utility.DirectionBitmapMap;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -28,15 +29,19 @@ public abstract class GameActor implements ViewObject {
 	//Bitmap of this CoffeeGirl
 	protected DirectionBitmapMap bitmapmap;
 
-	//represents current position (on the GameGrid)
-	protected int x;
-	protected int y;
+	//represents (interpolated) current position (on the GameGrid)
+	protected int x, y; 
+	//represents a more precise current position on the GameGrid
+	private float x_real, y_real;
 	//represents the position we move towards
 	protected int target_x, target_y;
-	//Define the move rate, in pixels per 100ms
+	
+	//Define the move rate, in pixels per UNIT_INTERVAL_MS ms
 	protected int move_rate;
+	final double UNIT_INTERVAL_MS = 200.0; 
 	//Represents the last time we performed an onUpdate() operation
 	protected long time_of_last_update;
+	
 	//Represents the last time that we DREW this GameActor
 	protected long last_time_drawn;
 	//Number of ms between sprite frames
@@ -74,7 +79,10 @@ public abstract class GameActor implements ViewObject {
 	public GameActor(Context caller, int move_rate, int starting_x, int starting_y) {
 		//Set starting position to middle of canvas
 		x = starting_x;
+		x_real = starting_x;
 		y = starting_y;
+		y_real = starting_y;
+		
 		target_x=x; target_y=y;
 		
 		time_of_last_update = -1;
@@ -93,6 +101,7 @@ public abstract class GameActor implements ViewObject {
 	/** onUpdate() gets called when GameActor needs to be updated by ViewThread
 	 * 
 	 */
+	@SuppressLint("FloatMath")
 	public void onUpdate() {
 		//If we aren't visible there's no need to do motion calculation, just exit
 		if(!visible) return;
@@ -105,10 +114,10 @@ public abstract class GameActor implements ViewObject {
 		/* =-=-= CALCULATE MOTION VECTOR AND APPLY IT TO CHANGE POSITION! =-=-= */
 		float max_dist_moved; //the maximum distance we can move this onUpdate()
 		
-		final double UNIT_INTERVAL_MS = 100.0; 
-		
-		//If we haven't even moved yet then just assume we can only move move_rate pixels
-		if(time_of_last_update < 0)	max_dist_moved = move_rate;
+		//If we haven't even moved yet then just assume we can't move and calculate again on the next frame
+		if(time_of_last_update < 0)	{
+			max_dist_moved = 0.0f;
+		}
 		//Otherwise, assume we can move move_rate * (time since last update / 100ms) pixels
 		else {
 			double unit_intervals_since_moved = ( (double)(SystemClock.uptimeMillis() - time_of_last_update) ) / UNIT_INTERVAL_MS;
@@ -118,7 +127,7 @@ public abstract class GameActor implements ViewObject {
 		//If we're not at our target position move towards it at move_rate
 		if(target_x != x || target_y != y) {
 			//Calculate distance to target
-			float distance = (int) Math.sqrt((target_x - x)*(target_x - x) + (target_y - y)*(target_y - y));
+			float distance = (float) Math.sqrt((target_x - x_real)*(target_x - x_real) + (target_y - y_real)*(target_y - y_real));
 			
 			//Calculate the length of our vector motion
 			float vector_length = Math.min( max_dist_moved, distance );
@@ -131,20 +140,17 @@ public abstract class GameActor implements ViewObject {
 			} else {
 				float vector_x, vector_y;
 				//Scale vectors by the distance that we are to traverse
-				vector_x = ((float)(target_x - x)) * vector_length/distance;
-				vector_y = ((float)(target_y - y)) * vector_length/distance;
+				vector_x = ((float)(target_x - x_real)) * vector_length/distance;
+				vector_y = ((float)(target_y - y_real)) * vector_length/distance;
 				
-				x+=(int) vector_x;
-				y+=(int) vector_y;
-				
-				//If we moved the actor, then log this update as having occurred
-				//If the actor hasn't moved (because not enough time has elapsed) then don't move the actor!
-				if(! ( ((int) vector_x == 0) && ((int) vector_y == 0) ))
-					time_of_last_update = SystemClock.uptimeMillis();
+				x_real += vector_x;
+				y_real += vector_y;
+				x = (int) Math.round(x_real); 
+				y = (int) Math.round(y_real);
 			}
 		}
-		else 
-			time_of_last_update = -1;
+		
+		time_of_last_update = SystemClock.uptimeMillis();
 	}
 
 	/** handleTap() is called by InputThread on user input, it does nothing for GameActor */
@@ -157,9 +163,6 @@ public abstract class GameActor implements ViewObject {
 	 * */
 	public void draw(Canvas canvas) {
 		if(isVisible()) {
-			int drawn_x = GameGrid.canvasX(x);
-			int drawn_y = GameGrid.canvasY(y);
-			
 			Bitmap bitmap;
 			
 			if(SystemClock.uptimeMillis() > last_time_drawn + SPRITE_FRAME_PERIOD_MS ) {
@@ -169,6 +172,14 @@ public abstract class GameActor implements ViewObject {
 				bitmap = bitmapmap.getDirectionList(target_x - x, target_y - y).getCurrent();
 			}
 			
+			this.draw(canvas, bitmap);
+		}
+	}
+	
+	protected void draw(Canvas canvas, Bitmap bitmap) {
+		if(isVisible()) {
+			int drawn_x = GameGrid.canvasX(x);
+			int drawn_y = GameGrid.canvasY(y);
 			canvas.drawBitmap(bitmap, drawn_x - (bitmap.getWidth() / 2), drawn_y - (bitmap.getHeight() / 2), null);
 		}
 	}

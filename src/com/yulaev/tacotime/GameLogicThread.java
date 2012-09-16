@@ -12,6 +12,7 @@ import android.util.Log;
 import com.yulaev.tacotime.gamelogic.GameInfo;
 import com.yulaev.tacotime.gamelogic.GameLevel;
 import com.yulaev.tacotime.gamelogic.Interaction;
+import com.yulaev.tacotime.gamelogic.leveldefs.GameLevel_0;
 import com.yulaev.tacotime.gamelogic.leveldefs.GameLevel_1;
 import com.yulaev.tacotime.gamelogic.leveldefs.GameLevel_2;
 import com.yulaev.tacotime.gamelogic.leveldefs.GameLevel_3;
@@ -82,7 +83,7 @@ public class GameLogicThread extends Thread {
 	Context caller;
 	
 	/** Mostly just initializes the Handler that receives and acts on in-game interactions that occur */
-	public GameLogicThread(ViewThread viewThread, TimerThread timerThread, InputThread inputThread, Context caller, boolean load_saved) {
+	public GameLogicThread(ViewThread viewThread, TimerThread timerThread, InputThread inputThread, Context caller, boolean load_saved, int start_level) {
 		super();
 		
 		//Set pointers to all of the other threads
@@ -94,6 +95,7 @@ public class GameLogicThread extends Thread {
 		
 		//"reset" GameInfo
 		GameInfo.reset();
+		GameInfo.setLevel(start_level);
 		
 		gameItems = new HashMap<String, GameItem>();
 		foodItems = new HashMap<String, GameFoodItem>();
@@ -233,8 +235,12 @@ public class GameLogicThread extends Thread {
 				coffeeGirl.setItemHolding("cupcake");
 			if(old_state == CoffeeGirl.STATE_NORMAL && interactee_state == CounterTop.STATE_HOLDING_BLENDEDDRINK)
 				coffeeGirl.setItemHolding("blended_drink");
-			if(old_state != CoffeeGirl.STATE_NORMAL && interactee_state == CounterTop.STATE_IDLE)
-				coffeeGirl.setItemHolding("nothing");
+			if(old_state != CoffeeGirl.STATE_NORMAL && interactee_state == CounterTop.STATE_HOLDING_PIE)
+				coffeeGirl.setItemHolding("pieslice");
+			if(old_state != CoffeeGirl.STATE_NORMAL && interactee_state == CounterTop.STATE_HOLDING_SANDWICH)
+				coffeeGirl.setItemHolding("sandwich");
+			if(old_state != CoffeeGirl.STATE_NORMAL && interactee_state == CounterTop.STATE_HOLDING_ESPRESSO)
+				coffeeGirl.setItemHolding("espresso");
 		}
 		
 		//Default case - don't change state!
@@ -243,6 +249,8 @@ public class GameLogicThread extends Thread {
 	//Used to time various things, like pre-level and post-level "announcements"
 	//Only used within stateMachineClockTick()
 	int message_timer;
+	//used to track information about the current level instance loaded
+	GameLevel currLevel;
 
 	/** Updates this GameLogicThread's state machine. Should be called every time a clock tick (nominally one
 	 * real-time second) occurs
@@ -257,12 +265,15 @@ public class GameLogicThread extends Thread {
 		if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_PREPLAY) {
 			//At the very beginning of the level, load the current level (increment previous level # by one)
 			loadLevel(GameInfo.getLevel() + 1);
+			currLevel = getLevelInstance(GameInfo.getLevel());
 			
 			//For three seconds tell the user that the evel is about to start
 			message_timer = 3;
 			
 			Log.v(activitynametag, "GLT is loading a new level!");
 			GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_PREPLAY_MESSAGE);
+			
+			GameInfo.setCustomersLeft(customerQueue.numberOfCustomersLeft(), currLevel.customersUntilBonus() - customerQueue.numberOfCustomersServed());
 		}
 		
 		//Pre-play message - this is the state we are in when we display the Level Start countdown message
@@ -277,8 +288,11 @@ public class GameLogicThread extends Thread {
 				GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_INPLAY);
 				MessageRouter.sendAnnouncementMessage("", false); //remove the announcement message
 				MessageRouter.sendPauseMessage(false); //unpauses ViewThread and InputThread
+				if(GameInfo.getLevel() == 0) MessageRouter.sendPauseUIMessage(true);
 				Log.v(activitynametag, "GLT is starting a new level!");
 			}
+			
+			GameInfo.setCustomersLeft(customerQueue.numberOfCustomersLeft(), currLevel.customersUntilBonus() - customerQueue.numberOfCustomersServed());
 		}
 		
 		//In-game state - we are in this state when the user is playing the level
@@ -304,6 +318,8 @@ public class GameLogicThread extends Thread {
 				
 				GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_POSTPLAY_MESSAGE);
 			}
+			
+			GameInfo.setCustomersLeft(customerQueue.numberOfCustomersLeft(), currLevel.customersUntilBonus() - customerQueue.numberOfCustomersServed());
 		}
 		
 		//Post-play state: we enter this state as soon as the level finished - we display a message indicating that
@@ -311,21 +327,24 @@ public class GameLogicThread extends Thread {
 		else if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_POSTPLAY_MESSAGE) {
 			if(message_timer > 0) {
 				message_timer--;
+				GameInfo.setCustomersLeft(customerQueue.numberOfCustomersLeft(), currLevel.customersUntilBonus() - customerQueue.numberOfCustomersServed());
 			}
 			//We use message_timer again to make sure we only display the post-level dialog once :)
 			else if (message_timer == 0){
-				//Calculate our end-level bonus and display the level end dialog
-				GameLevel currLevel = getLevelInstance(GameInfo.getLevel());				
-				GameInfo.setAndReturnMoney(currLevel.getBonusMoney(GameInfo.getLevelTime() > 0));
-				GameInfo.setAndReturnPoints(currLevel.getBonusPoints(GameInfo.getLevelTime() > 0));
+				//Calculate our end-level bonus and display the level end dialog			
+				GameInfo.setAndReturnMoney(currLevel.getBonusMoney(customerQueue.numberOfCustomersServed()));
+				GameInfo.setAndReturnPoints(currLevel.getBonusPoints(customerQueue.numberOfCustomersServed()));
+				//Add on the PENALTY for the number of customer that we pissed off
+				Log.d(activitynametag, "calculated that " + customerQueue.numberOfCustomersIgnored() + " customers were unsatisfied.");
+				GameInfo.setAndReturnPoints(currLevel.getCustomerDissatisfactionPenalty(customerQueue.numberOfCustomersIgnored()));
 				
 				//Send all of the accrued bonuses to the level-end dialog
 				//See MessageRouter.sendPostLevelDialogOpenMessage() javadocs for an explanation of the arguments given
-				MessageRouter.sendPostLevelDialogOpenMessage(GameInfo.points, GameInfo.money, 
-						GameInfo.level_points-currLevel.getBonusPoints(GameInfo.getLevelTime() > 0), 
-						GameInfo.level_money-currLevel.getBonusMoney(GameInfo.getLevelTime() > 0),
-						currLevel.getBonusPoints(GameInfo.getLevelTime() > 0),
-						currLevel.getBonusMoney(GameInfo.getLevelTime() > 0));
+				MessageRouter.sendPostLevelDialogOpenMessage( GameInfo.points, GameInfo.money, 
+						GameInfo.level_points-currLevel.getBonusPoints(customerQueue.numberOfCustomersServed()), 
+						GameInfo.level_money-currLevel.getBonusMoney(customerQueue.numberOfCustomersServed()),
+						currLevel.getBonusPoints(customerQueue.numberOfCustomersServed()),
+						currLevel.getBonusMoney(customerQueue.numberOfCustomersServed()) );
 				
 				message_timer--;
 			}
@@ -335,9 +354,14 @@ public class GameLogicThread extends Thread {
 		//that the game is over
 		else if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_POSTPLAY) {
 			//
-			if(GameInfo.getLevel() < MAX_GAME_LEVEL) {
+			if(GameInfo.getLevel() < MAX_GAME_LEVEL && GameInfo.getLevel() > 0) {
 				MessageRouter.sendPauseMessage(true);
 				MessageRouter.sendLevelEndMessage();
+			}
+			else if(GameInfo.getLevel() == 0) {
+				GameInfo.reset();
+				MessageRouter.sendPauseUIMessage(false);
+				GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_PREPLAY);
 			}
 			else {
 				MessageRouter.sendGameOverMessage();
@@ -434,6 +458,8 @@ public class GameLogicThread extends Thread {
 	private static final int MAX_GAME_LEVEL=7;
 	/** Loads a new level; creates a GameLevel Object corresponding to the new level
 	 * and loads the level. Also resets game state and level max time.
+	 * 
+	 * As as side effect, in GameInfo, we set the level number to levelNumber and reset the level data
 	 * @param levelNumber
 	 */
 	private void loadLevel(int levelNumber) {
@@ -461,9 +487,13 @@ public class GameLogicThread extends Thread {
 	private GameLevel getLevelInstance(int levelNumber) {
 		GameLevel newLevel = null;
 		
-		if(levelNumber == 1) {
+		if(levelNumber == 0) {
 			//Launch level 1!
-			newLevel = new GameLevel_1(); //TODO FIX ME
+			newLevel = new GameLevel_0(); 
+		}
+		else if(levelNumber == 1) {
+			//Launch level 1!
+			newLevel = new GameLevel_1();
 		}
 		else if(levelNumber == 2) {
 			//Launch level 2!

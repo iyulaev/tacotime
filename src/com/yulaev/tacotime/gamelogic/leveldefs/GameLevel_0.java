@@ -29,22 +29,23 @@ import com.yulaev.tacotime.gameobjects.objectdefs.PieTray;
 import com.yulaev.tacotime.gameobjects.objectdefs.SoundSystem;
 import com.yulaev.tacotime.gameobjects.objectdefs.TrashCan;
 
-/** Describes level #3 for the Coffee Time game! */
+/** Describes level #1 for the Coffee Time game! */
 
-public class GameLevel_6 extends GameLevel {
-	public GameLevel_6() {
-		this.level_number = 6;
-		this.customerQueue_length = 40;
-		this.point_mult = 1.6f;
-		this.money_mult = 1.6f;
-		this.customer_impatience = 1.0f;
-		this.time_limit_sec = 3 * 60 + 20;
-		this.customer_max_order_size = 3;
+public class GameLevel_0 extends GameLevel {
+	
+	public GameLevel_0() {
+		this.level_number = 0;
+		this.customerQueue_length = 2;
+		this.point_mult = 0.0f;
+		this.money_mult = 0.0f;
+		this.customer_impatience = 0.25f;
+		this.time_limit_sec = 70;
+		this.customer_max_order_size = 1;
 		
-		this.point_bonus = 125;
-		this.money_bonus = 100;
-		this.point_bonus_derating = 0.3f;
-		this.money_bonus_derating = 0.3f;
+		this.point_bonus = 0;
+		this.money_bonus = 0;
+		this.point_bonus_derating = 0.5f;
+		this.money_bonus_derating = 0.5f;		
 	}
 	
 	/** Set up this level; add all GameItems and such to the Threads, set up the Customers and such
@@ -103,56 +104,10 @@ public class GameLevel_6 extends GameLevel {
 		inputThread.addViewObject(cupcakeTray);
 		gameLogicThread.addGameItem(cupcakeTray);
 		
-		PieTray pieTray = new PieTray(caller, R.drawable.cake_tray, 
-				PieTray.DEFAULT_XPOS, PieTray.DEFAULT_YPOS, GameItem.ORIENTATION_EAST);
-		//viewThread.addViewObject(cupcakeTray);
-		viewThread.addGameItem(pieTray);
-		inputThread.addViewObject(pieTray);
-		gameLogicThread.addGameItem(pieTray);
-		
-		Blender blender = new Blender(caller, R.drawable.blender_idle, 
-				Blender.DEFAULT_XPOS, Blender.DEFAULT_YPOS, GameItem.ORIENTATION_WEST);
-		//viewThread.addViewObject(blender);
-		viewThread.addGameItem(blender);
-		inputThread.addViewObject(blender);
-		gameLogicThread.addGameItem(blender);
-		
-		Microwave microwave = new Microwave(caller, R.drawable.microwave_inactive, 
-				Microwave.DEFAULT_XPOS, Microwave.DEFAULT_YPOS, GameItem.ORIENTATION_EAST);
-		//viewThread.addViewObject(blender);
-		viewThread.addGameItem(microwave);
-		inputThread.addViewObject(microwave);
-		gameLogicThread.addGameItem(microwave);
-		
-		if(GameInfo.hasUpgrade("espressomachine")) {
-			EspressoMachine espressomachine = new EspressoMachine(caller, R.drawable.espresso_machine_inactive, 
-					EspressoMachine.DEFAULT_XPOS, EspressoMachine.DEFAULT_YPOS, GameItem.ORIENTATION_NORTH);
-			//viewThread.addViewObject(blender);
-			viewThread.addGameItem(espressomachine);
-			inputThread.addViewObject(espressomachine);
-			gameLogicThread.addGameItem(espressomachine);
-		}
-		
-		if(GameInfo.hasUpgrade("soundsystem")) {
-			SoundSystem soundsystem = new SoundSystem(caller);
-			//viewThread.addViewObject(blender);
-			viewThread.addGameItem(soundsystem);
-			inputThread.addViewObject(soundsystem);
-			gameLogicThread.addGameItem(soundsystem);
-			
-			this.customer_impatience *= 0.9;
-		}
-		
 		//Set up all Food Items (UPDATE FOR NEW FOODITEM)
 		gameLogicThread.addNewFoodItem(new FoodItemNothing(caller), CoffeeGirl.STATE_NORMAL);
 		gameLogicThread.addNewFoodItem(new FoodItemCoffee(caller), CoffeeGirl.STATE_CARRYING_COFFEE);
 		gameLogicThread.addNewFoodItem(new FoodItemCupcake(caller), CoffeeGirl.STATE_CARRYING_CUPCAKE);
-		gameLogicThread.addNewFoodItem(new FoodItemBlendedDrink(caller), CoffeeGirl.STATE_CARRYING_BLENDEDDRINK);
-		gameLogicThread.addNewFoodItem(new FoodItemPieSlice(caller), CoffeeGirl.STATE_CARRYING_PIESLICE);
-		gameLogicThread.addNewFoodItem(new FoodItemSandwich(caller), CoffeeGirl.STATE_CARRYING_SANDWICH);
-		
-		if(GameInfo.hasUpgrade("espressomachine"))
-			gameLogicThread.addNewFoodItem(new FoodItemEspresso(caller), CoffeeGirl.STATE_CARRYING_ESPRESSO);
 		
 		//Magic numbers: 40 - x-position of Customers, (GameGrid.GAMEGRID_HEIGHT-45) - y-position of customers
 		//1 - starting customer queue length, 
@@ -160,6 +115,11 @@ public class GameLevel_6 extends GameLevel {
 				customerQueue_length, point_mult, money_mult, 
 				customer_impatience, customer_max_order_size, 
 				gameLogicThread.getFoodItems());
+		
+		//Tutorial level pre-sets the customer orders
+		custQueue.setCustomerOrder(0, new FoodItemCoffee(caller));
+		custQueue.setCustomerOrder(1, new FoodItemCupcake(caller));
+		
 		//viewThread.addViewObject(custQueue);
 		viewThread.addGameItem(custQueue);
 		inputThread.addViewObject(custQueue);

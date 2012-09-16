@@ -24,7 +24,7 @@ public class CoffeeMachine extends GameItem {
 	
 	//Defines for default X and Y positions;
 	public static int DEFAULT_XPOS = 16;
-	public static int DEFAULT_YPOS = 40;
+	public static int DEFAULT_YPOS = 60;
 	
 	//keep track of how many coffee machines are instantiated (so we can name them appropriately)
 	public static int instanceCount = 0;
@@ -44,13 +44,10 @@ public class CoffeeMachine extends GameItem {
 		int brew_time = BREW_TIME_MS;
 		if(GameInfo.hasUpgrade("quickbrewing")) brew_time -= 1000;
 		
-		this.DEFAULT_XPOS = 16;
-		this.DEFAULT_YPOS = 40;
-		
 		//Add states that describe behavior of coffee machine
 		//super.addState(String stateName, int state_delay_ms, int r_bitmap, boolean input_sensitive, boolean time_sensitive)
 		this.addState("idle", 0, R.drawable.coffeemachine_idle, true, false);
 		this.addState("brewing", brew_time, R.drawable.coffeemachine_brewing, false, true);
-		this.addState("done", 0, R.drawable.coffeemachine_done, true, "nothing", false);
+		this.addState("done", 10000, R.drawable.coffeemachine_done, true, "nothing", true);
 	}
 }

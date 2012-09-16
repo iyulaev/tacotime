@@ -20,7 +20,7 @@ public class Blender extends GameItem {
 	
 	//Defines for default X and Y positions;
 	public static int DEFAULT_XPOS = 16;
-	public static int DEFAULT_YPOS = 80;
+	public static int DEFAULT_YPOS = 40;
 	
 	/** Constructor for CoffeeMachine mostly mimics a game items, except it sets the name by itself. Also it sets up
 	 * all of the CoffeeMachine states and the associated bitmaps; the bitmap provided as an argument is just a "default" bitmap
@@ -38,6 +38,6 @@ public class Blender extends GameItem {
 		//super.addState(String stateName, int state_delay_ms, int r_bitmap, boolean input_sensitive, boolean time_sensitive)
 		this.addState("idle", 0, R.drawable.blender_idle, true, "coffee", false);
 		this.addState("blending", 2000, R.drawable.blender, false, true);
-		this.addState("done", 0, R.drawable.blender_done, true, "nothing", false);
+		this.addState("done", 7500, R.drawable.blender_done, true, "nothing", true);
 	}
 }

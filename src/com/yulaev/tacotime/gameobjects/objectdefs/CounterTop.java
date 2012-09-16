@@ -21,6 +21,9 @@ public class CounterTop extends GameItem {
 	public static final int STATE_HOLDING_COFFEE=1;
 	public static final int STATE_HOLDING_CUPCAKE=2;
 	public static final int STATE_HOLDING_BLENDEDDRINK=3;
+	public static final int STATE_HOLDING_ESPRESSO=4;
+	public static final int STATE_HOLDING_PIE=5;
+	public static final int STATE_HOLDING_SANDWICH=6;
 	
 	//keep track of how many coffee machines are instantiated
 	public static int instanceCount = 0;
@@ -41,15 +44,15 @@ public class CounterTop extends GameItem {
 	public CounterTop(Context caller, int r_bitmap, int x_pos, int y_pos, int orientation) {
 		super(caller, "CounterTop" + (++instanceCount), r_bitmap, x_pos, y_pos, orientation, 20, 15);
 		
-		this.DEFAULT_XPOS = 50;
-		this.DEFAULT_YPOS = 20;
-		
 		//Add states that describe behavior of coffee machine
 		//super.addState(String stateName, int state_delay_ms, int r_bitmap, boolean input_sensitive, boolean time_sensitive)
 		this.addState("idle", 0, R.drawable.countertop_grey, true, false);
 		this.addState("holding_coffee", 2000, R.drawable.countertop_grey_w_coffee, true, false);
 		this.addState("holding_cupcake", 2000, R.drawable.countertop_grey_w_cupcake, true, false);
 		this.addState("holding_blendeddrink", 2000, R.drawable.countertop_grey_w_blendeddrink, true, false);
+		this.addState("holding_blendeddrink", 2000, R.drawable.countertop_grey_w_espresso, true, false);
+		this.addState("holding_blendeddrink", 2000, R.drawable.countertop_grey_w_pie, true, false);
+		this.addState("holding_blendeddrink", 2000, R.drawable.countertop_grey_w_sandwich, true, false);
 	}
 	
 	/** Called by onInteraction only. Used to (try) to transition states. We define the state machine for CounterTop explicitly 
@@ -99,6 +102,27 @@ public class CounterTop extends GameItem {
 				if( current_state_idx == STATE_IDLE ) {
 					int old_state = current_state_idx;
 					setState(STATE_HOLDING_BLENDEDDRINK);
+					return(new Interaction(old_state));
+				}
+			}
+			if(input.equals("pieslice")) {
+				if( current_state_idx == STATE_IDLE ) {
+					int old_state = current_state_idx;
+					setState(STATE_HOLDING_PIE);
+					return(new Interaction(old_state));
+				}
+			}
+			if(input.equals("sandwich")) {
+				if( current_state_idx == STATE_IDLE ) {
+					int old_state = current_state_idx;
+					setState(STATE_HOLDING_SANDWICH);
+					return(new Interaction(old_state));
+				}
+			}
+			if(input.equals("espresso")) {
+				if( current_state_idx == STATE_IDLE ) {
+					int old_state = current_state_idx;
+					setState(STATE_HOLDING_ESPRESSO);
 					return(new Interaction(old_state));
 				}
 			}

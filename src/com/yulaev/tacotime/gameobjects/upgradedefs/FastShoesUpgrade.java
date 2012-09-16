@@ -11,7 +11,7 @@ public class FastShoesUpgrade extends GameUpgrade {
 
 	public FastShoesUpgrade() {
 		this.upgradeCost = 150;
-		this.upgradeDescription = "Increase walking speed 20%";
+		this.upgradeDescription = "Increase walking speed 10%";
 		this.upgradeName = UPGRADE_NAME;
 		this.upgradeLongName = "Fast Shoes";
 		this.upgradeLevel = 0;

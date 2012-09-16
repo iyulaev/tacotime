@@ -17,6 +17,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.NinePatchDrawable;
+import android.os.SystemClock;
 import android.util.Log;
 
 /** Customer implements a single customer that requests one or more items out of the possible foodItems list.
@@ -37,7 +38,7 @@ public class Customer extends GameActor {
 	public static int STATE_HIDDEN = 0;
 	public static int STATE_INLINE_HAPPY = 1;
 	public static int STATE_INLINE_OK = 2;
-	public static int STATE_INLINE_ANGRY = 3;
+	public static int STATE_ANGRY = 3;
 	public static int STATE_SERVED = 4;
 	public static int STATE_FINISHED = 5;
 	
@@ -52,6 +53,7 @@ public class Customer extends GameActor {
 	
 	public static int DEFAULT_MAX_ORDER_SIZE = 2;
 	private int max_order_size;
+
 
 	/** Initialize a new Customer.
 	 * 
@@ -148,7 +150,7 @@ public class Customer extends GameActor {
 	private static int locations_queue_x[] = {40,40};
 	private static int locations_queue_y[] = {GameGrid.GAMEGRID_HEIGHT - 30, GameGrid.GAMEGRID_HEIGHT - 12};
 	private static int locations_exit_x = GameGrid.GAMEGRID_WIDTH - 5;
-	private static int locations_exit_y = GameGrid.GAMEGRID_HEIGHT - 35;
+	private static int locations_exit_y = GameGrid.GAMEGRID_HEIGHT - 30;
 	
 	/** Sets the state of this customer
 	 * @param new_state The State to put this customer into
@@ -161,7 +163,7 @@ public class Customer extends GameActor {
 			y = location_start_y;
 		}
 		
-		else if(new_state == STATE_SERVED) {
+		else if(new_state == STATE_SERVED || new_state == STATE_ANGRY) {
 			setLocked();
 			this.target_x = locations_exit_x;	
 			this.target_y = locations_exit_y;
@@ -185,7 +187,7 @@ public class Customer extends GameActor {
 		}
 		
 		//If state is "in line" make sure that we are standing in the appropriate part of the line
-		if(this.getState() == STATE_INLINE_HAPPY || this.getState() == STATE_INLINE_OK || this.getState() == STATE_INLINE_ANGRY) {
+		if(this.getState() == STATE_INLINE_HAPPY || this.getState() == STATE_INLINE_OK) {
 			setLocked();
 			this.target_x = locations_queue_x[getQueuePosition()];			
 			this.target_y = locations_queue_y[getQueuePosition()];
@@ -200,12 +202,12 @@ public class Customer extends GameActor {
 				mood_last_updated = GameInfo.currentTimeMillis()/1000;
 				
 				if(this.getState() == STATE_INLINE_HAPPY) setState(STATE_INLINE_OK);
-				else if(this.getState() == STATE_INLINE_OK) setState(STATE_INLINE_ANGRY);
+				else if(this.getState() == STATE_INLINE_OK) setState(STATE_ANGRY);
 			}
 		}
 		
 		//If we have been served and have advanced to the exit location then set state to finished
-		if(this.getState() == STATE_SERVED) {
+		if(this.getState() == STATE_SERVED || this.getState() == STATE_ANGRY) {
 			if(x == locations_exit_x && y == locations_exit_y) {
 				setState(STATE_FINISHED);
 			}
@@ -218,14 +220,14 @@ public class Customer extends GameActor {
 	/** Called when the customer needs to be drawn. Apart from drawing the customer icon we also
 	 * draw the customer's order, using icons and a speech bubble (which is a 9patch drawing)
 	 */
-	public void draw(Canvas canvas) {
+	public void draw(Canvas canvas) {		
 		super.draw(canvas);
 		
 		Bitmap bitmap = bitmapmap.getDirectionList(target_x - x, target_y - y).getCurrent();
 		
 		//draw the order using a 9patch speech bubble, if this Customer is visible and is waiting for their order
 		//to be fulfilled
-		if(isVisible() && (this.getState() == STATE_INLINE_HAPPY || this.getState() == STATE_INLINE_OK || this.getState() == STATE_INLINE_ANGRY)) {
+		if(isVisible() && (this.getState() == STATE_INLINE_HAPPY || this.getState() == STATE_INLINE_OK)) {
 			int ICON_WIDTH = 20 + 10; //10 is for padding
 			int BUBBLE_WIDTH = 54;
 			int BUBBLE_HEIGHT = 32;
@@ -273,6 +275,15 @@ public class Customer extends GameActor {
 	ArrayList<GameFoodItem> customerOrder;
 	float moneyMultiplier;
 	float pointsMultiplier;
+	
+	/** Used to set the customerOrder to a single particular menu option. This will be used by the game tutorial
+	 * in order to set the Customer orders to something predictable
+	 */
+	public void setCustomerOrder(GameFoodItem theItem) {
+		customerOrder.clear();
+		customerOrder.add(theItem);
+		customerOrderSize = 1;
+	}
 	
 	/** Called when an interaction occurs with this Customer
 	 * @param itemInteracted the name of the FoodItem that the interacter (CoffeeGirl) held when interacting with

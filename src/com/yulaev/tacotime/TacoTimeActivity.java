@@ -14,6 +14,7 @@ import com.yulaev.tacotime.gamelogic.Interaction;
 import android.app.AlertDialog.Builder;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -28,6 +29,9 @@ public class TacoTimeActivity extends Activity {
 	
 	private static final String activitynametag = "TacoTimeActivity";
 	private boolean saved_game_exists;
+	
+	Dialog dialog;
+	private static final int ASK_TUTORIAL_DIALOG = 1;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -52,9 +56,7 @@ public class TacoTimeActivity extends Activity {
 		Button newGame = (Button) findViewById(R.id.new_game);
 		newGame.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Intent i = new Intent(v.getContext(), TacoTimeMainGameActivity.class);
-				i.putExtra("LoadSavedGame", false);
-				startActivityForResult(i,0);
+				showDialog(ASK_TUTORIAL_DIALOG);
 			}
 		});
 		
@@ -64,6 +66,7 @@ public class TacoTimeActivity extends Activity {
 				if(saved_game_exists) {
 					Intent i = new Intent(v.getContext(), TacoTimeMainGameActivity.class);
 					i.putExtra("LoadSavedGame", true);
+					i.putExtra("WatchTutorial", false);
 					startActivityForResult(i,0);
 				} else {
 					showNoSavedGameError(GameInfo.characterName);
@@ -73,24 +76,6 @@ public class TacoTimeActivity extends Activity {
 		
 		Log.v(activitynametag, "By the way, we are playing character " + GameInfo.characterName);
 	}
-	
-	/** Displays an AlertDialog dialog to the user, stating that whatsNotImplemented hasn't been implemented yet. 
-	 * @param whatsNotImplemented String describing what it is that we haven't implemented.
-	 * */
-	/*private void showUnimplementedError(String whatsNotImplemented) {
-       
-		Builder b = new AlertDialog.Builder(this)
-        .setTitle("Not Implemented")
-        .setIcon(R.drawable.fooditem_coffee )
-        .setMessage("Sorry! " + whatsNotImplemented + " hasn't been implemented yet.")
-        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                	; //onClick() does nothing, just kills the dialog.
-                }
-        });
-        
-        b.show();
-	}*/
 	
 	/** Displays an AlertDialog dialog to the user, indicating that no saved game exists
 	 * @param characterName The name of the character for whom no saved game exists
@@ -108,5 +93,50 @@ public class TacoTimeActivity extends Activity {
         });
         
         b.show();
+	}
+	
+	
+	/** Used to launch the dialog that asks the user, "would you like to see the tutorial?"
+	 */
+	protected Dialog onCreateDialog(int d) {
+		
+		dialog = new Dialog(this);
+		
+		switch (d) {
+			case ASK_TUTORIAL_DIALOG:				
+				dialog.setContentView(R.layout.asktutorialdialog);
+				dialog.setTitle("Tutorial?");
+				
+				Button okButton = (Button) dialog.findViewById(R.id.ok);
+				okButton.setOnClickListener(new View.OnClickListener() {
+					public void onClick(View v) {
+						Intent i = new Intent(v.getContext(), TacoTimeMainGameActivity.class);
+						i.putExtra("LoadSavedGame", false);
+						i.putExtra("WatchTutorial", true);
+						startActivityForResult(i,0);
+						
+						dialog.dismiss();
+					}
+				});
+				
+				Button cancelButton = (Button) dialog.findViewById(R.id.cancel);
+				cancelButton.setOnClickListener(new View.OnClickListener() {
+					public void onClick(View v) {
+						Intent i = new Intent(v.getContext(), TacoTimeMainGameActivity.class);
+						i.putExtra("LoadSavedGame", false);
+						i.putExtra("WatchTutorial", false);
+						startActivityForResult(i,0);
+						
+						dialog.dismiss();
+					}
+				});
+
+				dialog.show();
+				break;
+		}
+		
+		
+		
+		return dialog;
 	}
 }

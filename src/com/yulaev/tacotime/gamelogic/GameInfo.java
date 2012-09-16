@@ -35,6 +35,8 @@ public class GameInfo {
 	//and whether the level is in play or not
 	private static int level;
 	private static int levelTime;
+	private static int customersLeftforLevel;
+	private static int customersLeftforBonus;
 	
 	//This string array represents the various upgrades that the user has bought 
 	private static ArrayList<String> upgradesBought;
@@ -136,7 +138,14 @@ public class GameInfo {
 	 */
 	public static synchronized int getGameMode() { return gameMode; }
 	
+	/** Set the number of customers left in the current level */
+	public static synchronized void setCustomersLeft(int customersLeftforLevel, int customersLeftforBonus) {
+		GameInfo.customersLeftforLevel = customersLeftforLevel;
+		GameInfo.customersLeftforBonus = customersLeftforBonus;
+	}
 	
+	public static synchronized int getCustomersLeftForLevel() { return customersLeftforLevel; }
+	public static synchronized int getCustomersLeftForBonus() { return customersLeftforBonus; }
 	
 	
 	/** Reset this GameInfo, effectively clearing global game state. Note, however, that characterName, 
@@ -150,8 +159,8 @@ public class GameInfo {
 		
 		money = 0;
 		points = 0;
-		level_money = 0;
-		level_points = 0;
+		
+		levelReset();
 		
 		game_time_millis = SystemClock.uptimeMillis();
 	}
@@ -164,6 +173,8 @@ public class GameInfo {
 	public static synchronized void levelReset() {
 		level_money = 0;
 		level_points = 0;
+		customersLeftforLevel = 0;
+		customersLeftforBonus = 0;	
 	}
 	
 	/** Initializes the database and either loads the SavedCharacter keyed by GameInfo.characterName 

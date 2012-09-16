@@ -37,7 +37,7 @@ public class GameLevel_7 extends GameLevel {
 		this.customerQueue_length = 40;
 		this.point_mult = 1.6f;
 		this.money_mult = 1.6f;
-		this.customer_impatience = 0.55f;
+		this.customer_impatience = 1.0f;
 		this.time_limit_sec = 3 * 60 + 20;
 		this.customer_max_order_size = 3;
 		
@@ -124,12 +124,14 @@ public class GameLevel_7 extends GameLevel {
 		inputThread.addViewObject(microwave);
 		gameLogicThread.addGameItem(microwave);
 		
-		EspressoMachine espressomachine = new EspressoMachine(caller, R.drawable.espresso_machine_inactive, 
-				EspressoMachine.DEFAULT_XPOS, EspressoMachine.DEFAULT_YPOS, GameItem.ORIENTATION_NORTH);
-		//viewThread.addViewObject(blender);
-		viewThread.addGameItem(espressomachine);
-		inputThread.addViewObject(espressomachine);
-		gameLogicThread.addGameItem(espressomachine);
+		if(GameInfo.hasUpgrade("espressomachine")) {
+			EspressoMachine espressomachine = new EspressoMachine(caller, R.drawable.espresso_machine_inactive, 
+					EspressoMachine.DEFAULT_XPOS, EspressoMachine.DEFAULT_YPOS, GameItem.ORIENTATION_NORTH);
+			//viewThread.addViewObject(blender);
+			viewThread.addGameItem(espressomachine);
+			inputThread.addViewObject(espressomachine);
+			gameLogicThread.addGameItem(espressomachine);
+		}
 		
 		if(GameInfo.hasUpgrade("soundsystem")) {
 			SoundSystem soundsystem = new SoundSystem(caller);
@@ -148,7 +150,9 @@ public class GameLevel_7 extends GameLevel {
 		gameLogicThread.addNewFoodItem(new FoodItemBlendedDrink(caller), CoffeeGirl.STATE_CARRYING_BLENDEDDRINK);
 		gameLogicThread.addNewFoodItem(new FoodItemPieSlice(caller), CoffeeGirl.STATE_CARRYING_PIESLICE);
 		gameLogicThread.addNewFoodItem(new FoodItemSandwich(caller), CoffeeGirl.STATE_CARRYING_SANDWICH);
-		gameLogicThread.addNewFoodItem(new FoodItemEspresso(caller), CoffeeGirl.STATE_CARRYING_ESPRESSO);
+		
+		if(GameInfo.hasUpgrade("espressomachine"))
+			gameLogicThread.addNewFoodItem(new FoodItemEspresso(caller), CoffeeGirl.STATE_CARRYING_ESPRESSO);
 		
 		//Magic numbers: 40 - x-position of Customers, (GameGrid.GAMEGRID_HEIGHT-45) - y-position of customers
 		//1 - starting customer queue length, 

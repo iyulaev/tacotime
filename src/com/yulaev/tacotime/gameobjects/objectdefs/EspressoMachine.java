@@ -46,6 +46,6 @@ public class EspressoMachine extends GameItem {
 		//super.addState(String stateName, int state_delay_ms, int r_bitmap, boolean input_sensitive, boolean time_sensitive)
 		this.addState("idle", 0, R.drawable.espresso_machine_inactive, true, false);
 		this.addState("brewing", brew_time, R.drawable.espresso_machine_active, false, true);
-		this.addState("done", 0, R.drawable.espresso_machine_done, true, "nothing", false);
+		this.addState("done", 10000, R.drawable.espresso_machine_done, true, "nothing", true);
 	}
 }

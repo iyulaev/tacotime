@@ -190,7 +190,9 @@ public class ViewThread extends Thread {
 			this.gamePanel.onDraw(canvas, viewObjects, 
 					GameInfo.setAndReturnMoney(0), GameInfo.setAndReturnPoints(0),
 					draw_announcement_message, announcementMessage,
-					GameInfo.getLevelTime());
+					GameInfo.getLevelTime(),
+					GameInfo.getCustomersLeftForLevel(),
+					GameInfo.getCustomersLeftForBonus());
 
 		} catch(Exception e) {;} 
 		finally {

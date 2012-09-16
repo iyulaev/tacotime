@@ -15,7 +15,6 @@ import com.yulaev.tacotime.gameobjects.GameItem;
 import com.yulaev.tacotime.gameobjects.fooditemdefs.FoodItemBlendedDrink;
 import com.yulaev.tacotime.gameobjects.fooditemdefs.FoodItemCoffee;
 import com.yulaev.tacotime.gameobjects.fooditemdefs.FoodItemCupcake;
-import com.yulaev.tacotime.gameobjects.fooditemdefs.FoodItemEspresso;
 import com.yulaev.tacotime.gameobjects.fooditemdefs.FoodItemNothing;
 import com.yulaev.tacotime.gameobjects.fooditemdefs.FoodItemPieSlice;
 import com.yulaev.tacotime.gameobjects.fooditemdefs.FoodItemSandwich;
@@ -23,7 +22,6 @@ import com.yulaev.tacotime.gameobjects.objectdefs.Blender;
 import com.yulaev.tacotime.gameobjects.objectdefs.CoffeeMachine;
 import com.yulaev.tacotime.gameobjects.objectdefs.CounterTop;
 import com.yulaev.tacotime.gameobjects.objectdefs.CupCakeTray;
-import com.yulaev.tacotime.gameobjects.objectdefs.EspressoMachine;
 import com.yulaev.tacotime.gameobjects.objectdefs.Microwave;
 import com.yulaev.tacotime.gameobjects.objectdefs.PieTray;
 import com.yulaev.tacotime.gameobjects.objectdefs.SoundSystem;
@@ -37,7 +35,7 @@ public class GameLevel_5 extends GameLevel {
 		this.customerQueue_length = 30;
 		this.point_mult = 1.5f;
 		this.money_mult = 1.5f;
-		this.customer_impatience = 0.6f;
+		this.customer_impatience = 0.9f;
 		this.time_limit_sec = 3 * 60 - 10;
 		this.customer_max_order_size = 3;
 		

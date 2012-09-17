@@ -35,7 +35,7 @@ public class GameLevel_1 extends GameLevel {
 	
 	public GameLevel_1() {
 		this.level_number = 1;
-		this.customerQueue_length = 8;
+		this.customerQueue_length = 11;
 		this.point_mult = 1.0f;
 		this.money_mult = 1.0f;
 		this.customer_impatience = 0.6f;

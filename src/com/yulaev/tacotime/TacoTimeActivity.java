@@ -10,6 +10,7 @@ import com.yulaev.tacotime.R;
 import com.yulaev.tacotime.gamelogic.GameDatabase;
 import com.yulaev.tacotime.gamelogic.GameInfo;
 import com.yulaev.tacotime.gamelogic.Interaction;
+import com.yulaev.tacotime.utility.Analytics;
 
 import android.app.AlertDialog.Builder;
 import android.app.Activity;
@@ -53,6 +54,9 @@ public class TacoTimeActivity extends Activity {
 		if(testDB.databaseCache.containsKey(GameInfo.characterName)) saved_game_exists = true;
 		testDB.close();
 		
+		//Setup analytics
+		Analytics.beginSession(this);
+		
 		Button newGame = (Button) findViewById(R.id.new_game);
 		newGame.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -75,6 +79,12 @@ public class TacoTimeActivity extends Activity {
 		});
 		
 		Log.v(activitynametag, "By the way, we are playing character " + GameInfo.characterName);
+	}
+	
+	/** Called when game is exited basically */
+	@Override
+	public void onDestroy() {
+		Analytics.endSession();
 	}
 	
 	/** Displays an AlertDialog dialog to the user, indicating that no saved game exists
@@ -110,6 +120,8 @@ public class TacoTimeActivity extends Activity {
 				Button okButton = (Button) dialog.findViewById(R.id.ok);
 				okButton.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
+						Analytics.reportTutorialRun(true);
+						
 						Intent i = new Intent(v.getContext(), TacoTimeMainGameActivity.class);
 						i.putExtra("LoadSavedGame", false);
 						i.putExtra("WatchTutorial", true);
@@ -122,6 +134,8 @@ public class TacoTimeActivity extends Activity {
 				Button cancelButton = (Button) dialog.findViewById(R.id.cancel);
 				cancelButton.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
+						Analytics.reportTutorialRun(false);
+						
 						Intent i = new Intent(v.getContext(), TacoTimeMainGameActivity.class);
 						i.putExtra("LoadSavedGame", false);
 						i.putExtra("WatchTutorial", false);

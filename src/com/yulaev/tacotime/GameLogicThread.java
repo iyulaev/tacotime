@@ -29,6 +29,7 @@ import com.yulaev.tacotime.gameobjects.objectdefs.CoffeeMachine;
 import com.yulaev.tacotime.gameobjects.objectdefs.CounterTop;
 import com.yulaev.tacotime.gameobjects.objectdefs.EspressoMachine;
 import com.yulaev.tacotime.gameobjects.objectdefs.Microwave;
+import com.yulaev.tacotime.utility.Analytics;
 
 
 /**
@@ -353,7 +354,6 @@ public class GameLogicThread extends Thread {
 		//Post-play state: exit the level and either pause the game & display the BetweenLevelMenu or display
 		//that the game is over
 		else if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_POSTPLAY) {
-			//
 			if(GameInfo.getLevel() < MAX_GAME_LEVEL && GameInfo.getLevel() > 0) {
 				MessageRouter.sendPauseMessage(true);
 				MessageRouter.sendLevelEndMessage();
@@ -366,6 +366,10 @@ public class GameLogicThread extends Thread {
 			else {
 				MessageRouter.sendGameOverMessage();
 			}
+			
+			Analytics.reportLevelFinished(GameInfo.getLevel(), 
+					currLevel.customersUntilBonus()<=0, 
+					((float) customerQueue.numberOfCustomersServed()) / ((float) currLevel.numberOfCustomers()));
 		}
 	}
 	

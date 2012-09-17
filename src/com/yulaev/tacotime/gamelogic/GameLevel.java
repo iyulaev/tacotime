@@ -83,4 +83,6 @@ public class GameLevel {
 	public int customersUntilBonus() {
 		return ((int)(proportion_customers_until_bonus * customerQueue_length));
 	}
+	
+	public int numberOfCustomers() { return customerQueue_length; }
 }

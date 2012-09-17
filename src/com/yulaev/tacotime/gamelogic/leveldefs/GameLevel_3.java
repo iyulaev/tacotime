@@ -34,7 +34,7 @@ import com.yulaev.tacotime.gameobjects.objectdefs.TrashCan;
 public class GameLevel_3 extends GameLevel {
 	public GameLevel_3() {
 		this.level_number = 3;
-		this.customerQueue_length = 18;
+		this.customerQueue_length = 22;
 		this.point_mult = 1.4f;
 		this.money_mult = 1.4f;
 		this.customer_impatience = 0.8f;

@@ -17,7 +17,10 @@ for your own application.
 
 =-=-= Licensing =-=-=
 
-Released under BSD License (our group name is TBD)
+All sound effects including music (c) 2012 Ryan Warner-Steel
+Released under Creative Commons Attribution-NonCommercial (CC BY-NC) license.
+
+All software code, including XML, released under BSD License (our group name is TBD)
 
 Copyright (c) 2012, <Company Name>
 All rights reserved.

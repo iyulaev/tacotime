@@ -103,7 +103,7 @@ public class InputThread extends Thread {
 						MessageRouter.sendLoadGameMessage();
 					}
 					
-					//on "return to main menu" just pauses the music
+					//on "return to main menu" just stops the music
 					else if(result == INGAMEDIALOGRESULT_MAIN_MENU) {
 						MessageRouter.sendPlayNothingMessage();
 					}

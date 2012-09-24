@@ -58,9 +58,10 @@ public class CustomerQueue extends GameItem {
 	 * @param point_mult The point multiplier for customer order completions; typically set per-level when each level is loaded.
 	 * @param money_mult The money multiplier for customer order completions; typically set per-level when each level
 	 * @param impatience How quickly each customer in this CustomerQueue's mood will degrade as they 
-	 * wait longer for order fulfillemtn
+	 * wait longer for order fulfillment
 	 * @param max_items_in_order The maximum number of items that can be in any Customer's order from the game menu
 	 * @param foodItemMenu A List of FoodItems that the Customer's can create their random order from
+	 * @param queue_number The queue identifier for this CustomerQueue; used to handle multiple queues existing in the level.
 	 */
 	public CustomerQueue(Context caller, int x_pos, int y_pos, int orientation, 
 			int queue_length, float point_mult, float money_mult, 

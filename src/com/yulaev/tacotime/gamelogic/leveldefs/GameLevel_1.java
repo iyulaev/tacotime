@@ -111,15 +111,14 @@ public class GameLevel_1 extends GameLevel {
 		gameLogicThread.addNewFoodItem(new FoodItemCupcake(caller), CoffeeGirl.STATE_CARRYING_CUPCAKE);
 		
 		//Magic numbers: 40 - x-position of Customers, (GameGrid.GAMEGRID_HEIGHT-45) - y-position of customers
-		//1 - starting customer queue length, 
 		CustomerQueue custQueue1 = new CustomerQueue(caller, 
 				CustomerQueue.X_POS, 
 				GameGrid.GAMEGRID_HEIGHT-40, 
 				GameItem.ORIENTATION_SOUTH, 
 				customerQueue_length, point_mult, money_mult, 
 				customer_impatience, customer_max_order_size, 
-				gameLogicThread.getFoodItems(), 1);
-		//viewThread.addViewObject(custQueue);
+				gameLogicThread.getFoodItems(), 
+				1); //1 -> Magic number, the CustomerQueue ID # (for multiple queue instances)
 		viewThread.addGameItem(custQueue1);
 		inputThread.addViewObject(custQueue1);
 		
@@ -130,7 +129,6 @@ public class GameLevel_1 extends GameLevel {
 				customerQueue_length, point_mult, money_mult, 
 				customer_impatience, customer_max_order_size, 
 				gameLogicThread.getFoodItems(), 2);
-		//viewThread.addViewObject(custQueue);
 		viewThread.addGameItem(custQueue2);
 		inputThread.addViewObject(custQueue2);*/
 		

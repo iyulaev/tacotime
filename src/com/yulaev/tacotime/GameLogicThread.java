@@ -68,7 +68,8 @@ public class GameLogicThread extends Thread {
 	
 	//Keep track of the CoffeeGirl instance in this game
 	public CoffeeGirl coffeeGirl;
-	//Keep track of the customerQueue instance; only used to determine if the level has been finished
+	//Keep track of the customerQueue instances; only used to determine if the level has been finished
+	//and to send some data (like # of customers remaining in queue) into GameInfo
 	public CustomerQueueWrapper customerQueueWrapper;
 	//Keep track of all of the GameItems, by a name -> instance map
 	public HashMap<String, GameItem> gameItems;

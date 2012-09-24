@@ -33,6 +33,7 @@ public class GameInfo {
 	
 	//These variables keep track of what level we are on, how many game ticks remain on the clock,
 	//and whether the level is in play or not
+	public static final int MAX_GAME_LEVEL=7;
 	private static int level;
 	private static int levelTime;
 	private static int customersLeftforLevel;

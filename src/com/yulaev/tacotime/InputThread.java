@@ -103,8 +103,10 @@ public class InputThread extends Thread {
 						MessageRouter.sendLoadGameMessage();
 					}
 					
-					//on "return to main menu" does nothing, since the TTMGA will handle destroying TTMGA
-					else if(result == INGAMEDIALOGRESULT_MAIN_MENU); 
+					//on "return to main menu" just pauses the music
+					else if(result == INGAMEDIALOGRESULT_MAIN_MENU); {
+						MessageRouter.sendPlayNothingMessage();
+					}
 				}
 			}
 		};		

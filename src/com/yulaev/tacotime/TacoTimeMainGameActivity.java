@@ -45,6 +45,9 @@ public class TacoTimeMainGameActivity extends Activity {
 	
 	public static final int ASK_TUTORIAL_DIALOG = 0; 
 	
+	//The maingamepanel which will contain the canvas for the whole game
+	MainGamePanel mgpView;
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -72,7 +75,7 @@ public class TacoTimeMainGameActivity extends Activity {
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 		GameGrid.setupGameGrid(dm.widthPixels, dm.heightPixels);
 		
-		MainGamePanel mgpView = new MainGamePanel(this, load_saved_game, watch_tutorial);
+		mgpView = new MainGamePanel(this, load_saved_game, watch_tutorial);
 		
 		//Used only for allocating an intent to be launched from 
 		final Context ttmgaContext = mgpView.getContext(); //this seems wrong...
@@ -141,6 +144,16 @@ public class TacoTimeMainGameActivity extends Activity {
 		
 		// Change content view so that we can see the MainGamePanel!
 		setContentView(mgpView);
+	}
+	
+	
+	/** Mostly just used to destroy the MainGamePanel, which itself calls destroy() on SoundThread,
+	 * which stops all music and deallocates all MediaPlayer resources.
+	 */
+	@Override
+	public void onDestroy () {
+		mgpView.destroy();
+		super.onDestroy();
 	}
 	
 	/** When the Back button gets pressed during game play, we should NOT actually go back; rather, we should

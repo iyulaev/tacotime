@@ -1,6 +1,9 @@
 package com.yulaev.tacotime.gameobjects;
 
 import java.util.ArrayList;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import com.yulaev.tacotime.R;
 import com.yulaev.tacotime.gamelogic.GameGrid;
 import com.yulaev.tacotime.gamelogic.State;
@@ -56,9 +59,11 @@ public abstract class GameActor implements ViewObject {
 	//define whether this GameActor should be drawn
 	protected boolean visible;
 	
+	private Lock myLock;
+	
 	/** These methods are used to lock and unlock the GameActor's internal variables, like position */
-	protected synchronized boolean setLocked(){ while(locked); locked = true; return(locked); }	
-	protected synchronized void unLock() { locked = false; }
+	protected synchronized void setLocked(){ myLock.lock(); }
+	protected synchronized void unLock() { myLock.unlock(); }
 	
 	/** Creates a new GameActor. Strating location is set to the center of the game grid
 	 * 
@@ -96,6 +101,8 @@ public abstract class GameActor implements ViewObject {
 		bitmapmap = new DirectionBitmapMap(false);
 		bitmapmap.setDirectionList(0, new CircularList<Bitmap>(1,
 				BitmapFactory.decodeResource(caller.getResources(), R.drawable.coffeegirl)));
+		
+		myLock = new ReentrantLock();
 	}
 
 	/** onUpdate() gets called when GameActor needs to be updated by ViewThread
@@ -247,7 +254,7 @@ public abstract class GameActor implements ViewObject {
 	 * 
 	 * @return Index of the current CoffeeGirl State
 	 */
-	public int getState() {
+	public synchronized int getState() {
 		return(current_state_idx);
 	}
 	

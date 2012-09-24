@@ -11,18 +11,18 @@ import android.app.Application;
  */
 public class TacoTimeApplication extends Application {
 
-    private static TacoTimeApplication sInstance;
+    //private static TacoTimeApplication sInstance;
 
     //public static SessionHandler sharedSession;
 
-    public static TacoTimeApplication getInstance() {
+    /*public static TacoTimeApplication getInstance() {
       return sInstance;
-    }
+    }*/
 
     @Override
     public void onCreate() {
       super.onCreate();  
-      sInstance = this;
+      //sInstance = this;
     }
 
 }

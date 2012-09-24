@@ -36,6 +36,7 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 	InputThread inputThread;
 	GameLogicThread gameLogicThread;
 	TutorialThread tutorialThread;
+	SoundThread soundThread;
 	
 	//Make sure we don't double-make the threads
 	boolean threads_launched;
@@ -72,6 +73,10 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		inputThread = new InputThread();
 		MessageRouter.inputThread = inputThread;
 		
+		//create sound thread
+		soundThread = new SoundThread(context);
+		MessageRouter.soundThread = soundThread;
+		
 		//create the Game Logic Thread
 		gameLogicThread = new GameLogicThread(viewThread, timerThread, inputThread, this.getContext(), load_saved_game,
 					watch_tutorial ? -1 : 0);
@@ -94,6 +99,13 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		
 		// make the GamePanel focusable so it can handle events
 		setFocusable(true);
+	}
+	
+	/** called when we are to destroy this MainGamePanel; mostly in charge of freeing resources by calling the
+	 * "destructor" methods of the various threads we've created
+	 */
+	public void destroy() {
+		soundThread.destroy();
 	}
 
 	/** Not sure why this is here right now but I suppose it is to handle changes like a change
@@ -122,6 +134,7 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 			inputThread.start();
 			gameLogicThread.start();
 			timerThread.start();
+			soundThread.start();
 			if(tutorialThread != null)
 				tutorialThread.start();
 			
@@ -131,6 +144,7 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		else {
 			MessageRouter.sendSuspendTimerThreadMessage(false);
 			MessageRouter.sendSuspendViewThreadMessage(false);
+			MessageRouter.sendSuspendSoundThreadMessage(false);
 		}
 	}
 
@@ -141,6 +155,7 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		//Pause the threads that have event loops built in
 		MessageRouter.sendSuspendTimerThreadMessage(true);
 		MessageRouter.sendSuspendViewThreadMessage(true);
+		MessageRouter.sendSuspendSoundThreadMessage(true);
 	}
 	
 	/** Responds to a touch event; mostly just sends the tap event to the InputThread via MessageRouter. 

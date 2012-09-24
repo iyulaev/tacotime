@@ -19,6 +19,7 @@ public class MessageRouter {
 	public static TimerThread timerThread;
 	public static InputThread inputThread;
 	public static GameLogicThread gameLogicThread;
+	public static SoundThread soundThread;
 	public static Handler ttaHandler;
 	
 	public static final String activitynametag = "MessageRouter";
@@ -186,6 +187,18 @@ public class MessageRouter {
 		}
 	}
 	
+	/** Sends a "suspend" message to the SoundThread
+	 * 
+	 */
+	public synchronized static void sendSuspendSoundThreadMessage(boolean suspended) {
+		if(soundThread != null) {
+			Message message = Message.obtain();
+			if(suspended) message.what = SoundThread.MESSAGE_SUSPEND;
+			else message.what = SoundThread.MESSAGE_UNSUSPEND;
+			soundThread.handler.sendMessage(message);
+		}
+	}
+	
 	/** Sends  message to the ViewThread telling it to display an announcement. An announcement is displayed
 	 * by overlaying some text on top of the game canvas display.
 	 * 
@@ -318,6 +331,53 @@ public class MessageRouter {
 			gameLogicThread.handler.sendMessage(message);
 			
 			Log.v("MessageRouter", "Sent level end dialog closed message to the GLT handler");
+		}
+	}
+	
+	/** Called by GameLogicThread to play some level music 
+	 * @param level The level to play music for*/
+	public synchronized static void sendPlayLevelMusicMessage(int level) {
+		if(soundThread != null) {
+			Message message = Message.obtain();
+			message.what = SoundThread.MESSAGE_PLAY_LEVEL_MUSIC;
+			message.arg1 = level;
+			soundThread.handler.sendMessage(message);
+			
+			Log.v("MessageRouter", "Told SoundThread to play music for level " + level);
+		}
+	}
+	/** Called by GameLogicThread to load/prepare some level music
+	 * @param level The level to load & prepare music for */
+	public synchronized static void sendLoadLevelMusicMessage(int level) {
+		if(soundThread != null) {
+			Message message = Message.obtain();
+			message.what = SoundThread.MESSAGE_LOAD_LEVEL_MUSIC;
+			message.arg1 = level;
+			soundThread.handler.sendMessage(message);
+			
+			Log.v("MessageRouter", "Told SoundThread to load music for level " + level);
+		}
+	}
+	
+	/** Called by GameLogicThread to play some level end sfx */
+	public synchronized static void sendPlayLevelEndSfxMessage() {
+		if(soundThread != null) {
+			Message message = Message.obtain();
+			message.what = SoundThread.MESSAGE_PLAY_LEVEL_END;
+			soundThread.handler.sendMessage(message);
+			
+			Log.v("MessageRouter", "Told SoundThread to play level end sfx");
+		}
+	}
+	
+	/** Called by GameLogicThread to tell the SoundThread to play nothing */
+	public synchronized static void sendPlayNothingMessage() {
+		if(soundThread != null) {
+			Message message = Message.obtain();
+			message.what = SoundThread.MESSAGE_PLAY_LEVEL_END;
+			soundThread.handler.sendMessage(message);
+			
+			Log.v("MessageRouter", "Told SoundThread to play level end sfx");
 		}
 	}
 }

@@ -214,7 +214,7 @@ public class Customer extends GameActor {
 		}
 		
 		//If the customer has advanced to the finished state then do nothing
-		if(this.getState() == STATE_FINISHED) ;
+		//if(this.getState() == STATE_FINISHED) ;
 	}
 	
 	/** Called when the customer needs to be drawn. Apart from drawing the customer icon we also

@@ -1,20 +1,30 @@
 package com.yulaev.tacotime;
 
+import java.io.IOException;
 import java.util.HashMap;
+
+import com.yulaev.tacotime.gamelogic.GameInfo;
+import com.yulaev.tacotime.gamelogic.Interaction;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.media.SoundPool;
+import android.os.Handler;
+import android.os.Message;
+import android.os.SystemClock;
+import android.util.Log;
 
 public class SoundThread extends Thread {
+	private final String activitynametag = "SoundThread";
 	 
 	//Enum all music & sfx
 	private final int MUSIC_NOTHING = 0;
 	private final int MUSIC_LEVEL_1 = 1;
-	private final int MUSIC_LEVEL_1_DURATION = 31;
-	private final int MUSIC_LEVEL_END = 2;
-	private final int MUSIC_LEVEL_END_DURATION = 3;
+	private final int MUSIC_LEVEL_2 = 2;
+	
+	private final int MUSIC_LEVEL_END = GameInfo.MAX_GAME_LEVEL + 1;
 	
 	//Count the total number of sounds in the sound pool
 	private final int SFX_COUNT = 2;
@@ -23,45 +33,158 @@ public class SoundThread extends Thread {
 	public static final int MESSAGE_PLAY_LEVEL_MUSIC = 1;
 	public static final int MESSAGE_PLAY_LEVEL_END = 2;
 	public static final int MESSAGE_PLAY_NOTHING = 3;
+	public static final int MESSAGE_SUSPEND = 4;
+	public static final int MESSAGE_UNSUSPEND = 5;
+	public static final int MESSAGE_LOAD_LEVEL_MUSIC = 6;
+	
+	//How long between SoundThread wake-ups
+	private static final int THREAD_DELAY_MS = 250;
+	private static final int THREAD_DELAY_MS_SLOW = 1000;
+	
+	//Handler for receiving messages
+	public static Handler handler;
 	
 	//Objects to play music & sounds - utility & datapath, not state
 	private Context caller;
-	private SoundPool mSoundPool;
-	private AudioManager  mAudioManager;
 	private HashMap<Integer, Integer> levelMusicMap;
-	private HashMap<Integer, Integer> sfxMap;
+	private HashMap<Integer, Integer> levelMusicResourceMap;
+	private HashMap<Integer, MediaPlayer> sfxMap;
 	
 	//Keeps track of state - what is playing and whether it has been changed
 	private boolean currently_playing_changed;
+	private boolean do_loop;
 	private int currently_playing;
-	private int current_mstream;
+	private MediaPlayer current_mstream;
+	private boolean suspended;
+	private boolean running;
+	
 	
 	public SoundThread(Context caller) {
 		this.caller = caller;
-		mSoundPool = new SoundPool(SFX_COUNT, AudioManager.STREAM_MUSIC, 0);
-		mAudioManager = (AudioManager)caller.getSystemService(Context.AUDIO_SERVICE);
+		
+		running = true;
 		
 		setupSoundMap();
-		currently_playing = 0;
+		currently_playing = MUSIC_NOTHING;
 		currently_playing_changed = false;
+		current_mstream = null;
+		do_loop=false;
+		
+		setSuspended(false);
+		
+		handler = new Handler() {
+			@Override
+			public void handleMessage(Message msg) {
+				//Handle message to play level msuic
+				if(msg.what == MESSAGE_PLAY_LEVEL_MUSIC) {
+					if(levelMusicMap != null && levelMusicMap.containsKey(msg.arg1))
+						setMusicPlaying(levelMusicMap.get(msg.arg1), true);
+				}
+				else if(msg.what == MESSAGE_LOAD_LEVEL_MUSIC) {
+					if(levelMusicMap != null && levelMusicMap.containsKey(msg.arg1))
+						loadLevelMusic(msg.arg1);
+				}
+				
+				//Handle message to play the level end sfx
+				else if(msg.what == MESSAGE_PLAY_LEVEL_END) {
+					setMusicPlaying(MUSIC_LEVEL_END, false);
+				}
+				
+				//Handle message to play nothing
+				else if(msg.what == MESSAGE_PLAY_NOTHING) {
+					setMusicPlaying(MUSIC_NOTHING, false);
+				}
+				
+				else if(msg.what == MESSAGE_SUSPEND) {
+					setSuspended(true);
+				}
+				
+				else if(msg.what == MESSAGE_UNSUSPEND) {
+					setSuspended(false);
+				}
+			}
+		};
 	}
+	
+	/** Called when the soundthread is to be wound down. Releases all associated resources, mostly the
+	 * MediaPlayer objects that get loaded when we play the game */
+	public synchronized void destroy() {
+		running = false;
+		
+		for(int key : sfxMap.keySet()) {
+			MediaPlayer mplayerIdx = sfxMap.get(key);
+			
+			if(mplayerIdx != null) {
+				mplayerIdx.stop();					
+				mplayerIdx.release();
+			}
+		}
+	}
+	
+	private synchronized void setSuspended(boolean n_suspended) { suspended = n_suspended; }
+	private synchronized boolean getSuspended() { return suspended; }
 	
 	@SuppressLint("UseSparseArrays")
 	private void setupSoundMap() {
 		levelMusicMap = new HashMap<Integer, Integer>(4*SFX_COUNT);
-		sfxMap = new HashMap<Integer, Integer>(4*SFX_COUNT);
+		levelMusicResourceMap = new HashMap<Integer, Integer>(4*SFX_COUNT);
+		sfxMap = new HashMap<Integer, MediaPlayer>(4*SFX_COUNT);
 		
-		levelMusicMap.put(MUSIC_LEVEL_1, mSoundPool.load(caller, R.raw.music_level_1, 1));
-		sfxMap.put(MUSIC_LEVEL_END, mSoundPool.load(caller, R.raw.sfx_level_end, 1));
+		//Mapping from level numbers to level number enumerations
+		levelMusicMap.put(1, MUSIC_LEVEL_1);
+		levelMusicResourceMap.put(MUSIC_LEVEL_1, R.raw.music_level_1);
+		levelMusicMap.put(2, MUSIC_LEVEL_2);
+		levelMusicResourceMap.put(MUSIC_LEVEL_2, R.raw.music_level_2);
+		
+		//Mapping from sound effects to actual effect indices, and their durations	
+		sfxMap.put(MUSIC_LEVEL_END, MediaPlayer.create(caller, R.raw.sfx_level_end));
 	}
 	
-	private synchronized void setMusicPlaying(int new_music) {
+	private void loadLevelMusic(int level_number) {
+		if(!levelMusicMap.containsKey(level_number)) return;
+		
+		int level_enum = levelMusicMap.get(level_number);
+		int level_resource = levelMusicResourceMap.get(level_enum);
+		
+		//If the previous level has a enum & resource associated with it...
+		if(levelMusicMap.containsKey(level_number-1)) {
+			int prev_level_enum = levelMusicMap.get(level_number-1);
+			int prev_level_resource = levelMusicResourceMap.get(prev_level_enum);
+			
+			//Check if the resource is the same, if so, reuse the same MediaPlayer (and return, since
+			//we are done loading stuff)
+			if(prev_level_resource == level_resource && sfxMap.containsKey(prev_level_enum)) {
+				sfxMap.put(level_enum, sfxMap.get(prev_level_enum));
+				return;
+			}
+			//If the resource is not the same, we should release the previous level's music
+			else if(sfxMap.containsKey(prev_level_enum)) {
+				MediaPlayer prevLevelMP = sfxMap.get(prev_level_enum);
+				prevLevelMP.stop();
+				prevLevelMP.release();
+			}
+		}
+		
+		//Load the current level's music
+		sfxMap.put(level_enum, MediaPlayer.create(caller, level_resource));
+		/*if(sfxMap.get(level_enum) != null) {
+			try {sfxMap.get(level_enum).prepare(); }
+			catch (IOException e) { Log.e(activitynametag, e.toString()); }
+		}*/
+	}
+	
+	private synchronized void setMusicPlaying(int new_music, boolean do_loop) {
 		currently_playing_changed = true;
 		this.currently_playing = new_music;
+		this.do_loop = do_loop;
 	}
 	
 	private synchronized int getMusicPlaying() {
 		return this.currently_playing;
+	}
+	
+	private synchronized boolean getMusicLoop() {
+		return this.do_loop;
 	}
 	
 	private synchronized boolean getMusicChanged() {
@@ -70,25 +193,36 @@ public class SoundThread extends Thread {
 		return retval;
 	}
 	
-	private void stopMusic() {
-		mSoundPool.stop(current_mstream);
-	}
 	
-	private void playLevelMusic(int level_number) {
-		stopMusic();
+	/** Called to play a given sound effects enum. It will pause whatever is currently playing, and then
+	 * start playing the music/sound effect that corresponds to sfx_idx (see the enums at the top of this
+	 * class definition).
+	 * @param sfx_idx Sound effect of music to play
+	 * @param looping Whether we should loop the sound or not
+	 */
+	private void playSfx(int sfx_idx, boolean looping) {
+		if(current_mstream != null) current_mstream.pause();
 		
-		float streamVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-		current_mstream = mSoundPool.play(levelMusicMap.get(level_number), streamVolume, streamVolume, 1, 0, 1f);
+		if(sfx_idx != MUSIC_NOTHING && sfxMap != null && sfxMap.containsKey(sfx_idx)) {
+			current_mstream = sfxMap.get(sfx_idx);
+			current_mstream.setLooping(looping);
+			current_mstream.start();
+		}
 	}
 	
-	private void playSfx(int sfx_idx) {
-		stopMusic();
-		
-		float streamVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-		current_mstream = mSoundPool.play(sfxMap.get(sfx_idx), streamVolume, streamVolume, 1, 0, 1f);
-	}
-	
-	private void run() {
+	public void run() {		
+		while(running) {
+			//If we aren't suspended, check if the music has been changed
+			//If it has been changed then play the new music with the given looping setting
+			if(!getSuspended()) {
+				if(getMusicChanged()) {
+					playSfx(getMusicPlaying(), getMusicLoop());
+				}
+			}
+			
+			try { Thread.sleep(getSuspended() ? THREAD_DELAY_MS_SLOW : THREAD_DELAY_MS); }
+			catch(InterruptedException e) { ; }
+		}
 		
 	}
 

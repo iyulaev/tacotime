@@ -161,6 +161,13 @@ public class SavedCharacter implements Comparable{
 		return(returned);
 	}
 	
+	@Override
+	public int hashCode() {
+		int retval = _id;
+		retval *= name.hashCode();
+		return retval;
+	}
+	
 	/** Return a String representation of this SavedCharacter. Typically used for debugging */
 	public String toString() {
 		String returned = new String();

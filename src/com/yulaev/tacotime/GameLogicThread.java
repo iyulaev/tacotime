@@ -252,6 +252,7 @@ public class GameLogicThread extends Thread {
 	int message_timer;
 	//used to track information about the current level instance loaded
 	GameLevel currLevel;
+	
 
 	/** Updates this GameLogicThread's state machine. Should be called every time a clock tick (nominally one
 	 * real-time second) occurs
@@ -259,7 +260,7 @@ public class GameLogicThread extends Thread {
 	 * @sideeffect Mucks with GameInfo and MessageRouter to update game state and inform other Threads
 	 * about the updates in the game state.
 	 */
-	public void stateMachineClockTick() {
+	public void stateMachineClockTick() {		
 		//Pre-play state - this is the state we are in before gameplay begins
 		//IF we are viewing the main panel AND we are ready to play a level, this means the
 		//game is ready for another level - load one!
@@ -275,6 +276,8 @@ public class GameLogicThread extends Thread {
 			GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_PREPLAY_MESSAGE);
 			
 			GameInfo.setCustomersLeft(customerQueue.numberOfCustomersLeft(), currLevel.customersUntilBonus() - customerQueue.numberOfCustomersServed());
+			
+			MessageRouter.sendLoadLevelMusicMessage(GameInfo.getLevel());
 		}
 		
 		//Pre-play message - this is the state we are in when we display the Level Start countdown message
@@ -291,6 +294,8 @@ public class GameLogicThread extends Thread {
 				MessageRouter.sendPauseMessage(false); //unpauses ViewThread and InputThread
 				if(GameInfo.getLevel() == 0) MessageRouter.sendPauseUIMessage(true);
 				Log.v(activitynametag, "GLT is starting a new level!");
+				
+				MessageRouter.sendPlayLevelMusicMessage(GameInfo.getLevel());
 			}
 			
 			GameInfo.setCustomersLeft(customerQueue.numberOfCustomersLeft(), currLevel.customersUntilBonus() - customerQueue.numberOfCustomersServed());
@@ -312,10 +317,12 @@ public class GameLogicThread extends Thread {
 				message_timer = 3;
 				
 				//Indicate that the level has been finished and, if we finished the last level, that the game is over
-				if(GameInfo.getLevel() < MAX_GAME_LEVEL)
+				if(GameInfo.getLevel() < GameInfo.MAX_GAME_LEVEL)
 					MessageRouter.sendAnnouncementMessage("Level " + GameInfo.getLevel() + " Finished", true);
 				else
 					MessageRouter.sendAnnouncementMessage("Game Over", true);
+				
+				MessageRouter.sendPlayLevelEndSfxMessage();
 				
 				GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_POSTPLAY_MESSAGE);
 			}
@@ -354,7 +361,7 @@ public class GameLogicThread extends Thread {
 		//Post-play state: exit the level and either pause the game & display the BetweenLevelMenu or display
 		//that the game is over
 		else if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_POSTPLAY) {
-			if(GameInfo.getLevel() < MAX_GAME_LEVEL && GameInfo.getLevel() > 0) {
+			if(GameInfo.getLevel() < GameInfo.MAX_GAME_LEVEL && GameInfo.getLevel() > 0) {
 				MessageRouter.sendPauseMessage(true);
 				MessageRouter.sendLevelEndMessage();
 			}
@@ -458,8 +465,6 @@ public class GameLogicThread extends Thread {
 	
 	
 	// Level loader methods
-	
-	private static final int MAX_GAME_LEVEL=7;
 	/** Loads a new level; creates a GameLevel Object corresponding to the new level
 	 * and loads the level. Also resets game state and level max time.
 	 * 

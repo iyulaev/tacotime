@@ -85,6 +85,7 @@ public class TacoTimeActivity extends Activity {
 	@Override
 	public void onDestroy() {
 		Analytics.endSession();
+		super.onDestroy();
 	}
 	
 	/** Displays an AlertDialog dialog to the user, indicating that no saved game exists

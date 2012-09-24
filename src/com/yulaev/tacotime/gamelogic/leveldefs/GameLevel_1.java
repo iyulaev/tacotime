@@ -6,6 +6,7 @@ import com.yulaev.tacotime.GameLogicThread;
 import com.yulaev.tacotime.InputThread;
 import com.yulaev.tacotime.R;
 import com.yulaev.tacotime.ViewThread;
+import com.yulaev.tacotime.gamelogic.CustomerQueueWrapper;
 import com.yulaev.tacotime.gamelogic.GameGrid;
 import com.yulaev.tacotime.gamelogic.GameInfo;
 import com.yulaev.tacotime.gamelogic.GameLevel;
@@ -35,7 +36,7 @@ public class GameLevel_1 extends GameLevel {
 	
 	public GameLevel_1() {
 		this.level_number = 1;
-		this.customerQueue_length = 11;
+		this.customerQueue_length = 4;
 		this.point_mult = 1.0f;
 		this.money_mult = 1.0f;
 		this.customer_impatience = 0.6f;
@@ -111,13 +112,28 @@ public class GameLevel_1 extends GameLevel {
 		
 		//Magic numbers: 40 - x-position of Customers, (GameGrid.GAMEGRID_HEIGHT-45) - y-position of customers
 		//1 - starting customer queue length, 
-		CustomerQueue custQueue = new CustomerQueue(caller, 40, GameGrid.GAMEGRID_HEIGHT-40, GameItem.ORIENTATION_SOUTH, 
+		CustomerQueue custQueue1 = new CustomerQueue(caller, 
+				CustomerQueue.X_POS, 
+				GameGrid.GAMEGRID_HEIGHT-40, 
+				GameItem.ORIENTATION_SOUTH, 
 				customerQueue_length, point_mult, money_mult, 
 				customer_impatience, customer_max_order_size, 
-				gameLogicThread.getFoodItems());
+				gameLogicThread.getFoodItems(), 1);
 		//viewThread.addViewObject(custQueue);
-		viewThread.addGameItem(custQueue);
-		inputThread.addViewObject(custQueue);
-		gameLogicThread.setCustomerQueue(custQueue);
+		viewThread.addGameItem(custQueue1);
+		inputThread.addViewObject(custQueue1);
+		
+		/*CustomerQueue custQueue2 = new CustomerQueue(caller, 
+				CustomerQueue.X_POS + CustomerQueue.DISTANCE_TO_QUEUE_TWO, 
+				GameGrid.GAMEGRID_HEIGHT-CustomerQueue.Y_POS_FROM_GG_BOTTOM, 
+				GameItem.ORIENTATION_SOUTH, 
+				customerQueue_length, point_mult, money_mult, 
+				customer_impatience, customer_max_order_size, 
+				gameLogicThread.getFoodItems(), 2);
+		//viewThread.addViewObject(custQueue);
+		viewThread.addGameItem(custQueue2);
+		inputThread.addViewObject(custQueue2);*/
+		
+		gameLogicThread.setCustomerQueue(new CustomerQueueWrapper(custQueue1/*, custQueue2*/));
 	}
 }

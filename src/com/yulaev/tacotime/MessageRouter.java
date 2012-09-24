@@ -374,10 +374,10 @@ public class MessageRouter {
 	public synchronized static void sendPlayNothingMessage() {
 		if(soundThread != null) {
 			Message message = Message.obtain();
-			message.what = SoundThread.MESSAGE_PLAY_LEVEL_END;
+			message.what = SoundThread.MESSAGE_PLAY_NOTHING;
 			soundThread.handler.sendMessage(message);
 			
-			Log.v("MessageRouter", "Told SoundThread to play level end sfx");
+			Log.v("MessageRouter", "Told SoundThread to play nothing");
 		}
 	}
 }

@@ -9,6 +9,8 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+
+import com.yulaev.tacotime.gamelogic.CustomerQueueWrapper;
 import com.yulaev.tacotime.gamelogic.GameInfo;
 import com.yulaev.tacotime.gamelogic.GameLevel;
 import com.yulaev.tacotime.gamelogic.Interaction;
@@ -67,7 +69,7 @@ public class GameLogicThread extends Thread {
 	//Keep track of the CoffeeGirl instance in this game
 	public CoffeeGirl coffeeGirl;
 	//Keep track of the customerQueue instance; only used to determine if the level has been finished
-	public CustomerQueue customerQueue;
+	public CustomerQueueWrapper customerQueueWrapper;
 	//Keep track of all of the GameItems, by a name -> instance map
 	public HashMap<String, GameItem> gameItems;
 	//Keep track of all of the GameFoodItems, by a name -> instance map
@@ -219,7 +221,7 @@ public class GameLogicThread extends Thread {
 		//CoffeeGirl interacts with CustomerQueue - if the interaction is successful then CoffeeGirl loses the
 		//item that she currently holds and gains some points in return
 		if(old_state != CoffeeGirl.STATE_NORMAL && 
-				interactedWith.equals("CustomerQueue") &&
+				interactedWith.contains("CustomerQueue") &&
 				interactionResult.was_success) {
 			GameInfo.setAndReturnPoints(interactionResult.point_result);
 			GameInfo.setAndReturnMoney(interactionResult.money_result);
@@ -275,7 +277,7 @@ public class GameLogicThread extends Thread {
 			Log.v(activitynametag, "GLT is loading a new level!");
 			GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_PREPLAY_MESSAGE);
 			
-			GameInfo.setCustomersLeft(customerQueue.numberOfCustomersLeft(), currLevel.customersUntilBonus() - customerQueue.numberOfCustomersServed());
+			GameInfo.setCustomersLeft(customerQueueWrapper.numberOfCustomersLeft(), currLevel.customersUntilBonus() - customerQueueWrapper.numberOfCustomersServed());
 			
 			MessageRouter.sendLoadLevelMusicMessage(GameInfo.getLevel());
 		}
@@ -298,7 +300,7 @@ public class GameLogicThread extends Thread {
 				MessageRouter.sendPlayLevelMusicMessage(GameInfo.getLevel());
 			}
 			
-			GameInfo.setCustomersLeft(customerQueue.numberOfCustomersLeft(), currLevel.customersUntilBonus() - customerQueue.numberOfCustomersServed());
+			GameInfo.setCustomersLeft(customerQueueWrapper.numberOfCustomersLeft(), currLevel.customersUntilBonus() - customerQueueWrapper.numberOfCustomersServed());
 		}
 		
 		//In-game state - we are in this state when the user is playing the level
@@ -311,7 +313,7 @@ public class GameLogicThread extends Thread {
 			Log.v(activitynametag, GameInfo.getLevelTime() + " seconds remaining in this level!");
 			
 			//If we've run out of time on this level, or customerQueue has run out, then kill the level
-			if(GameInfo.getLevelTime() <= 0 || customerQueue.isFinished()) {
+			if(GameInfo.getLevelTime() <= 0 || customerQueueWrapper.isFinished()) {
 				Log.v(activitynametag, "GLT is finishing this level!");
 				
 				message_timer = 3;
@@ -327,7 +329,7 @@ public class GameLogicThread extends Thread {
 				GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_POSTPLAY_MESSAGE);
 			}
 			
-			GameInfo.setCustomersLeft(customerQueue.numberOfCustomersLeft(), currLevel.customersUntilBonus() - customerQueue.numberOfCustomersServed());
+			GameInfo.setCustomersLeft(customerQueueWrapper.numberOfCustomersLeft(), currLevel.customersUntilBonus() - customerQueueWrapper.numberOfCustomersServed());
 		}
 		
 		//Post-play state: we enter this state as soon as the level finished - we display a message indicating that
@@ -335,24 +337,24 @@ public class GameLogicThread extends Thread {
 		else if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_POSTPLAY_MESSAGE) {
 			if(message_timer > 0) {
 				message_timer--;
-				GameInfo.setCustomersLeft(customerQueue.numberOfCustomersLeft(), currLevel.customersUntilBonus() - customerQueue.numberOfCustomersServed());
+				GameInfo.setCustomersLeft(customerQueueWrapper.numberOfCustomersLeft(), currLevel.customersUntilBonus() - customerQueueWrapper.numberOfCustomersServed());
 			}
 			//We use message_timer again to make sure we only display the post-level dialog once :)
 			else if (message_timer == 0){
 				//Calculate our end-level bonus and display the level end dialog			
-				GameInfo.setAndReturnMoney(currLevel.getBonusMoney(customerQueue.numberOfCustomersServed()));
-				GameInfo.setAndReturnPoints(currLevel.getBonusPoints(customerQueue.numberOfCustomersServed()));
+				GameInfo.setAndReturnMoney(currLevel.getBonusMoney(customerQueueWrapper.numberOfCustomersServed()));
+				GameInfo.setAndReturnPoints(currLevel.getBonusPoints(customerQueueWrapper.numberOfCustomersServed()));
 				//Add on the PENALTY for the number of customer that we pissed off
-				Log.d(activitynametag, "calculated that " + customerQueue.numberOfCustomersIgnored() + " customers were unsatisfied.");
-				GameInfo.setAndReturnPoints(currLevel.getCustomerDissatisfactionPenalty(customerQueue.numberOfCustomersIgnored()));
+				Log.d(activitynametag, "calculated that " + customerQueueWrapper.numberOfCustomersIgnored() + " customers were unsatisfied.");
+				GameInfo.setAndReturnPoints(currLevel.getCustomerDissatisfactionPenalty(customerQueueWrapper.numberOfCustomersIgnored()));
 				
 				//Send all of the accrued bonuses to the level-end dialog
 				//See MessageRouter.sendPostLevelDialogOpenMessage() javadocs for an explanation of the arguments given
 				MessageRouter.sendPostLevelDialogOpenMessage( GameInfo.points, GameInfo.money, 
-						GameInfo.level_points-currLevel.getBonusPoints(customerQueue.numberOfCustomersServed()), 
-						GameInfo.level_money-currLevel.getBonusMoney(customerQueue.numberOfCustomersServed()),
-						currLevel.getBonusPoints(customerQueue.numberOfCustomersServed()),
-						currLevel.getBonusMoney(customerQueue.numberOfCustomersServed()) );
+						GameInfo.level_points-currLevel.getBonusPoints(customerQueueWrapper.numberOfCustomersServed()), 
+						GameInfo.level_money-currLevel.getBonusMoney(customerQueueWrapper.numberOfCustomersServed()),
+						currLevel.getBonusPoints(customerQueueWrapper.numberOfCustomersServed()),
+						currLevel.getBonusMoney(customerQueueWrapper.numberOfCustomersServed()) );
 				
 				message_timer--;
 			}
@@ -376,7 +378,7 @@ public class GameLogicThread extends Thread {
 			
 			Analytics.reportLevelFinished(GameInfo.getLevel(), 
 					currLevel.customersUntilBonus()<=0, 
-					((float) customerQueue.numberOfCustomersServed()) / ((float) currLevel.numberOfCustomers()));
+					((float) customerQueueWrapper.numberOfCustomersServed()) / ((float) currLevel.numberOfCustomers()));
 		}
 	}
 	
@@ -394,13 +396,15 @@ public class GameLogicThread extends Thread {
 	}
 	
 	/** Set the CustomerQueue associated with this GameLogicThread. Called by a GameLevel constructor after the
-	 * constructor has finished initlaizing the CustomerQueue so that this GLT can query the status of the 
+	 * constructor has finished initializing the CustomerQueue so that this GLT can query the status of the 
 	 * queue and advance it's state machine accordingly, i.e. finish the level when the queue is exhausted.
 	 * @param n_customerQueue
 	 */
-	public synchronized void setCustomerQueue(CustomerQueue n_customerQueue) {
-		customerQueue = n_customerQueue;
-		this.addGameItem(customerQueue);
+	public synchronized void setCustomerQueue(CustomerQueueWrapper n_customerQueueWrapper) {
+		customerQueueWrapper = n_customerQueueWrapper;
+		
+		for(CustomerQueue customerQueue : customerQueueWrapper.getContainedQueues())
+			this.addGameItem(customerQueue);
 	}
 	
 	 /** Adds a GameItem to this TacoTime game. The GameItem will be put into the gameItems data structure 

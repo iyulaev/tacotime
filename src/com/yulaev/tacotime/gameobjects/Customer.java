@@ -53,6 +53,7 @@ public class Customer extends GameActor {
 	
 	public static int DEFAULT_MAX_ORDER_SIZE = 2;
 	private int max_order_size;
+	int queue_number;
 
 
 	/** Initialize a new Customer.
@@ -68,12 +69,14 @@ public class Customer extends GameActor {
 	 */
 	public Customer(Context caller, int move_rate, int starting_queue_position, 
 			float point_mult, float money_mult, float impatience, int max_order_size,
-			List<GameFoodItem> foodItemChoices) {
+			List<GameFoodItem> foodItemChoices, int queue_number) {
 			
-		super(caller, move_rate, location_start_x, location_start_y);
+		super(caller, move_rate, location_start_x + ((queue_number==2) ? CustomerQueue.DISTANCE_TO_QUEUE_TWO : 0), location_start_y);
 		
 		queue_position = starting_queue_position;
 		visible = false;
+		
+		this.queue_number = queue_number;
 		
 		//Generate this customer's food item order
 		Random random = new Random();
@@ -159,7 +162,7 @@ public class Customer extends GameActor {
 		super.setState(new_state);
 		
 		if(new_state == STATE_INLINE_HAPPY) {
-			x = location_start_x;
+			x = location_start_x + ((queue_number==2) ? CustomerQueue.DISTANCE_TO_QUEUE_TWO : 0);
 			y = location_start_y;
 		}
 		
@@ -189,7 +192,7 @@ public class Customer extends GameActor {
 		//If state is "in line" make sure that we are standing in the appropriate part of the line
 		if(this.getState() == STATE_INLINE_HAPPY || this.getState() == STATE_INLINE_OK) {
 			setLocked();
-			this.target_x = locations_queue_x[getQueuePosition()];			
+			this.target_x = locations_queue_x[getQueuePosition()] + ((queue_number==2) ? CustomerQueue.DISTANCE_TO_QUEUE_TWO : 0);			
 			this.target_y = locations_queue_y[getQueuePosition()];
 			unLock();
 			

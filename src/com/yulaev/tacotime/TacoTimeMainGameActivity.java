@@ -192,7 +192,7 @@ public class TacoTimeMainGameActivity extends Activity {
 			.setNeutralButton(GameInfo.getLevel() > 0 ? "Retry Level" : "Next Level", 
 						new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int id) {
-					MessageRouter.sendInGameDialogResult( InputThread.INGAMEDIALOGRESULT_RETRY_LEVEL);
+					MessageRouter.sendInGameDialogResult(InputThread.INGAMEDIALOGRESULT_RETRY_LEVEL);
 				}
 			})
 			//Maps to "continue"

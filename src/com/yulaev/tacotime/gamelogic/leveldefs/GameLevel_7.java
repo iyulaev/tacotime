@@ -6,6 +6,7 @@ import com.yulaev.tacotime.GameLogicThread;
 import com.yulaev.tacotime.InputThread;
 import com.yulaev.tacotime.R;
 import com.yulaev.tacotime.ViewThread;
+import com.yulaev.tacotime.gamelogic.CustomerQueueWrapper;
 import com.yulaev.tacotime.gamelogic.GameGrid;
 import com.yulaev.tacotime.gamelogic.GameInfo;
 import com.yulaev.tacotime.gamelogic.GameLevel;
@@ -163,6 +164,6 @@ public class GameLevel_7 extends GameLevel {
 		//viewThread.addViewObject(custQueue);
 		viewThread.addGameItem(custQueue);
 		inputThread.addViewObject(custQueue);
-		gameLogicThread.setCustomerQueue(custQueue);
+		gameLogicThread.setCustomerQueue(new CustomerQueueWrapper(custQueue));
 	}
 }

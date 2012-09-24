@@ -153,8 +153,10 @@ public class SoundThread extends Thread {
 			
 			//Check if the resource is the same, if so, reuse the same MediaPlayer (and return, since
 			//we are done loading stuff)
+			//Kind of a stupid local optimization, sorry
 			if(prev_level_resource == level_resource && sfxMap.containsKey(prev_level_enum)) {
 				sfxMap.put(level_enum, sfxMap.get(prev_level_enum));
+				sfxMap.remove(prev_level_enum);
 				return;
 			}
 			//If the resource is not the same, we should release the previous level's music
@@ -162,15 +164,13 @@ public class SoundThread extends Thread {
 				MediaPlayer prevLevelMP = sfxMap.get(prev_level_enum);
 				prevLevelMP.stop();
 				prevLevelMP.release();
+				sfxMap.remove(prev_level_enum);
 			}
 		}
 		
 		//Load the current level's music
-		sfxMap.put(level_enum, MediaPlayer.create(caller, level_resource));
-		/*if(sfxMap.get(level_enum) != null) {
-			try {sfxMap.get(level_enum).prepare(); }
-			catch (IOException e) { Log.e(activitynametag, e.toString()); }
-		}*/
+		if(!sfxMap.containsKey(level_enum))		
+			sfxMap.put(level_enum, MediaPlayer.create(caller, level_resource));
 	}
 	
 	private synchronized void setMusicPlaying(int new_music, boolean do_loop) {

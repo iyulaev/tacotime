@@ -94,7 +94,7 @@ public class InputThread extends Thread {
 					if(result == InputThread.INGAMEDIALOGRESULT_MAIN_MENU) dialogResultString = "main menu";
 					if(result == InputThread.INGAMEDIALOGRESULT_RETRY_LEVEL) dialogResultString = "retry level";
 					if(result == InputThread.INGAMEDIALOGRESULT_CONTINUE) dialogResultString = "continue";
-					Log.d(activitynametag, "Dialog result was: " + dialogResultString);*/
+					Log.d(activitynametag, "Dialog result was: " + dialogResultString + " (" + result + ")");*/
 					
 					//on continue, do nothing
 					
@@ -104,7 +104,7 @@ public class InputThread extends Thread {
 					}
 					
 					//on "return to main menu" just pauses the music
-					else if(result == INGAMEDIALOGRESULT_MAIN_MENU); {
+					else if(result == INGAMEDIALOGRESULT_MAIN_MENU) {
 						MessageRouter.sendPlayNothingMessage();
 					}
 				}

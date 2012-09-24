@@ -31,6 +31,11 @@ public class CustomerQueue extends GameItem {
 	public static final int TIME_BETWEEN_CUSTOMERS_MS = 2000;
 	private long time_since_last_customer;
 	
+	//Define position of customer queue
+	public static final int X_POS = 40;
+	public static final int DISTANCE_TO_QUEUE_TWO = 30;
+	public static final int Y_POS_FROM_GG_BOTTOM = 40;
+	
 	private static final String activitynametag = "CustomerQueue";
 	
 	int queue_length;
@@ -39,6 +44,8 @@ public class CustomerQueue extends GameItem {
 	int customers_processed;
 	//Customers_satisfied indicates how many customers had their orders satisfied
 	int customers_satisfied;
+	
+	int queue_number;
 	
 	/** Create a new CustomerQueue. We will probably only be creating one queue per game level.
 	 * 
@@ -58,12 +65,13 @@ public class CustomerQueue extends GameItem {
 	public CustomerQueue(Context caller, int x_pos, int y_pos, int orientation, 
 			int queue_length, float point_mult, float money_mult, 
 			float impatience, int max_items_in_order, 
-			List<GameFoodItem> foodItemMenu) {
+			List<GameFoodItem> foodItemMenu, int queue_number) {
 		//public GameItem(Context caller, String name, int r_bitmap, int x_pos, int y_pos, int orientation, int gg_width, int gg_height)
-		super(caller, "CustomerQueue", R.drawable.countertop, x_pos, y_pos, orientation, 20, 17);
+		super(caller, "CustomerQueue" + Integer.toString(queue_number), R.drawable.countertop, x_pos, y_pos, orientation, 20, 17);
 		
 		//Create and fill up the CustomerQueue
 		this.queue_length = queue_length;
+		this.queue_number = queue_number;
 		customerList = new ArrayList<Customer>(queue_length);
 		for(int i = 0; i < queue_length; i++) {
 			customerList.add(new Customer(caller, 
@@ -73,7 +81,8 @@ public class CustomerQueue extends GameItem {
 					money_mult, 
 					impatience, 
 					max_items_in_order, 
-					foodItemMenu));
+					foodItemMenu,
+					queue_number));
 		}
 		
 		for(int i = 0; i < queue_length; i++) {
@@ -84,6 +93,13 @@ public class CustomerQueue extends GameItem {
 		
 		customers_satisfied = 0;
 		customers_processed = 0;
+	}
+	
+	public CustomerQueue(Context caller, int x_pos, int y_pos, int orientation, 
+			int queue_length, float point_mult, float money_mult, 
+			float impatience, int max_items_in_order, 
+			List<GameFoodItem> foodItemMenu) {
+		this(caller, x_pos,  y_pos, orientation, queue_length, point_mult, money_mult, impatience, max_items_in_order, foodItemMenu, 1);
 	}
 	
 	/** Used to set the food item order for a particular customer. Tutorial uses this method to set 
@@ -113,8 +129,8 @@ public class CustomerQueue extends GameItem {
 				return customerList.get(i);
 		}
 		
-		//Should never happen?
-		return customerList.get(queue_length-1);
+		//Happens when the queue is empty
+		return null;
 	}
 	
 	/** Called by ViewThread when we are to update the state of this CustomerQueue. Aside from doing the typical
@@ -131,7 +147,7 @@ public class CustomerQueue extends GameItem {
 		}
 		
 		//Advance the queue if customer at position 0 has finished
-		if(head().getState() == Customer.STATE_ANGRY || head().getState() == Customer.STATE_SERVED || head().getState() == Customer.STATE_FINISHED) {
+		if(head() != null && (head().getState() == Customer.STATE_ANGRY || head().getState() == Customer.STATE_SERVED || head().getState() == Customer.STATE_FINISHED)) {
 			if(head().getState() == Customer.STATE_SERVED) customers_satisfied++;
 			advanceQueue(); 
 		}
@@ -176,7 +192,10 @@ public class CustomerQueue extends GameItem {
 	 * 
 	 * */
 	public Interaction onInteraction(String foodItem) {
-		return(head().onInteraction(foodItem));
+		if(head() != null)
+			return(head().onInteraction(foodItem));
+		else
+			return new Interaction();
 	}
 	
 	/** Return true if the last Customer (and by extension every other customer) in this queue has been served

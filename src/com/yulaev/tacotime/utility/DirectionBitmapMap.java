@@ -32,12 +32,12 @@ public class DirectionBitmapMap {
 		
 		if(n_direction_sensitive) {
 			directionIndexedLists = new ArrayList<CircularList<Bitmap>>(DIRECTION_SENSITIVE_SIZE);
-			default_direction = DIRECTION_SOUTH;
 		}
 		else {
 			directionIndexedLists = new ArrayList<CircularList<Bitmap>>(DIRECTION_INSENSITIVE_SIZE);
-			default_direction = DIRECTION_NULL;
 		}
+		
+		default_direction = DIRECTION_NULL;
 	}
 	
 	/** Create a new DirectionBitmapMap, with given starting CircularList. Assumes that this DBM
@@ -64,7 +64,7 @@ public class DirectionBitmapMap {
 		this.direction_sensitive = true;
 		directionIndexedLists = new ArrayList<CircularList<Bitmap>>(DIRECTION_SENSITIVE_SIZE);
 				
-		default_direction = DIRECTION_SOUTH;
+		default_direction = DIRECTION_NULL;
 		
 		directionIndexedLists.add(direction, startingList);
 	}

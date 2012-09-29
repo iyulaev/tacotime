@@ -12,10 +12,13 @@ import java.util.Iterator;
 import com.yulaev.tacotime.gamelogic.GameGrid;
 import com.yulaev.tacotime.gameobjects.ViewObject;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.Display;
@@ -55,8 +58,6 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 	public MainGamePanel(Context context, boolean load_saved_game, boolean watch_tutorial) {
 		super(context);
 		this.context = context;
-		
-		Log.d(activitynametag, "MainGamePanel constructor called!");
 		
 		// adding the callback (this) to the surface holder to intercept events
 		getHolder().addCallback(this);
@@ -169,19 +170,33 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		return super.onTouchEvent(event);
 	}
 	
+	boolean static_setup_done = false;
 	//Paint that we use in onDraw(); these are class variables so that we don't keep creating new ones
 	Paint gridPaint;
+	Rect playAreaRect; //rectangle for the area that will be filled with tiles
+	//Paint counterPaint;
+	Rect counterAreaLeftRect; //rectangle for the left screen side counter top
+	Rect counterAreaRightRect; //rectangle for the right screen side counter top
+	Rect counterAreaTopRect; //rectangle for the top screen side counter top
+	Rect counterAreaBottomRect; //rectangle for the bottom screen side counter top
+	
 	Paint moneyPaint;
 	Paint pointsPaint;
 	Paint levelTimePaint;
 	Paint customersLeftPaint;
+	
 	Paint announcementPaint;
+	//Bitmap that we will use for the background
+	Bitmap background;
+	//Bitmaps we'll use for counter top
+	Bitmap counterTopVert;
+	Bitmap counterTopHorz;
 	
 	//Used for displaying toasts
-	private Toast t;
+	/* private Toast t;
 	private int toast_trim = 40;
 	private long time_since_last_toast = -1;
-	private final int TIME_BETWEEN_TOASTS = 1000;
+	private final int TIME_BETWEEN_TOASTS = 1000; */
 	
 	@Override
 	protected void onDraw(Canvas canvas) {
@@ -208,15 +223,72 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 			int level_time,
 			int customers_left,
 			int customers_until_bonus) {
-		if(gridPaint == null) {
+		
+		//Set up all of the Paint objects if we haven't done this yet! (should only happen once per game)
+		if(!static_setup_done) {
+			int status_text_size = 20;
+			int announcement_text_size = 28;
+			
 			gridPaint = new Paint();
 			gridPaint.setColor(0xFF2f2f2f);
+			
+			playAreaRect = new Rect(0,
+					0,
+					GameGrid.canvasX(GameGrid.GAMEGRID_WIDTH),
+					GameGrid.canvasY(GameGrid.GAMEGRID_HEIGHT));
+			background = BitmapFactory.decodeResource(this.getResources(), R.drawable.background);
+			
+			counterAreaLeftRect = new Rect(0,0,
+					GameGrid.canvasX(GameGrid.GAMEGRID_PADDING_LEFT) - 16,
+					GameGrid.canvasY(GameGrid.GAMEGRID_HEIGHT-33));
+			counterAreaRightRect = new Rect(GameGrid.canvasX(GameGrid.GAMEGRID_WIDTH-GameGrid.GAMEGRID_PADDING_RIGHT) + 16,
+					0,
+					canvas.getWidth(),
+					GameGrid.canvasY(GameGrid.GAMEGRID_HEIGHT-33));
+			counterAreaTopRect = new Rect(0,0,
+					canvas.getWidth(),
+					GameGrid.canvasY(GameGrid.GAMEGRID_PADDING_TOP) - 16);
+			counterAreaBottomRect = new Rect(0,GameGrid.canvasY(GameGrid.GAMEGRID_HEIGHT - GameGrid.GAMEGRID_PADDING_BOTTOM) + 16,
+					canvas.getWidth(),
+					GameGrid.canvasY(GameGrid.GAMEGRID_HEIGHT - 33));
+			//counterPaint = new Paint();
+			//counterPaint.setColor(0xFFd4b66f);
+			counterTopVert = BitmapFactory.decodeResource(this.getResources(), R.drawable.background_counter_vertical);
+			counterTopHorz = BitmapFactory.decodeResource(this.getResources(), R.drawable.background_counter_horizontal);
+			
+			moneyPaint = new Paint();
+			moneyPaint.setColor(Color.GREEN);
+			moneyPaint.setTextSize(status_text_size);
+			pointsPaint = new Paint();
+			pointsPaint.setColor(Color.BLUE);
+			pointsPaint.setTextSize(status_text_size);
+			levelTimePaint = new Paint();
+			levelTimePaint.setColor(Color.RED);
+			levelTimePaint.setTextSize(status_text_size);
+			announcementPaint = new Paint();
+			announcementPaint.setColor(0xFFDFDFDF);
+			announcementPaint.setTextSize(announcement_text_size);
+			announcementPaint.setTextAlign(Paint.Align.CENTER);
+			customersLeftPaint = new Paint();
+			customersLeftPaint.setColor(0xFFDFDFDF);
+			customersLeftPaint.setTextSize(status_text_size);
+			
+			static_setup_done = true;
 		}
 		
 		canvas.drawColor(Color.BLACK);
 		
 		//Draw in a background
-		canvas.drawRect(0,0, GameGrid.maxCanvasX(), GameGrid.maxCanvasY(), gridPaint);
+		canvas.drawBitmap(background, null, playAreaRect, null);
+		canvas.drawRect(0, GameGrid.canvasY(GameGrid.GAMEGRID_HEIGHT), GameGrid.maxCanvasX(), canvas.getHeight(), gridPaint);
+		//Draw countertop (16 is half of the sprite width)
+		canvas.drawBitmap(counterTopVert, null, counterAreaLeftRect, null);
+		canvas.drawBitmap(counterTopVert, null, counterAreaRightRect, null);
+		canvas.drawBitmap(counterTopHorz, null, counterAreaTopRect, null);
+		canvas.drawBitmap(counterTopHorz, null, counterAreaBottomRect, null);
+		
+		
+		
 		
 		//Draw ALL ViewObjects on the board
 		Iterator<ViewObject> it = voAr.iterator();
@@ -224,38 +296,21 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 			it.next().draw(canvas);
 		}
 		
-		//Set up all of the Paint objects if we haven't done this yet! (should only happen once per game)
-		if(moneyPaint == null || pointsPaint == null || announcementPaint == null) {
-			moneyPaint = new Paint();
-			moneyPaint.setColor(Color.GREEN);
-			moneyPaint.setTextSize(16);
-			pointsPaint = new Paint();
-			pointsPaint.setColor(Color.BLUE);
-			pointsPaint.setTextSize(16);
-			levelTimePaint = new Paint();
-			levelTimePaint.setColor(Color.RED);
-			levelTimePaint.setTextSize(16);
-			announcementPaint = new Paint();
-			announcementPaint.setColor(0xFFDFDFDF);
-			announcementPaint.setTextSize(24);
-			announcementPaint.setTextAlign(Paint.Align.CENTER);
-			customersLeftPaint = new Paint();
-			customersLeftPaint.setColor(0xFFDFDFDF);
-			customersLeftPaint.setTextSize(16);
-		}
+		
+		
 		
 		//Draw information regarding how many customers are left
 		String customersLeftStr = new String("Customers Left: " + Integer.toString(customers_left));
 		if(customers_until_bonus<=0) customersLeftStr += " (BONUS ACHIEVED)";
-		canvas.drawText(customersLeftStr, 14, canvas.getHeight()-85-30, customersLeftPaint);
+		canvas.drawText(customersLeftStr, 14, canvas.getHeight()-105-45, customersLeftPaint);
 		
 		//Draw money, points and display an announcement message IF there is an announcement
-		canvas.drawText("Time Left: " + Integer.toString(level_time), 14, canvas.getHeight()-85, levelTimePaint);
-		canvas.drawText("Money: $" + Integer.toString(money), 14, canvas.getHeight()-50, moneyPaint);
+		canvas.drawText("Time Left: " + Integer.toString(level_time), 14, canvas.getHeight()-105, levelTimePaint);
+		canvas.drawText("Money: $" + Integer.toString(money), 14, canvas.getHeight()-60, moneyPaint);
 		canvas.drawText("Points: " + Integer.toString(points), 14, canvas.getHeight()-15, pointsPaint);
 		
 		if(draw_announcement_message) {
-			canvas.drawText(announcementMessage, canvas.getWidth()/2, 24 + 40, announcementPaint);
+			canvas.drawText(announcementMessage, canvas.getWidth()/2, GameGrid.canvasY(GameGrid.GAMEGRID_HEIGHT) + 50, announcementPaint);
 			
 			/*if(time_since_last_toast + TIME_BETWEEN_TOASTS < SystemClock.uptimeMillis()) {
 				time_since_last_toast = SystemClock.uptimeMillis();

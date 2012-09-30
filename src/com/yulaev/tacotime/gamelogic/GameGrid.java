@@ -11,10 +11,10 @@ import android.util.Log;
 
 public class GameGrid {
 	//Set padding areas for this gamegrid; this is areas where CoffeeGirl can't go
-	public static final int GAMEGRID_PADDING_LEFT = 30;
-	public static final int GAMEGRID_PADDING_RIGHT = 40;
-	public static final int GAMEGRID_PADDING_TOP = 35;
-	public static final int GAMEGRID_PADDING_BOTTOM = 55;
+	public static final int GAMEGRID_PADDING_LEFT = 20;
+	public static final int GAMEGRID_PADDING_RIGHT = 20;
+	public static final int GAMEGRID_PADDING_TOP = 20;
+	public static final int GAMEGRID_PADDING_BOTTOM = 50;
 		
 	//Set constraints for gameGrid
 	public static final int GAMEGRID_WIDTH = 70+(GAMEGRID_PADDING_LEFT+GAMEGRID_PADDING_RIGHT);

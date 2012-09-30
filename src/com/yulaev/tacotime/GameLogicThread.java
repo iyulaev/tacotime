@@ -239,12 +239,15 @@ public class GameLogicThread extends Thread {
 				coffeeGirl.setItemHolding("cupcake");
 			if(old_state == CoffeeGirl.STATE_NORMAL && interactee_state == CounterTop.STATE_HOLDING_BLENDEDDRINK)
 				coffeeGirl.setItemHolding("blended_drink");
-			if(old_state != CoffeeGirl.STATE_NORMAL && interactee_state == CounterTop.STATE_HOLDING_PIE)
+			if(old_state == CoffeeGirl.STATE_NORMAL && interactee_state == CounterTop.STATE_HOLDING_PIE)
 				coffeeGirl.setItemHolding("pieslice");
-			if(old_state != CoffeeGirl.STATE_NORMAL && interactee_state == CounterTop.STATE_HOLDING_SANDWICH)
+			if(old_state == CoffeeGirl.STATE_NORMAL && interactee_state == CounterTop.STATE_HOLDING_SANDWICH)
 				coffeeGirl.setItemHolding("sandwich");
-			if(old_state != CoffeeGirl.STATE_NORMAL && interactee_state == CounterTop.STATE_HOLDING_ESPRESSO)
+			if(old_state == CoffeeGirl.STATE_NORMAL && interactee_state == CounterTop.STATE_HOLDING_ESPRESSO)
 				coffeeGirl.setItemHolding("espresso");
+			
+			if(old_state != CoffeeGirl.STATE_NORMAL && interactee_state == CounterTop.STATE_IDLE)
+				coffeeGirl.setItemHolding("nothing");
 		}
 		
 		//Default case - don't change state!

@@ -1,6 +1,7 @@
 package com.yulaev.tacotime.gameobjects.objectdefs;
 
 import com.yulaev.tacotime.R;
+import com.yulaev.tacotime.gamelogic.GameGrid;
 import com.yulaev.tacotime.gameobjects.GameItem;
 
 import android.content.Context;
@@ -26,8 +27,8 @@ public class Microwave extends GameItem {
 	public static int instanceCount = 0;
 	
 	//Defines for default X and Y positions;
-	public static int DEFAULT_XPOS = 113;
-	public static int DEFAULT_YPOS = 40;
+	public static int DEFAULT_XPOS = GameGrid.GAMEGRID_WIDTH - GameGrid.GAMEGRID_PADDING_RIGHT + 13; //113
+	public static int DEFAULT_YPOS = GameGrid.GAMEGRID_PADDING_TOP + 5;//40;
 	
 	/** Constructor for CoffeeMachine mostly mimics a game items, except it sets the name by itself. Also it sets up
 	 * all of the CoffeeMachine states and the associated bitmaps; the bitmap provided as an argument is just a "default" bitmap

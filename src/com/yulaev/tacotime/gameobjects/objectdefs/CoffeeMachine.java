@@ -1,6 +1,7 @@
 package com.yulaev.tacotime.gameobjects.objectdefs;
 
 import com.yulaev.tacotime.R;
+import com.yulaev.tacotime.gamelogic.GameGrid;
 import com.yulaev.tacotime.gamelogic.GameInfo;
 import com.yulaev.tacotime.gameobjects.GameItem;
 
@@ -23,8 +24,8 @@ public class CoffeeMachine extends GameItem {
 	public static final int BREW_TIME_MS = 2500;
 	
 	//Defines for default X and Y positions;
-	public static int DEFAULT_XPOS = 16;
-	public static int DEFAULT_YPOS = 60;
+	public static int DEFAULT_XPOS = GameGrid.GAMEGRID_PADDING_LEFT - 14;
+	public static int DEFAULT_YPOS = GameGrid.GAMEGRID_PADDING_TOP + 25;
 	
 	//keep track of how many coffee machines are instantiated (so we can name them appropriately)
 	public static int instanceCount = 0;

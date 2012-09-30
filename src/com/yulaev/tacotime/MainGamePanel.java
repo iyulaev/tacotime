@@ -98,6 +98,8 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		int display_height = display.getHeight();
 		toast_position_y = display_height - GameGrid.canvasX(GameGrid.GAMEGRID_HEIGHT); */
 		
+		//Log.v(activitynametag, "GameGrid (player area) = " + GameGrid.canvasY(GameGrid.GAMEGRID_WIDTH) + "," + GameGrid.canvasY(GameGrid.GAMEGRID_HEIGHT - 33));
+		
 		// make the GamePanel focusable so it can handle events
 		setFocusable(true);
 	}
@@ -175,10 +177,7 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 	Paint gridPaint;
 	Rect playAreaRect; //rectangle for the area that will be filled with tiles
 	//Paint counterPaint;
-	Rect counterAreaLeftRect; //rectangle for the left screen side counter top
-	Rect counterAreaRightRect; //rectangle for the right screen side counter top
-	Rect counterAreaTopRect; //rectangle for the top screen side counter top
-	Rect counterAreaBottomRect; //rectangle for the bottom screen side counter top
+	Rect counterAreaFullRect;
 	
 	Paint moneyPaint;
 	Paint pointsPaint;
@@ -189,8 +188,7 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 	//Bitmap that we will use for the background
 	Bitmap background;
 	//Bitmaps we'll use for counter top
-	Bitmap counterTopVert;
-	Bitmap counterTopHorz;
+	Bitmap counterTopFull;
 	
 	//Used for displaying toasts
 	/* private Toast t;
@@ -232,29 +230,26 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 			gridPaint = new Paint();
 			gridPaint.setColor(0xFF2f2f2f);
 			
-			playAreaRect = new Rect(0,
+			/*playAreaRect = new Rect(0,
 					0,
-					GameGrid.canvasX(GameGrid.GAMEGRID_WIDTH),
-					GameGrid.canvasY(GameGrid.GAMEGRID_HEIGHT));
+					GameGrid.canvasX(GameGrid.Gx`AMEGRID_WIDTH),
+					GameGrid.canvasY(GameGrid.GAMEGRID_HEIGHT));*/
 			background = BitmapFactory.decodeResource(this.getResources(), R.drawable.background);
+			int background_side = (GameGrid.canvasX(GameGrid.GAMEGRID_WIDTH)>GameGrid.canvasY(GameGrid.GAMEGRID_HEIGHT)) ? 
+					GameGrid.canvasX(GameGrid.GAMEGRID_WIDTH) : 
+					GameGrid.canvasY(GameGrid.GAMEGRID_HEIGHT);
+			background = Bitmap.createScaledBitmap(background, 
+					background_side,background_side,
+					false);
 			
-			counterAreaLeftRect = new Rect(0,0,
-					GameGrid.canvasX(GameGrid.GAMEGRID_PADDING_LEFT) - 16,
-					GameGrid.canvasY(GameGrid.GAMEGRID_HEIGHT-33));
-			counterAreaRightRect = new Rect(GameGrid.canvasX(GameGrid.GAMEGRID_WIDTH-GameGrid.GAMEGRID_PADDING_RIGHT) + 16,
-					0,
+			counterAreaFullRect = new Rect(0,0,
 					canvas.getWidth(),
-					GameGrid.canvasY(GameGrid.GAMEGRID_HEIGHT-33));
-			counterAreaTopRect = new Rect(0,0,
-					canvas.getWidth(),
-					GameGrid.canvasY(GameGrid.GAMEGRID_PADDING_TOP) - 16);
-			counterAreaBottomRect = new Rect(0,GameGrid.canvasY(GameGrid.GAMEGRID_HEIGHT - GameGrid.GAMEGRID_PADDING_BOTTOM) + 16,
-					canvas.getWidth(),
-					GameGrid.canvasY(GameGrid.GAMEGRID_HEIGHT - 33));
-			//counterPaint = new Paint();
-			//counterPaint.setColor(0xFFd4b66f);
-			counterTopVert = BitmapFactory.decodeResource(this.getResources(), R.drawable.background_counter_vertical);
-			counterTopHorz = BitmapFactory.decodeResource(this.getResources(), R.drawable.background_counter_horizontal);
+					GameGrid.canvasY(GameGrid.GAMEGRID_HEIGHT-25));
+			
+			counterTopFull = BitmapFactory.decodeResource(this.getResources(), R.drawable.countertop_full);
+			counterTopFull = Bitmap.createScaledBitmap(counterTopFull, 
+					canvas.getWidth(),GameGrid.canvasY(GameGrid.GAMEGRID_HEIGHT-25),
+					false);
 			
 			moneyPaint = new Paint();
 			moneyPaint.setColor(Color.GREEN);
@@ -279,13 +274,11 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		canvas.drawColor(Color.BLACK);
 		
 		//Draw in a background
-		canvas.drawBitmap(background, null, playAreaRect, null);
+		//canvas.drawBitmap(background, null, playAreaRect, null);
+		canvas.drawBitmap(background, 0,0, null);
 		canvas.drawRect(0, GameGrid.canvasY(GameGrid.GAMEGRID_HEIGHT), GameGrid.maxCanvasX(), canvas.getHeight(), gridPaint);
-		//Draw countertop (16 is half of the sprite width)
-		canvas.drawBitmap(counterTopVert, null, counterAreaLeftRect, null);
-		canvas.drawBitmap(counterTopVert, null, counterAreaRightRect, null);
-		canvas.drawBitmap(counterTopHorz, null, counterAreaTopRect, null);
-		canvas.drawBitmap(counterTopHorz, null, counterAreaBottomRect, null);
+		//Draw countertop 
+		canvas.drawBitmap(counterTopFull, 0,0, null);
 		
 		
 		
@@ -297,16 +290,16 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		}
 		
 		
-		
+		final int SPACE_BETWEEN_ANNOUNCEMENT_LINES = 40;
 		
 		//Draw information regarding how many customers are left
 		String customersLeftStr = new String("Customers Left: " + Integer.toString(customers_left));
 		if(customers_until_bonus<=0) customersLeftStr += " (BONUS ACHIEVED)";
-		canvas.drawText(customersLeftStr, 14, canvas.getHeight()-105-45, customersLeftPaint);
+		canvas.drawText(customersLeftStr, 14, canvas.getHeight()-15-SPACE_BETWEEN_ANNOUNCEMENT_LINES*3, customersLeftPaint);
 		
 		//Draw money, points and display an announcement message IF there is an announcement
-		canvas.drawText("Time Left: " + Integer.toString(level_time), 14, canvas.getHeight()-105, levelTimePaint);
-		canvas.drawText("Money: $" + Integer.toString(money), 14, canvas.getHeight()-60, moneyPaint);
+		canvas.drawText("Time Left: " + Integer.toString(level_time), 14, canvas.getHeight()-15-SPACE_BETWEEN_ANNOUNCEMENT_LINES*2, levelTimePaint);
+		canvas.drawText("Money: $" + Integer.toString(money), 14, canvas.getHeight()-15-SPACE_BETWEEN_ANNOUNCEMENT_LINES*1, moneyPaint);
 		canvas.drawText("Points: " + Integer.toString(points), 14, canvas.getHeight()-15, pointsPaint);
 		
 		if(draw_announcement_message) {

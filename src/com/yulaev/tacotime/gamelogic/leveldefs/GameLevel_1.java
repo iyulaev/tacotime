@@ -34,6 +34,8 @@ import com.yulaev.tacotime.gameobjects.objectdefs.TrashCan;
 
 public class GameLevel_1 extends GameLevel {
 	
+	private static boolean TESTING_MODE = true; 
+	
 	public GameLevel_1() {
 		this.level_number = 1;
 		this.customerQueue_length = 4;
@@ -75,7 +77,7 @@ public class GameLevel_1 extends GameLevel {
 		inputThread.addViewObject(coffeeMachine);
 		gameLogicThread.addGameItem(coffeeMachine);	
 		
-		if(GameInfo.hasUpgrade("secondcoffeemachine")) {
+		if(GameInfo.hasUpgrade("secondcoffeemachine") || TESTING_MODE) {
 			coffeeMachine = new CoffeeMachine(caller, R.drawable.coffeemachine, 
 					CoffeeMachine.DEFAULT_XPOS, CoffeeMachine.DEFAULT_YPOS+20, GameItem.ORIENTATION_WEST);
 			viewThread.addGameItem(coffeeMachine);
@@ -83,7 +85,7 @@ public class GameLevel_1 extends GameLevel {
 			gameLogicThread.addGameItem(coffeeMachine);
 		}
 		
-		if(GameInfo.hasUpgrade("countertop")) {
+		if(GameInfo.hasUpgrade("countertop") || TESTING_MODE) {
 			CounterTop counterTop = new CounterTop(caller, R.drawable.countertop_grey, 
 					CounterTop.DEFAULT_XPOS, CounterTop.DEFAULT_YPOS, GameItem.ORIENTATION_NORTH);
 			viewThread.addGameItem(counterTop);
@@ -105,10 +107,61 @@ public class GameLevel_1 extends GameLevel {
 		inputThread.addViewObject(cupcakeTray);
 		gameLogicThread.addGameItem(cupcakeTray);
 		
+		if(TESTING_MODE) {
+			PieTray pieTray = new PieTray(caller, R.drawable.cake_tray, 
+					PieTray.DEFAULT_XPOS, PieTray.DEFAULT_YPOS, GameItem.ORIENTATION_EAST);
+			//viewThread.addViewObject(cupcakeTray);
+			viewThread.addGameItem(pieTray);
+			inputThread.addViewObject(pieTray);
+			gameLogicThread.addGameItem(pieTray);
+			
+			Blender blender = new Blender(caller, R.drawable.blender_idle, 
+					Blender.DEFAULT_XPOS, Blender.DEFAULT_YPOS, GameItem.ORIENTATION_WEST);
+			//viewThread.addViewObject(blender);
+			viewThread.addGameItem(blender);
+			inputThread.addViewObject(blender);
+			gameLogicThread.addGameItem(blender);
+			
+			Microwave microwave = new Microwave(caller, R.drawable.microwave_inactive, 
+					Microwave.DEFAULT_XPOS, Microwave.DEFAULT_YPOS, GameItem.ORIENTATION_EAST);
+			//viewThread.addViewObject(blender);
+			viewThread.addGameItem(microwave);
+			inputThread.addViewObject(microwave);
+			gameLogicThread.addGameItem(microwave);
+			
+			if(true) {
+				EspressoMachine espressomachine = new EspressoMachine(caller, R.drawable.espresso_machine_inactive, 
+						EspressoMachine.DEFAULT_XPOS, EspressoMachine.DEFAULT_YPOS, GameItem.ORIENTATION_NORTH);
+				//viewThread.addViewObject(blender);
+				viewThread.addGameItem(espressomachine);
+				inputThread.addViewObject(espressomachine);
+				gameLogicThread.addGameItem(espressomachine);
+			}
+			
+			if(true) {
+				SoundSystem soundsystem = new SoundSystem(caller);
+				//viewThread.addViewObject(blender);
+				viewThread.addGameItem(soundsystem);
+				inputThread.addViewObject(soundsystem);
+				gameLogicThread.addGameItem(soundsystem);
+				
+				this.customer_impatience *= 0.9;
+			}
+		}
+		
 		//Set up all Food Items (UPDATE FOR NEW FOODITEM)
 		gameLogicThread.addNewFoodItem(new FoodItemNothing(caller), CoffeeGirl.STATE_NORMAL);
 		gameLogicThread.addNewFoodItem(new FoodItemCoffee(caller), CoffeeGirl.STATE_CARRYING_COFFEE);
 		gameLogicThread.addNewFoodItem(new FoodItemCupcake(caller), CoffeeGirl.STATE_CARRYING_CUPCAKE);
+		
+		if(TESTING_MODE) {
+			gameLogicThread.addNewFoodItem(new FoodItemBlendedDrink(caller), CoffeeGirl.STATE_CARRYING_BLENDEDDRINK);
+			gameLogicThread.addNewFoodItem(new FoodItemPieSlice(caller), CoffeeGirl.STATE_CARRYING_PIESLICE);
+			gameLogicThread.addNewFoodItem(new FoodItemSandwich(caller), CoffeeGirl.STATE_CARRYING_SANDWICH);
+			
+			if(true)
+				gameLogicThread.addNewFoodItem(new FoodItemEspresso(caller), CoffeeGirl.STATE_CARRYING_ESPRESSO);
+		}
 		
 		//Magic numbers: 40 - x-position of Customers, (GameGrid.GAMEGRID_HEIGHT-45) - y-position of customers
 		CustomerQueue custQueue1 = new CustomerQueue(caller, 
@@ -122,16 +175,19 @@ public class GameLevel_1 extends GameLevel {
 		viewThread.addGameItem(custQueue1);
 		inputThread.addViewObject(custQueue1);
 		
-		/*CustomerQueue custQueue2 = new CustomerQueue(caller, 
+		if(TESTING_MODE) {
+			CustomerQueue custQueue2 = new CustomerQueue(caller, 
 				CustomerQueue.X_POS + CustomerQueue.DISTANCE_TO_QUEUE_TWO, 
 				GameGrid.GAMEGRID_HEIGHT-CustomerQueue.Y_POS_FROM_GG_BOTTOM, 
 				GameItem.ORIENTATION_SOUTH, 
 				customerQueue_length, point_mult, money_mult, 
 				customer_impatience, customer_max_order_size, 
 				gameLogicThread.getFoodItems(), 2);
-		viewThread.addGameItem(custQueue2);
-		inputThread.addViewObject(custQueue2);*/
-		
-		gameLogicThread.setCustomerQueue(new CustomerQueueWrapper(custQueue1/*, custQueue2*/));
+			viewThread.addGameItem(custQueue2);
+			inputThread.addViewObject(custQueue2);
+			
+			gameLogicThread.setCustomerQueue(new CustomerQueueWrapper(custQueue1, custQueue2));
+		} else
+			gameLogicThread.setCustomerQueue(new CustomerQueueWrapper(custQueue1));
 	}
 }

@@ -34,7 +34,6 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 	private static final String activitynametag = MainGamePanel.class.getSimpleName();
 	
 	//The below are the UI-related threads that are involved in handling input and rendering the game
-	TimerThread timerThread;
 	ViewThread viewThread;
 	InputThread inputThread;
 	GameLogicThread gameLogicThread;
@@ -62,10 +61,6 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		// adding the callback (this) to the surface holder to intercept events
 		getHolder().addCallback(this);
 		
-		// create the timer loop thread, that fires off events to other threads
-		timerThread = new TimerThread();
-		MessageRouter.timerThread = timerThread;
-		
 		// create the view thread that will be responsible for updating the canvas
 		viewThread = new ViewThread(getHolder(), this);
 		MessageRouter.viewThread = viewThread;
@@ -79,7 +74,7 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		MessageRouter.soundThread = soundThread;
 		
 		//create the Game Logic Thread
-		gameLogicThread = new GameLogicThread(viewThread, timerThread, inputThread, this.getContext(), load_saved_game,
+		gameLogicThread = new GameLogicThread(viewThread, inputThread, this.getContext(), load_saved_game,
 					watch_tutorial ? -1 : 0);
 		gameLogicThread.setSelf(gameLogicThread);
 		MessageRouter.gameLogicThread = gameLogicThread;
@@ -136,7 +131,7 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 			viewThread.start();
 			inputThread.start();
 			gameLogicThread.start();
-			timerThread.start();
+			//timerThread.start();
 			soundThread.start();
 			if(tutorialThread != null)
 				tutorialThread.start();
@@ -185,6 +180,7 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 	Paint customersLeftPaint;
 	
 	Paint announcementPaint;
+	Paint announcementItalicPaint;
 	//Bitmap that we will use for the background
 	Bitmap background;
 	//Bitmaps we'll use for counter top
@@ -220,11 +216,13 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 			boolean draw_announcement_message, String announcementMessage,
 			int level_time,
 			int customers_left,
-			int customers_until_bonus) {
+			int customers_until_bonus,
+			boolean use_italic_announcement_font) {
 		
 		//Set up all of the Paint objects if we haven't done this yet! (should only happen once per game)
 		if(!static_setup_done) {
 			int status_text_size = 20;
+			int announcement_italic_text_size = 24;
 			int announcement_text_size = 28;
 			
 			gridPaint = new Paint();
@@ -232,7 +230,7 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 			
 			/*playAreaRect = new Rect(0,
 					0,
-					GameGrid.canvasX(GameGrid.Gx`AMEGRID_WIDTH),
+					GameGrid.canvasX(GameGrid.GAMEGRID_WIDTH),
 					GameGrid.canvasY(GameGrid.GAMEGRID_HEIGHT));*/
 			background = BitmapFactory.decodeResource(this.getResources(), R.drawable.background);
 			int background_side = (GameGrid.canvasX(GameGrid.GAMEGRID_WIDTH)>GameGrid.canvasY(GameGrid.GAMEGRID_HEIGHT)) ? 
@@ -264,6 +262,11 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 			announcementPaint.setColor(0xFFDFDFDF);
 			announcementPaint.setTextSize(announcement_text_size);
 			announcementPaint.setTextAlign(Paint.Align.CENTER);
+			announcementItalicPaint = new Paint();
+			announcementItalicPaint.setColor(0xFFCFCFCF);
+			announcementItalicPaint.setTextSize(announcement_italic_text_size);
+			announcementItalicPaint.setTextAlign(Paint.Align.CENTER);
+			announcementItalicPaint.setTextSkewX(-0.20f);
 			customersLeftPaint = new Paint();
 			customersLeftPaint.setColor(0xFFDFDFDF);
 			customersLeftPaint.setTextSize(status_text_size);
@@ -303,7 +306,9 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		canvas.drawText("Points: " + Integer.toString(points), 14, canvas.getHeight()-15, pointsPaint);
 		
 		if(draw_announcement_message) {
-			canvas.drawText(announcementMessage, canvas.getWidth()/2, GameGrid.canvasY(GameGrid.GAMEGRID_HEIGHT) + 50, announcementPaint);
+			canvas.drawText(announcementMessage, 
+					canvas.getWidth()/2, GameGrid.canvasY(GameGrid.GAMEGRID_HEIGHT) + 40,
+					use_italic_announcement_font?announcementItalicPaint:announcementPaint);
 			
 			/*if(time_since_last_toast + TIME_BETWEEN_TOASTS < SystemClock.uptimeMillis()) {
 				time_since_last_toast = SystemClock.uptimeMillis();

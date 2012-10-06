@@ -1,7 +1,8 @@
 /** SoundThread is the application Thread that is responsible for loading and playing music
  * and sound effects in TacoTime. It runs asynchronously (for the most part...) and 
  * depends on receiving messages through MessageRouter to play sound effects and
- * music.,
+ * music.
+ * 
  */
 
 package com.yulaev.tacotime;
@@ -54,13 +55,19 @@ public class SoundThread extends Thread {
 	
 	//Keeps track of state - what is playing and whether it has been changed
 	private boolean currently_playing_changed;
+	//Whether or not to loop the currently playing sound sample
 	private boolean do_loop;
+	//What sound sample is currently playing
 	private int currently_playing;
+	//The MediaPlayer object corresponding to what's currently playing
 	private MediaPlayer current_mstream;
+	//Whether this SoundThread is suspended
 	private boolean suspended;
+	//Set to true when we create the thread; it gets set to false in destroy() allowing us to
+	//drop out of the busy loop and end the Thread's execution
 	private boolean running;
 	
-	/** Create a new soundthread. Instantiates the Hander (which handles messages received via
+	/** Create a new SoundThread. Instantiates the Hander (which handles messages received via
 	 * MessageRouter) and also loads sound effects, setting up data structures 
 	 * @param caller The calling Context, used to load MediaPlayer
 	 */
@@ -204,10 +211,12 @@ public class SoundThread extends Thread {
 	private synchronized int getMusicPlaying() {
 		return this.currently_playing;
 	}
+	
 	/** Returns true if we are to loop the currrently-playing music */
 	private synchronized boolean getMusicLoop() {
 		return this.do_loop;
 	}
+	
 	/** Returns true if the music has been changed. Sets currently_playing_changed to false regardless,
 	 * so we only indicate changed once (via this method) after the music playing has been changed.
 	 * @return
@@ -236,7 +245,7 @@ public class SoundThread extends Thread {
 	}
 	
 	/** Run this thread. It's a poll loop that checks if the music has been changed and, if so,
-	 * plays the new music.
+	 * plays the new music. Uses Thread.sleep() to allow Thread to idle between music change polls.
 	 */
 	public void run() {		
 		while(running) {

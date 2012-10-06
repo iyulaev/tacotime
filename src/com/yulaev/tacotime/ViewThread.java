@@ -75,6 +75,7 @@ public class ViewThread extends Thread {
 	//that overlay everything else on the canvas
 	private boolean draw_announcement_message;
 	private String announcementMessage;
+	private boolean usingItalicAnnouncement;
 
 	/** Constructor for ViewThread. Most of the work is in setting up the Message Handler, which is responsible 
 	 * for receiving messages from the GameLogicThread.
@@ -90,6 +91,7 @@ public class ViewThread extends Thread {
 		suspended = false;
 		
 		draw_announcement_message = false;
+		usingItalicAnnouncement = false;
 		
 		handler = new Handler() {
 			@SuppressLint({ "HandlerLeak" })
@@ -106,6 +108,7 @@ public class ViewThread extends Thread {
 				//handle announcement messages entered in by the GameLogicThread
 				else if (msg.what == MESSAGE_NEW_ANNOUNCEMENT) {
 					announcementMessage = (String) msg.obj;
+					setItalicAnnoucement(msg.arg1!=0);
 					draw_announcement_message = true;
 				}
 				else if (msg.what == MESSAGE_STOP_ANNOUNCEMENT) {
@@ -117,7 +120,7 @@ public class ViewThread extends Thread {
 				}
 				else if(msg.what == MESSAGE_SET_UNSUSPEND) {
 					setSuspended(false);
-				}
+				} 
 			}
 		};
 		
@@ -192,7 +195,8 @@ public class ViewThread extends Thread {
 					draw_announcement_message, announcementMessage,
 					GameInfo.getLevelTime(),
 					GameInfo.getCustomersLeftForLevel(),
-					GameInfo.getCustomersLeftForBonus());
+					GameInfo.getCustomersLeftForBonus(),
+					drawItalicAnnoucement());
 
 		} catch(Exception e) {;} 
 		finally {
@@ -213,6 +217,16 @@ public class ViewThread extends Thread {
 	public void setAnnouncement(String newAccouncement) {
 		announcementMessage = newAccouncement;
 	}
+	
+	/** Set whether Annoucement messages should be drawn using a smaller, italicised font or not. This is typically 
+	 * only used by the TutorialThread when displaying more text in annoucements than usual.
+	 * @param usingItalicAnnouncement
+	 * @return
+	 */
+	private synchronized void setItalicAnnoucement(boolean usingItalicAnnouncement) { 
+		this.usingItalicAnnouncement = usingItalicAnnouncement; 
+	}
+	private synchronized boolean drawItalicAnnoucement() { return usingItalicAnnouncement; }
 	
 	/** Allows the ViewThread to be paused. When the ViewThread is paused stuff still gets drawn to the canvas but
 	 * no GameItems get updated and no interactions are allowed to take place.

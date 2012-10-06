@@ -8,6 +8,7 @@ import java.util.List;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.yulaev.tacotime.gamelogic.CustomerQueueWrapper;
@@ -56,15 +57,25 @@ public class GameLogicThread extends Thread {
 	public static final int MESSAGE_NEXT_LEVEL = 4;
 	public static final int MESSAGE_POSTLEVEL_DIALOG_OPEN = 5;
 	public static final int MESSAGE_POSTLEVEL_DIALOG_CLOSED = 6;
+	public static final int MESSAGE_SET_SUSPENDED = 7;
+	public static final int MESSAGE_SET_UNSUSPEND = 8;
+	public static final int MESSAGE_SET_PAUSED = 9;
+	public static final int MESSAGE_SET_UNPAUSED = 10;
 	
 	//Define types of messages accepted by OTHER threads/handlers
 	public static final int MESSAGE_LEVEL_END = -1;
 	public static final int MESSAGE_GAME_END = -2;
+	
+	//Define the period between state machine updates
+	public static final int TIMER_GRANULARITY = 1000;
 
 	//This message handler will receive messages, probably from the UI Thread, and
 	//update the data objects and do other things that are related to handling
 	//game-specific input
 	public static Handler handler;
+	
+	private boolean suspended;
+	private boolean paused;
 	
 	//Keep track of the CoffeeGirl instance in this game
 	public CoffeeGirl coffeeGirl;
@@ -79,7 +90,6 @@ public class GameLogicThread extends Thread {
 	/*Keeps track of all of the threads; mostly just used for loading a level (since the level loader populates
 	the threads' data structures with GameItems and such */
 	ViewThread viewThread;
-	TimerThread timerThread;
 	InputThread inputThread;
 	GameLogicThread gameLogicThread;
 	
@@ -87,13 +97,12 @@ public class GameLogicThread extends Thread {
 	Context caller;
 	
 	/** Mostly just initializes the Handler that receives and acts on in-game interactions that occur */
-	public GameLogicThread(ViewThread viewThread, TimerThread timerThread, InputThread inputThread, Context caller, boolean load_saved, int start_level) {
+	public GameLogicThread(ViewThread viewThread, InputThread inputThread, Context caller, boolean load_saved, int start_level) {
 		super();
 		
 		//Set pointers to all of the other threads
 		//This is useful when we want to load a new level
 		this.viewThread = viewThread;
-		this.timerThread = timerThread;
 		this.inputThread = inputThread;
 		this.caller = caller;
 		
@@ -139,7 +148,7 @@ public class GameLogicThread extends Thread {
 				else if(msg.what == MESSAGE_LOAD_GAME) {
 					GameInfo.loadSavedGame();
 					GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_PREPLAY);
-					MessageRouter.sendPauseTimerMessage(false);
+					MessageRouter.sendPauseGLTMessage(false);
 				}
 				
 				//If we are to advance to the next level, set the GameMode appropriately and un-pause the
@@ -147,7 +156,7 @@ public class GameLogicThread extends Thread {
 				else if(msg.what == MESSAGE_NEXT_LEVEL) {
 					GameInfo.saveCurrentGame();
 					GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_PREPLAY);
-					MessageRouter.sendPauseTimerMessage(false);
+					MessageRouter.sendPauseGLTMessage(false);
 				}
 				
 				//If the post-leveldialog has been closed advance to the (final) post-play state
@@ -156,8 +165,197 @@ public class GameLogicThread extends Thread {
 				else if(msg.what == MESSAGE_POSTLEVEL_DIALOG_CLOSED) {
 					GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_POSTPLAY);
 				}
+				
+				else if (msg.what == MESSAGE_SET_SUSPENDED) setSuspended(true);
+				else if (msg.what == MESSAGE_SET_UNSUSPEND) setSuspended(false);
+				
+				else if (msg.what == MESSAGE_SET_PAUSED) setPaused(true);
+				else if (msg.what == MESSAGE_SET_UNPAUSED) setPaused(false);
 			}
 		};		
+	}
+	
+	/** Set whether this GameLogicThread is suspended or not. If the thread is suspended,
+	 * we cease to request call-backs and so fewer cycles get used. Un-suspending the thread
+	 * resumes the callbacks.
+	 * @param suspended
+	 */
+	private void setSuspended(boolean suspended) { 
+		this.suspended = suspended; 
+		if(!this.suspended) callRefreshDelayed();
+		
+		Log.d(activitynametag, "GameLogicThread is now " + (suspended?"suspended":"unsuspended"));
+	}
+	
+	/** Set whether this GameThread is paused or now. Whe paused, the GLT state machine does not
+	 * update nor transition between states
+	 * @param n_paused
+	 */
+	private void setPaused(boolean n_paused) {
+		this.paused = n_paused;
+		
+		Log.d(activitynametag, "GameLogicThread is now " + (n_paused?"paused":"unpaused"));
+	}
+	
+	/** Does nothing other than un-suspend itself */
+	@Override
+	public void run() {
+		
+		setSuspended(false);
+
+	}
+	
+	/** This methods sends out a timer tick and queues itself (via handler) to be called back after a fixed number 
+	 * of milliseconds. It effectively implements the busy loop for TimerThread.
+	 */
+	private long lastTimerTick = -1L;
+	private void callRefreshDelayed() { 
+		handler.postDelayed(
+			new Runnable() {
+				public void run() {	
+					if(!suspended) {
+						if(SystemClock.uptimeMillis() > lastTimerTick + TIMER_GRANULARITY) {
+							if(!paused) stateMachineClockTick();
+							lastTimerTick = SystemClock.uptimeMillis();
+						}
+						
+						callRefreshDelayed();
+					}
+				}
+			}, TIMER_GRANULARITY/3); //CallBack timer thread more often than necessary, just for fun.
+					//Maybe it'll increase the accuracy of each tick? Not sure we care though.
+	}
+	
+	//Used to time various things, like pre-level and post-level "announcements"
+	//Only used within stateMachineClockTick()
+	int message_timer;
+	//used to track information about the current level instance loaded
+	GameLevel currLevel;
+	
+	/** Updates this GameLogicThread's state machine. Should be called every time a clock tick (nominally one
+	 * real-time second) occurs
+	 * 
+	 * @sideeffect Mucks with GameInfo and MessageRouter to update game state and inform other Threads
+	 * about the updates in the game state.
+	 */
+	public void stateMachineClockTick() {		
+		//Pre-play state - this is the state we are in before gameplay begins
+		//IF we are viewing the main panel AND we are ready to play a level, this means the
+		//game is ready for another level - load one!
+		if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_PREPLAY) {
+			//At the very beginning of the level, load the current level (increment previous level # by one)
+			loadLevel(GameInfo.getLevel() + 1);
+			currLevel = getLevelInstance(GameInfo.getLevel());
+			
+			//For three seconds tell the user that the evel is about to start
+			message_timer = 3;
+			
+			Log.v(activitynametag, "GLT is loading a new level!");
+			GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_PREPLAY_MESSAGE);
+			
+			GameInfo.setCustomersLeft(customerQueueWrapper.numberOfCustomersLeft(), currLevel.customersUntilBonus() - customerQueueWrapper.numberOfCustomersServed());
+			
+			MessageRouter.sendLoadLevelMusicMessage(GameInfo.getLevel());
+		}
+		
+		//Pre-play message - this is the state we are in when we display the Level Start countdown message
+		//If we are in the pre-play message, update the message we display (indicating to the user when we
+		//are to start the level). Start the level when the count gets to zero.
+		else if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_PREPLAY_MESSAGE) {
+			if(message_timer > 0) {
+				message_timer--;
+				MessageRouter.sendAnnouncementMessage("Level " + GameInfo.getLevel() + " Start in " + message_timer, true);
+			}
+			else {
+				GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_INPLAY);
+				MessageRouter.sendAnnouncementMessage("", false); //remove the announcement message
+				MessageRouter.sendPauseMessage(false); //unpauses ViewThread and InputThread
+				if(GameInfo.getLevel() == 0) MessageRouter.sendPauseUIMessage(true);
+				Log.v(activitynametag, "GLT is starting a new level!");
+				
+				MessageRouter.sendPlayLevelMusicMessage(GameInfo.getLevel());
+			}
+			
+			GameInfo.setCustomersLeft(customerQueueWrapper.numberOfCustomersLeft(), currLevel.customersUntilBonus() - customerQueueWrapper.numberOfCustomersServed());
+		}
+		
+		//In-game state - we are in this state when the user is playing the level
+		//If we are in play check to see if we should finish the level
+		else if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_INPLAY) {
+			//Update the game time in GameInfo
+			GameInfo.setAndGetGameTimeMillis(TIMER_GRANULARITY);
+			
+			GameInfo.decrementLevelTime();
+			Log.v(activitynametag, GameInfo.getLevelTime() + " seconds remaining in this level!");
+			
+			//If we've run out of time on this level, or customerQueue has run out, then kill the level
+			if(GameInfo.getLevelTime() <= 0 || customerQueueWrapper.isFinished()) {
+				Log.v(activitynametag, "GLT is finishing this level!");
+				
+				message_timer = 3;
+				
+				//Indicate that the level has been finished and, if we finished the last level, that the game is over
+				if(GameInfo.getLevel() < GameInfo.MAX_GAME_LEVEL)
+					MessageRouter.sendAnnouncementMessage("Level " + GameInfo.getLevel() + " Finished", true);
+				else
+					MessageRouter.sendAnnouncementMessage("Game Over", true);
+				
+				MessageRouter.sendPlayLevelEndSfxMessage();
+				
+				GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_POSTPLAY_MESSAGE);
+			}
+			
+			GameInfo.setCustomersLeft(customerQueueWrapper.numberOfCustomersLeft(), currLevel.customersUntilBonus() - customerQueueWrapper.numberOfCustomersServed());
+		}
+		
+		//Post-play state: we enter this state as soon as the level finished - we display a message indicating that
+		//the level is over and detail the level result (points aquired, etc)
+		else if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_POSTPLAY_MESSAGE) {
+			if(message_timer > 0) {
+				message_timer--;
+				GameInfo.setCustomersLeft(customerQueueWrapper.numberOfCustomersLeft(), currLevel.customersUntilBonus() - customerQueueWrapper.numberOfCustomersServed());
+			}
+			//We use message_timer again to make sure we only display the post-level dialog once :)
+			else if (message_timer == 0){
+				//Calculate our end-level bonus and display the level end dialog			
+				GameInfo.setAndReturnMoney(currLevel.getBonusMoney(customerQueueWrapper.numberOfCustomersServed()));
+				GameInfo.setAndReturnPoints(currLevel.getBonusPoints(customerQueueWrapper.numberOfCustomersServed()));
+				//Add on the PENALTY for the number of customer that we pissed off
+				Log.d(activitynametag, "calculated that " + customerQueueWrapper.numberOfCustomersIgnored() + " customers were unsatisfied.");
+				GameInfo.setAndReturnPoints(currLevel.getCustomerDissatisfactionPenalty(customerQueueWrapper.numberOfCustomersIgnored()));
+				
+				//Send all of the accrued bonuses to the level-end dialog
+				//See MessageRouter.sendPostLevelDialogOpenMessage() javadocs for an explanation of the arguments given
+				MessageRouter.sendPostLevelDialogOpenMessage( GameInfo.points, GameInfo.money, 
+						GameInfo.level_points-currLevel.getBonusPoints(customerQueueWrapper.numberOfCustomersServed()), 
+						GameInfo.level_money-currLevel.getBonusMoney(customerQueueWrapper.numberOfCustomersServed()),
+						currLevel.getBonusPoints(customerQueueWrapper.numberOfCustomersServed()),
+						currLevel.getBonusMoney(customerQueueWrapper.numberOfCustomersServed()) );
+				
+				message_timer--;
+			}
+		}
+		
+		//Post-play state: exit the level and either pause the game & display the BetweenLevelMenu or display
+		//that the game is over
+		else if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_POSTPLAY) {
+			if(GameInfo.getLevel() < GameInfo.MAX_GAME_LEVEL && GameInfo.getLevel() > 0) {
+				MessageRouter.sendPauseMessage(true);
+				MessageRouter.sendLevelEndMessage();
+			}
+			else if(GameInfo.getLevel() == 0) {
+				GameInfo.reset();
+				MessageRouter.sendPauseUIMessage(false);
+				GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_PREPLAY);
+			}
+			else {
+				MessageRouter.sendGameOverMessage();
+			}
+			
+			Analytics.reportLevelFinished(GameInfo.getLevel(), 
+					currLevel.customersUntilBonus()<=0, 
+					((float) customerQueueWrapper.numberOfCustomersServed()) / ((float) currLevel.numberOfCustomers()));
+		}
 	}
 	
 	/** Used to provide a reference to this GameLogicThread instance. Mostly just used when we load a level, so that the 
@@ -253,141 +451,6 @@ public class GameLogicThread extends Thread {
 		//Default case - don't change state!
 	}
 	
-	//Used to time various things, like pre-level and post-level "announcements"
-	//Only used within stateMachineClockTick()
-	int message_timer;
-	//used to track information about the current level instance loaded
-	GameLevel currLevel;
-	
-
-	/** Updates this GameLogicThread's state machine. Should be called every time a clock tick (nominally one
-	 * real-time second) occurs
-	 * 
-	 * @sideeffect Mucks with GameInfo and MessageRouter to update game state and inform other Threads
-	 * about the updates in the game state.
-	 */
-	public void stateMachineClockTick() {		
-		//Pre-play state - this is the state we are in before gameplay begins
-		//IF we are viewing the main panel AND we are ready to play a level, this means the
-		//game is ready for another level - load one!
-		if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_PREPLAY) {
-			//At the very beginning of the level, load the current level (increment previous level # by one)
-			loadLevel(GameInfo.getLevel() + 1);
-			currLevel = getLevelInstance(GameInfo.getLevel());
-			
-			//For three seconds tell the user that the evel is about to start
-			message_timer = 3;
-			
-			Log.v(activitynametag, "GLT is loading a new level!");
-			GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_PREPLAY_MESSAGE);
-			
-			GameInfo.setCustomersLeft(customerQueueWrapper.numberOfCustomersLeft(), currLevel.customersUntilBonus() - customerQueueWrapper.numberOfCustomersServed());
-			
-			MessageRouter.sendLoadLevelMusicMessage(GameInfo.getLevel());
-		}
-		
-		//Pre-play message - this is the state we are in when we display the Level Start countdown message
-		//If we are in the pre-play message, update the message we display (indicating to the user when we
-		//are to start the level). Start the level when the count gets to zero.
-		else if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_PREPLAY_MESSAGE) {
-			if(message_timer > 0) {
-				message_timer--;
-				MessageRouter.sendAnnouncementMessage("Level " + GameInfo.getLevel() + " Start in " + message_timer, true);
-			}
-			else {
-				GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_INPLAY);
-				MessageRouter.sendAnnouncementMessage("", false); //remove the announcement message
-				MessageRouter.sendPauseMessage(false); //unpauses ViewThread and InputThread
-				if(GameInfo.getLevel() == 0) MessageRouter.sendPauseUIMessage(true);
-				Log.v(activitynametag, "GLT is starting a new level!");
-				
-				MessageRouter.sendPlayLevelMusicMessage(GameInfo.getLevel());
-			}
-			
-			GameInfo.setCustomersLeft(customerQueueWrapper.numberOfCustomersLeft(), currLevel.customersUntilBonus() - customerQueueWrapper.numberOfCustomersServed());
-		}
-		
-		//In-game state - we are in this state when the user is playing the level
-		//If we are in play check to see if we should finish the level
-		else if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_INPLAY) {
-			//Update the game time in GameInfo
-			GameInfo.setAndGetGameTimeMillis(TimerThread.TIMER_GRANULARIY);
-			
-			GameInfo.decrementLevelTime();
-			Log.v(activitynametag, GameInfo.getLevelTime() + " seconds remaining in this level!");
-			
-			//If we've run out of time on this level, or customerQueue has run out, then kill the level
-			if(GameInfo.getLevelTime() <= 0 || customerQueueWrapper.isFinished()) {
-				Log.v(activitynametag, "GLT is finishing this level!");
-				
-				message_timer = 3;
-				
-				//Indicate that the level has been finished and, if we finished the last level, that the game is over
-				if(GameInfo.getLevel() < GameInfo.MAX_GAME_LEVEL)
-					MessageRouter.sendAnnouncementMessage("Level " + GameInfo.getLevel() + " Finished", true);
-				else
-					MessageRouter.sendAnnouncementMessage("Game Over", true);
-				
-				MessageRouter.sendPlayLevelEndSfxMessage();
-				
-				GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_POSTPLAY_MESSAGE);
-			}
-			
-			GameInfo.setCustomersLeft(customerQueueWrapper.numberOfCustomersLeft(), currLevel.customersUntilBonus() - customerQueueWrapper.numberOfCustomersServed());
-		}
-		
-		//Post-play state: we enter this state as soon as the level finished - we display a message indicating that
-		//the level is over and detail the level result (points aquired, etc)
-		else if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_POSTPLAY_MESSAGE) {
-			if(message_timer > 0) {
-				message_timer--;
-				GameInfo.setCustomersLeft(customerQueueWrapper.numberOfCustomersLeft(), currLevel.customersUntilBonus() - customerQueueWrapper.numberOfCustomersServed());
-			}
-			//We use message_timer again to make sure we only display the post-level dialog once :)
-			else if (message_timer == 0){
-				//Calculate our end-level bonus and display the level end dialog			
-				GameInfo.setAndReturnMoney(currLevel.getBonusMoney(customerQueueWrapper.numberOfCustomersServed()));
-				GameInfo.setAndReturnPoints(currLevel.getBonusPoints(customerQueueWrapper.numberOfCustomersServed()));
-				//Add on the PENALTY for the number of customer that we pissed off
-				Log.d(activitynametag, "calculated that " + customerQueueWrapper.numberOfCustomersIgnored() + " customers were unsatisfied.");
-				GameInfo.setAndReturnPoints(currLevel.getCustomerDissatisfactionPenalty(customerQueueWrapper.numberOfCustomersIgnored()));
-				
-				//Send all of the accrued bonuses to the level-end dialog
-				//See MessageRouter.sendPostLevelDialogOpenMessage() javadocs for an explanation of the arguments given
-				MessageRouter.sendPostLevelDialogOpenMessage( GameInfo.points, GameInfo.money, 
-						GameInfo.level_points-currLevel.getBonusPoints(customerQueueWrapper.numberOfCustomersServed()), 
-						GameInfo.level_money-currLevel.getBonusMoney(customerQueueWrapper.numberOfCustomersServed()),
-						currLevel.getBonusPoints(customerQueueWrapper.numberOfCustomersServed()),
-						currLevel.getBonusMoney(customerQueueWrapper.numberOfCustomersServed()) );
-				
-				message_timer--;
-			}
-		}
-		
-		//Post-play state: exit the level and either pause the game & display the BetweenLevelMenu or display
-		//that the game is over
-		else if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_POSTPLAY) {
-			if(GameInfo.getLevel() < GameInfo.MAX_GAME_LEVEL && GameInfo.getLevel() > 0) {
-				MessageRouter.sendPauseMessage(true);
-				MessageRouter.sendLevelEndMessage();
-			}
-			else if(GameInfo.getLevel() == 0) {
-				GameInfo.reset();
-				MessageRouter.sendPauseUIMessage(false);
-				GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_PREPLAY);
-			}
-			else {
-				MessageRouter.sendGameOverMessage();
-			}
-			
-			Analytics.reportLevelFinished(GameInfo.getLevel(), 
-					currLevel.customersUntilBonus()<=0, 
-					((float) customerQueueWrapper.numberOfCustomersServed()) / ((float) currLevel.numberOfCustomers()));
-		}
-	}
-	
-	
-	
 	//Game object setter methods - since GTL with access lots of game objects, we give references to GLT so that
 	//it might more easily access them
 	
@@ -463,14 +526,6 @@ public class GameLogicThread extends Thread {
 		gameItems = new HashMap<String, GameItem>();
 		foodItems = new HashMap<String, GameFoodItem>();
 	}
-	
-	@Override
-	public void run() {
-		
-		;
-
-	}
-	
 	
 	// Level loader methods
 	/** Loads a new level; creates a GameLevel Object corresponding to the new level

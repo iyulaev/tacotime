@@ -16,7 +16,6 @@ import android.util.Log;
 public class MessageRouter {
 	
 	public static ViewThread viewThread;
-	public static TimerThread timerThread;
 	public static InputThread inputThread;
 	public static GameLogicThread gameLogicThread;
 	public static SoundThread soundThread;
@@ -118,11 +117,11 @@ public class MessageRouter {
 			viewThread.handler.sendMessage(message);
 		}
 		
-		if(timerThread != null) {
+		if(gameLogicThread != null) {
 			Message message = Message.obtain();
-			if(paused) message.what = TimerThread.MESSAGE_SET_PAUSED;
-			else message.what = TimerThread.MESSAGE_SET_UNPAUSED;
-			timerThread.handler.sendMessage(message);
+			if(paused) message.what = GameLogicThread.MESSAGE_SET_PAUSED;
+			else message.what = GameLogicThread.MESSAGE_SET_UNPAUSED;
+			gameLogicThread.handler.sendMessage(message);
 		}
 	}
 	
@@ -151,12 +150,12 @@ public class MessageRouter {
 	 * 
 	 * @param paused Whether to pause the GLT or not 
 	 */
-	public synchronized static void sendPauseTimerMessage(boolean paused) {
-		if(timerThread != null) {
+	public synchronized static void sendPauseGLTMessage(boolean paused) {
+		if(gameLogicThread != null) {
 			Message message = Message.obtain();
-			if(paused) message.what = TimerThread.MESSAGE_SET_PAUSED;
-			else message.what = TimerThread.MESSAGE_SET_UNPAUSED;
-			timerThread.handler.sendMessage(message);
+			if(paused) message.what = GameLogicThread.MESSAGE_SET_PAUSED;
+			else message.what = GameLogicThread.MESSAGE_SET_UNPAUSED;
+			gameLogicThread.handler.sendMessage(message);
 		}
 	}
 	
@@ -179,11 +178,25 @@ public class MessageRouter {
 	 * the GLT state machien to stop advancing and the GameInfo game time to stop advancing also.
 	 */
 	public synchronized static void sendSuspendTimerThreadMessage(boolean suspended) {
-		if(timerThread != null) {
+		if(gameLogicThread != null) {
 			Message message = Message.obtain();
-			if(suspended) message.what = TimerThread.MESSAGE_SET_SUSPENDED;
-			else message.what = TimerThread.MESSAGE_SET_UNSUSPEND;
-			timerThread.handler.sendMessage(message);
+			if(suspended) message.what = GameLogicThread.MESSAGE_SET_SUSPENDED;
+			else message.what = GameLogicThread.MESSAGE_SET_UNSUSPEND;
+			gameLogicThread.handler.sendMessage(message);
+		}
+	}
+	
+	/** Sends a "suspend" message to the GameLogicThread. 
+	 * 
+	 * @param suspended if true, the TimerThread stops sending out tick messages to the rest of the program. This causes
+	 * the GLT state machien to stop advancing and the GameInfo game time to stop advancing also.
+	 */
+	public synchronized static void sendSuspendGameLogicThreadMessage(boolean suspended) {
+		if(gameLogicThread != null) {
+			Message message = Message.obtain();
+			if(suspended) message.what = GameLogicThread.MESSAGE_SET_SUSPENDED;
+			else message.what = GameLogicThread.MESSAGE_SET_UNSUSPEND;
+			gameLogicThread.handler.sendMessage(message);
 		}
 	}
 	
@@ -207,16 +220,20 @@ public class MessageRouter {
 	 * and any presently displayed text gets cleared.
 	 * 
 	 */
-	public synchronized static void sendAnnouncementMessage(String announcementText, boolean doDisplay) {
+	public synchronized static void sendAnnouncementMessage(String announcementText, boolean doDisplay, boolean useItalics) {
 		if(viewThread != null) {
 			Message message = Message.obtain();
 			if(doDisplay) {
 				message.what = ViewThread.MESSAGE_NEW_ANNOUNCEMENT;
+				message.arg1 = useItalics?1:0;
 				message.obj = announcementText;
 			}
 			else message.what = ViewThread.MESSAGE_STOP_ANNOUNCEMENT;
 			viewThread.handler.sendMessage(message);
 		}
+	}
+	public synchronized static void sendAnnouncementMessage(String announcementText, boolean doDisplay) {
+		sendAnnouncementMessage(announcementText, doDisplay, false);
 	}
 	
 	/** Called when the back button gets pressed during game play. Tells the input thread that the back button 

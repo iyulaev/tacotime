@@ -77,6 +77,8 @@ public class TacoTimeMainGameActivity extends Activity {
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 		GameGrid.setupGameGrid(dm.widthPixels, dm.heightPixels);
 		
+		//Create the MainGamePanel! MGP contains the actual canvas that will get drawn to
+		//Also MGT loads and kicks off all of the logic/sound/view Threads
 		mgpView = new MainGamePanel(this, load_saved_game, watch_tutorial);
 		
 		//Used only for allocating an intent to be launched from 

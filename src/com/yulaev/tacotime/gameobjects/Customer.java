@@ -71,7 +71,7 @@ public class Customer extends GameActor {
 			float point_mult, float money_mult, float impatience, int max_order_size,
 			List<GameFoodItem> foodItemChoices, int queue_number) {
 			
-		super(caller, move_rate, location_start_x + ((queue_number==2) ? CustomerQueue.DISTANCE_TO_QUEUE_TWO : 0), location_start_y);
+		super(caller, move_rate, location_start_x + ((queue_number==2) ? CustomerQueue.DISTANCE_TO_QUEUE_TWO : 0), location_start_y, false);
 		
 		queue_position = starting_queue_position;
 		visible = false;

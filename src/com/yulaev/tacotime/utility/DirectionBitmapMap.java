@@ -27,14 +27,21 @@ public class DirectionBitmapMap {
 	 * 
 	 * @param n_direction_sensitive Whether this DirectionBitmapMap will be sensitive to direction.
 	 */
+	public DirectionBitmapMap(boolean n_direction_sensitive, int default_direction) {
+		this(n_direction_sensitive);
+		this.default_direction = default_direction;
+		
+	}
 	public DirectionBitmapMap(boolean n_direction_sensitive) {
 		this.direction_sensitive = n_direction_sensitive;
 		
 		if(n_direction_sensitive) {
 			directionIndexedLists = new ArrayList<CircularList<Bitmap>>(DIRECTION_SENSITIVE_SIZE);
+			for(int i = 0; i < DIRECTION_SENSITIVE_SIZE; i++) directionIndexedLists.add(null);
 		}
 		else {
 			directionIndexedLists = new ArrayList<CircularList<Bitmap>>(DIRECTION_INSENSITIVE_SIZE);
+			for(int i = 0; i < DIRECTION_INSENSITIVE_SIZE; i++) directionIndexedLists.add(null);
 		}
 		
 		default_direction = DIRECTION_NULL;
@@ -48,10 +55,11 @@ public class DirectionBitmapMap {
 	public DirectionBitmapMap(CircularList<Bitmap> startingList) {
 		this.direction_sensitive = false;
 		directionIndexedLists = new ArrayList<CircularList<Bitmap>>(DIRECTION_INSENSITIVE_SIZE);
+		for(int i = 0; i < DIRECTION_INSENSITIVE_SIZE; i++) directionIndexedLists.add(null);
 				
 		default_direction = DIRECTION_NULL;		
 		
-		directionIndexedLists.add(DIRECTION_NULL, startingList);
+		directionIndexedLists.set(DIRECTION_NULL, startingList);
 	}
 	
 	/** Create a new DirectionBitmapMap, with given starting CircularList. Assumes that this DBM
@@ -63,10 +71,11 @@ public class DirectionBitmapMap {
 	public DirectionBitmapMap(int direction, CircularList<Bitmap> startingList) {
 		this.direction_sensitive = true;
 		directionIndexedLists = new ArrayList<CircularList<Bitmap>>(DIRECTION_SENSITIVE_SIZE);
+		for(int i = 0; i < DIRECTION_SENSITIVE_SIZE; i++) directionIndexedLists.add(null);
 				
 		default_direction = DIRECTION_NULL;
 		
-		directionIndexedLists.add(direction, startingList);
+		directionIndexedLists.set(direction, startingList);
 	}
 	
 	/** Set the CircularList for a particular direction to a newly-provided CircularList.
@@ -76,12 +85,17 @@ public class DirectionBitmapMap {
 	 */
 	public void setDirectionList(int direction, CircularList<Bitmap> newList) {
 		if(direction_sensitive) {
-			directionIndexedLists.add(direction,newList);
+			directionIndexedLists.set(direction,newList);
 		} else {
-			directionIndexedLists.add(DIRECTION_NULL,newList);
+			directionIndexedLists.set(DIRECTION_NULL,newList);
 		}
 	}
 	
+	/** Get the CircularList for a particular direction heading. Returns the list for DIRECTION_NULL if
+	 * this DirectionBitmapMap is not direction-sensitive.
+	 * @param direction Direction to get the CircularList for.
+	 * @return The appropriate circular list; returns the list for DIRECTION_NULL if this isn't direction_sensitive.
+	 */
 	public CircularList<Bitmap> getDirectionList(int direction) {
 		if(direction_sensitive) {
 			return directionIndexedLists.get(direction);
@@ -103,14 +117,6 @@ public class DirectionBitmapMap {
 		if(vector_x == 0 && vector_y == 0) 
 			return getDirectionList(default_direction);
 		
-		//x vector greater than y vector? east-west direction
-		if(Math.abs(vector_x) > Math.abs(vector_y)) {
-			if(vector_x > 0) return getDirectionList(DIRECTION_EAST);
-			else return getDirectionList(DIRECTION_WEST);
-		}
-		else {
-			if(vector_y > 0) return getDirectionList(DIRECTION_NORTH);
-			else return getDirectionList(DIRECTION_SOUTH);
-		}
+		return getDirectionList(Utility.calculateHeadingDirection(vector_x, vector_y));
 	}
 }

@@ -16,6 +16,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.os.SystemClock;
+import android.util.Log;
 
 /** A GameActor is any ViewObject in the Game that moves about and can interact with (or through) GameItems. GameActors
  * are for now limited to CoffeeGirl (the player character) and Customers, who interact with CoffeeGirl through the
@@ -48,7 +49,11 @@ public abstract class GameActor implements ViewObject {
 	//Represents the last time that we DREW this GameActor
 	protected long last_time_drawn;
 	//Number of ms between sprite frames
-	protected long SPRITE_FRAME_PERIOD_MS = 250;
+	public long SPRITE_FRAME_PERIOD_MS = 250;
+	//Whether or not we are using
+	protected final boolean USING_NEW_SPRITES;
+	//This GameActor's sprite
+	protected GameSprite gameActorSprite;
 	
 	
 	//lock
@@ -65,13 +70,13 @@ public abstract class GameActor implements ViewObject {
 	protected synchronized void setLocked(){ myLock.lock(); }
 	protected synchronized void unLock() { myLock.unlock(); }
 	
-	/** Creates a new GameActor. Strating location is set to the center of the game grid
+	/** Creates a new GameActor. Starting location is set to the center of the game grid
 	 * 
 	 * @param caller The calling Context, for getting resources like Bitmap ids
 	 * @param move_rate The move rate, in terms of grid length per second, for this GameActor
 	 */
 	public GameActor(Context caller, int move_rate) {
-		this(caller, move_rate, GameGrid.GAMEGRID_WIDTH/2, GameGrid.GAMEGRID_HEIGHT/2);
+		this(caller, move_rate, GameGrid.GAMEGRID_WIDTH/2, GameGrid.GAMEGRID_HEIGHT/2, true);
 	}
 	
 	/** Creates a new GameActor
@@ -81,7 +86,7 @@ public abstract class GameActor implements ViewObject {
 	 * @param starting_x The starting x location on the GameGrid
 	 * @param starting_y The starting y location on the GameGrid
 	 */
-	public GameActor(Context caller, int move_rate, int starting_x, int starting_y) {
+	public GameActor(Context caller, int move_rate, int starting_x, int starting_y, boolean use_new_sprite) {
 		//Set starting position to middle of canvas
 		x = starting_x;
 		x_real = starting_x;
@@ -97,6 +102,8 @@ public abstract class GameActor implements ViewObject {
 		this.move_rate = move_rate;
 		visible = true;
 		last_time_drawn = -1;
+		
+		this.USING_NEW_SPRITES = use_new_sprite;
 		
 		bitmapmap = new DirectionBitmapMap(false);
 		bitmapmap.setDirectionList(0, new CircularList<Bitmap>(1,
@@ -168,23 +175,37 @@ public abstract class GameActor implements ViewObject {
 	/** Called by the ViewThread when the CoffeeGirl is to be drawn on the canvas 
 	 * @param canvas The canvas that this CoffeeGirl is to be drawn.
 	 * */
-	public void draw(Canvas canvas) {
+	public void draw(Canvas canvas) {		
 		if(isVisible()) {
-			Bitmap bitmap;
-			
-			if(SystemClock.uptimeMillis() > last_time_drawn + SPRITE_FRAME_PERIOD_MS ) {
-				bitmap = bitmapmap.getDirectionList(target_x - x, target_y - y).getNext();
-				last_time_drawn = SystemClock.uptimeMillis();
+			if(USING_NEW_SPRITES) {
+				if(gameActorSprite != null) {
+					Bitmap headBitmap = gameActorSprite.getHeadBitmap(target_x - x, target_y - y);
+					Bitmap hairBitmap = gameActorSprite.getHairBitmap(target_x - x, target_y - y);
+					Bitmap bodyBitmap = gameActorSprite.getBodyBitmap(target_x - x, target_y - y);
+					Bitmap feetBitmap = gameActorSprite.getFeetBitmap(target_x - x, target_y - y);
+					
+					this.draw(canvas, bodyBitmap);
+					this.draw(canvas, headBitmap);
+					this.draw(canvas, hairBitmap);
+					this.draw(canvas, feetBitmap);
+				} 
 			} else {
-				bitmap = bitmapmap.getDirectionList(target_x - x, target_y - y).getCurrent();
-			}
+				Bitmap bitmap;
+				
+				if(SystemClock.uptimeMillis() > last_time_drawn + SPRITE_FRAME_PERIOD_MS ) {
+					bitmap = bitmapmap.getDirectionList(target_x - x, target_y - y).getNext();
+					last_time_drawn = SystemClock.uptimeMillis();
+				} else {
+					bitmap = bitmapmap.getDirectionList(target_x - x, target_y - y).getCurrent();
+				}
 			
-			this.draw(canvas, bitmap);
-		}
+				this.draw(canvas, bitmap);
+			}
+		} 
 	}
 	
 	protected void draw(Canvas canvas, Bitmap bitmap) {
-		if(isVisible()) {
+		if(isVisible() && bitmap != null) {
 			int drawn_x = GameGrid.canvasX(x);
 			int drawn_y = GameGrid.canvasY(y);
 			canvas.drawBitmap(bitmap, drawn_x - (bitmap.getWidth() / 2), drawn_y - (bitmap.getHeight() / 2), null);

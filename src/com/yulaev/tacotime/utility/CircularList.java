@@ -6,16 +6,31 @@
 package com.yulaev.tacotime.utility;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class CircularList <T> {
 	ArrayList<T> objectList;
 	int curr_index;
 	
+	/** Create a new list, given a size "hint" and a single starting element to
+	 * insert into the list.
+	 * @param size_hint
+	 * @param starting
+	 */
 	public CircularList(int size_hint, T starting) {
 		objectList = new ArrayList<T>(size_hint);
 		curr_index = 0;
 		
 		add(starting);
+	}
+	
+	/** Create a new circular list, given a List of starting elements. */
+	public CircularList(List<T> starting) {
+		objectList = new ArrayList<T>(starting.size());
+		curr_index = 0;
+		
+		for(int i = 0; i < starting.size(); i++)
+			add(starting.get(i));
 	}
 	
 	public CircularList(int size_hint) {
@@ -28,6 +43,7 @@ public class CircularList <T> {
 		curr_index = 0;
 	}
 	
+	/** Add a new object to the end of the CircularList */
 	public void add(T newObject) {
 		objectList.add(newObject);
 	}
@@ -53,6 +69,17 @@ public class CircularList <T> {
 	 */
 	public T getCurrent() {
 		if(objectList.size() <= 0) return(null);
+		return(objectList.get(curr_index));
+	}
+	
+	/** Gets the first item in this CircularList, and "rewind" the list
+	 * 
+	 * @return The first object that was inserted into this CircularList
+	 */
+	public T getFirst() {
+		if(objectList.size() <= 0) return(null);
+		
+		curr_index = 0;
 		return(objectList.get(curr_index));
 	}
 	

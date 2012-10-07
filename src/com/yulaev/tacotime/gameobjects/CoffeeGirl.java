@@ -10,10 +10,12 @@ import com.yulaev.tacotime.gameobjects.upgradedefs.FastShoesUpgrade;
 import com.yulaev.tacotime.gameobjects.upgradedefs.FasterShoesUpgrade;
 import com.yulaev.tacotime.utility.CircularList;
 import com.yulaev.tacotime.utility.DirectionBitmapMap;
+import com.yulaev.tacotime.utility.Utility;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.util.Log;
 
@@ -61,28 +63,15 @@ public class CoffeeGirl extends GameActor {
 		//Add a state for each thing that CoffeeGirl may carry
 		//Annoyingly a line must be added to MainGamePanel for each GameFoodItem that we add into
 		//this game.
-		Bitmap tempBitmap;
+		this.addState("default", null);
+		this.addState("carrying_coffee", null);
+		this.addState("carrying_cupcake", null);
+		this.addState("carrying_blended_drink", null);
+		this.addState("carrying_pie_slice", null);
+		this.addState("carrying_sandwich", null);
+		this.addState("carrying_espresso", null);
 		
-		tempBitmap = BitmapFactory.decodeResource(caller.getResources(), R.drawable.coffeegirl);
-		this.addState("default", new DirectionBitmapMap(new CircularList<Bitmap>(1,tempBitmap)));
-		
-		tempBitmap = BitmapFactory.decodeResource(caller.getResources(), R.drawable.coffeegirl_w_coffee);
-		this.addState("carrying_coffee", new DirectionBitmapMap(new CircularList<Bitmap>(1,tempBitmap)));
-		
-		tempBitmap = BitmapFactory.decodeResource(caller.getResources(), R.drawable.coffeegirl_w_cupcake);
-		this.addState("carrying_cupcake", new DirectionBitmapMap(new CircularList<Bitmap>(1,tempBitmap)));
-		
-		tempBitmap = BitmapFactory.decodeResource(caller.getResources(), R.drawable.coffeegirl_w_blended_drink);
-		this.addState("carrying_blended_drink", new DirectionBitmapMap(new CircularList<Bitmap>(1,tempBitmap)));
-		
-		tempBitmap = BitmapFactory.decodeResource(caller.getResources(), R.drawable.coffeegirl_w_cake_slice);
-		this.addState("carrying_pie_slice", new DirectionBitmapMap(new CircularList<Bitmap>(1,tempBitmap)));
-		
-		tempBitmap = BitmapFactory.decodeResource(caller.getResources(), R.drawable.coffeegirl_w_sandwich);
-		this.addState("carrying_sandwich", new DirectionBitmapMap(new CircularList<Bitmap>(1,tempBitmap)));
-		
-		tempBitmap = BitmapFactory.decodeResource(caller.getResources(), R.drawable.coffeegirl_w_espresso);
-		this.addState("carrying_espresso", new DirectionBitmapMap(new CircularList<Bitmap>(1,tempBitmap)));
+		gameActorSprite = new CoffeeGirlSprite(caller);
 	}
 	
 	/** This method is called by the InputThread when a user input (a tap) occurs somewhere on the screen. We convert
@@ -105,16 +94,63 @@ public class CoffeeGirl extends GameActor {
 		unLock();
 	}
 	
+	public void draw(Canvas canvas) {
+		super.draw(canvas);
+		
+		if(isVisible()) {
+			if(USING_NEW_SPRITES && gameActorSprite != null) {
+				int vector_x = target_x - x;
+				int vector_y = target_y - y;
+				
+				//Draw the appropriate "hands" onto the game sprite; these depend on whether the CoffeeGirl is holding
+				//any GameFoodItems or not
+				Bitmap handsBitmap = gameActorSprite.getHandsBitmap(vector_x, vector_y, itemHolding.equals("nothing")?0:1);
+				this.draw(canvas, handsBitmap);
+				
+				//Figure out the direction heading and draw the currently-held item as appropriate into the game character area
+				Bitmap foodItemBitmap = gameActorSprite.getHeldItemBitmap(itemHolding);
+				int direction_heading = Utility.calculateHeadingDirection(vector_x, vector_y);
+				
+				switch(direction_heading) {
+				
+					case DirectionBitmapMap.DIRECTION_EAST:
+						canvas.drawBitmap(foodItemBitmap, 
+								GameGrid.canvasX(x) - (foodItemBitmap.getWidth() / 2) + 15, 
+								GameGrid.canvasY(y) - (foodItemBitmap.getHeight() / 2), 
+								null);
+						break;
+						
+					case DirectionBitmapMap.DIRECTION_WEST:
+						canvas.drawBitmap(foodItemBitmap, 
+								GameGrid.canvasX(x) - (foodItemBitmap.getWidth() / 2) - 15, 
+								GameGrid.canvasY(y) - (foodItemBitmap.getHeight() / 2), 
+								null);
+						break;
+					
+					case DirectionBitmapMap.DIRECTION_NORTH:
+						canvas.drawBitmap(foodItemBitmap, 
+								GameGrid.canvasX(x) - (foodItemBitmap.getWidth() / 2), 
+								GameGrid.canvasY(y) - (foodItemBitmap.getHeight() / 2), 
+								null); 
+						break;
+						
+					default:
+						canvas.drawBitmap(foodItemBitmap, 
+								GameGrid.canvasX(x) - (foodItemBitmap.getWidth() / 2) + 15, 
+								GameGrid.canvasY(y) - (foodItemBitmap.getHeight() / 2), 
+								null); 
+						break;
+				}
+			}
+		}
+	}
+	
 	
 	
 	/** For documentation see ViewObject interface */
 	public String getName() {return "CoffeeGirl";}
 	
-	
-	
-	
-	
-	
+
 	// Since CoffeeGirl's state is coupled to what items she is holding, we define these associations below
 	private String itemHolding; //the item that CoffeeGirl holds
 	private HashMap<String, State> itemToStateMap; //A map between GameFoodItems that CoffeeGirl may hold and

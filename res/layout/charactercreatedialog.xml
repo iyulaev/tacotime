@@ -5,18 +5,23 @@
 		
 	<EditText android:id="@+id/nametext" 
 		android:layout_width="fill_parent"
-		android:layout_margin="4px"
-		android:layout_marginTop="0px"
+		android:layout_margin="10dp"
+		android:layout_marginBottom="30dp"
 		android:layout_height="wrap_content" 
-		android:textColor="#000"/>
+		android:background="@color/coffeelightbrown"
+		android:textColor="@color/coffeedarkbrown"
+		style="@style/editandspinnertext"
+		android:text="Stacey"/>
 		
 	<Spinner android:id="@+id/typeselect"
 		android:layout_below="@id/nametext"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:padding="5px"
+		android:layout_margin="10dp"
+		android:padding="2dp"
 		android:gravity="center_horizontal"
-		/>
+		style="@style/editandspinnertext"
+		android:textColor="@color/coffeedarkbrown"/>
 
 	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 		android:id="@+id/button_lin_container" android:orientation="horizontal"
@@ -27,20 +32,24 @@
 		<Button android:id="@+id/ok"
 			android:layout_margin="6px"
 			android:layout_marginRight="2px"
-			android:padding="0px"
+			android:padding="15dp"
 			android:layout_width="0pt" 
 			android:layout_height="wrap_content"
 			android:layout_alignParentBottom="true"
 			android:layout_weight="1"
+			android:background="@drawable/coffee_button"
+			style="@style/dialogbuttontext"
 			android:text="OK" />
 		<Button android:id="@+id/cancel"
 			android:layout_margin="6px"
 			android:layout_marginLeft="2px"
-			android:padding="0px"
+			android:padding="15dp"
 			android:layout_width="0pt"
 			android:layout_height="wrap_content"
 			android:layout_alignParentBottom="true"
 			android:layout_weight="1"
+			android:background="@drawable/coffee_button"
+			style="@style/dialogbuttontext"
 			android:text="Cancel" />
 	</LinearLayout>
 </RelativeLayout>

@@ -11,7 +11,7 @@ import org.coffeecats.coffeetime.gamelogic.GameInfo;
 import org.coffeecats.coffeetime.gamelogic.Interaction;
 import org.coffeecats.coffeetime.utility.Analytics;
 
-import com.yulaev.tacotime.R;
+import org.coffeecats.coffeetime.R;
 
 import android.app.AlertDialog.Builder;
 import android.app.Activity;

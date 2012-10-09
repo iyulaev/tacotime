@@ -11,7 +11,7 @@ import org.coffeecats.coffeetime.utility.CircularList;
 import org.coffeecats.coffeetime.utility.DirectionBitmapMap;
 import org.coffeecats.coffeetime.utility.Utility;
 
-import com.yulaev.tacotime.R;
+import org.coffeecats.coffeetime.R;
 
 import android.content.Context;
 import android.graphics.Bitmap;

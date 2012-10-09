@@ -16,22 +16,22 @@
     <Button android:id="@+id/retry_level" android:layout_width="fill_parent"
 			android:layout_height="100dip" android:text="Retry Level"
 			android:layout_weight="0.5"
-			android:textSize="20sp"
-			android:textStyle="bold"
+			android:background="@drawable/coffee_button"
+			style="@style/button_text"
 			android:gravity="center_horizontal|center_vertical" />
     
     <Button android:id="@+id/save_and_continue" android:layout_width="fill_parent"
 			android:layout_height="100dip" android:text="Save and Continue"
 			android:layout_weight="0.5"
-			android:textSize="20sp"
-			android:textStyle="bold"
+			android:background="@drawable/coffee_button"
+			style="@style/button_text"
 			android:gravity="center_horizontal|center_vertical"/>
     
     <Button android:id="@+id/view_buy_upgrades" android:layout_width="fill_parent"
 			android:layout_height="100dip" android:text="View / Buy Upgrades"
 			android:layout_weight="0.5"
-			android:textSize="20sp"
-			android:textStyle="bold"
+			android:background="@drawable/coffee_button"
+			style="@style/button_text"
 			android:gravity="center_horizontal|center_vertical"/>
     
     <!-- <Button android:id="@+id/continue_game" android:layout_width="fill_parent"

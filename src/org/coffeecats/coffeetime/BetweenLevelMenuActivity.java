@@ -7,7 +7,7 @@
 
 package org.coffeecats.coffeetime;
 
-import com.yulaev.tacotime.R;
+import org.coffeecats.coffeetime.R;
 
 import android.app.AlertDialog.Builder;
 import android.app.Activity;

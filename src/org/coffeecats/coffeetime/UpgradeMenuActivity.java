@@ -17,7 +17,7 @@ import org.coffeecats.coffeetime.gameobjects.upgradedefs.FasterShoesUpgrade;
 import org.coffeecats.coffeetime.gameobjects.upgradedefs.QuickBrewingUpgrade;
 import org.coffeecats.coffeetime.gameobjects.upgradedefs.SoundSystemUpgrade;
 
-import com.yulaev.tacotime.R;
+import org.coffeecats.coffeetime.R;
 
 import android.app.ListActivity;
 import android.os.Bundle;

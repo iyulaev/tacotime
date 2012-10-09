@@ -16,15 +16,15 @@
     <Button android:id="@+id/continue_game" android:layout_width="fill_parent"
 			android:layout_height="100dip" android:text="Continue Game"
 			android:layout_weight="0.5"
-			android:textSize="20sp"
-			android:textStyle="bold"
+			android:background="@drawable/coffee_button"
+			style="@style/button_text"
 			android:gravity="center_horizontal|center_vertical" />
     
     <Button android:id="@+id/new_game" android:layout_width="fill_parent"
 			android:layout_height="100dip" android:text="New Game"
 			android:layout_weight="0.5"
-			android:textSize="20sp"
-			android:textStyle="bold"
+			android:background="@drawable/coffee_button"
+			style="@style/button_text"
 			android:gravity="center_horizontal|center_vertical"/>
     
     <!-- <Button android:id="@+id/continue_game" android:layout_width="fill_parent"

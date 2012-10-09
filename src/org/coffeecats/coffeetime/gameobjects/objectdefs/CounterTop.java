@@ -14,7 +14,7 @@ import org.coffeecats.coffeetime.gameobjects.GameItem;
 
 import android.content.Context;
 
-import com.yulaev.tacotime.R;
+import org.coffeecats.coffeetime.R;
 
 
 public class CounterTop extends GameItem {

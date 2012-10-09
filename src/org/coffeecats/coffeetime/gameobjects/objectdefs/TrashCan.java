@@ -5,7 +5,7 @@ import org.coffeecats.coffeetime.gameobjects.GameItem;
 
 import android.content.Context;
 
-import com.yulaev.tacotime.R;
+import org.coffeecats.coffeetime.R;
 
 /** This is a TrashCan. It is a GameItem. It is used for disposing of things for a (small) point penalty. */
 

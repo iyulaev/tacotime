@@ -2,7 +2,7 @@ package org.coffeecats.coffeetime.gameobjects.fooditemdefs;
 
 import org.coffeecats.coffeetime.gameobjects.GameFoodItem;
 
-import com.yulaev.tacotime.R;
+import org.coffeecats.coffeetime.R;
 
 import android.content.Context;
 import android.graphics.Bitmap;

@@ -5,7 +5,7 @@ import java.util.TreeMap;
 import android.content.Context;
 
 import com.flurry.android.FlurryAgent;
-import com.yulaev.tacotime.R;
+import org.coffeecats.coffeetime.R;
 
 public class Analytics {
 	//Define event types

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="coffeeverylightbrown">#EAF9E1</color>
+    <color name="coffeelightbrown">#DFEAD1</color>
+    <color name="coffeekindalightbrown">#796B56</color>
+    <color name="coffeemediumbrown">#442513</color>
+    <color name="coffeedarkbrown">#260800</color>
+    
+    <color name="machalightgreen">#A5DB34</color>
+    <color name="machamediumgreen">#83A73A</color>
+    <color name="machadarkgreen">#61723E</color>
+    
+    <color name="black">#222222</color>
+</resources>

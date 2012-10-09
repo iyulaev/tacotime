@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <style name="button_text">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textColor">@color/coffeedarkbrown</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    
+    <style name="listitemtitle">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textColor">@color/coffeedarkbrown</item>
+    </style>
+    
+    <style name="listitemcontents">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/coffeemediumbrown</item>
+    </style>
+    
+    <style name="listitemsmallcontents">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/coffeemediumbrown</item>
+    </style>
+    
+    
+    <style name="editandspinnertext">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/coffeemediumbrown</item>
+    </style>
+    
+    
+    <style name="dialogbuttontext">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/coffeedarkbrown</item>
+    </style>
+    
+</resources>

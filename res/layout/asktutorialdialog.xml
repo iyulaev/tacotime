@@ -9,7 +9,7 @@
 		android:layout_marginTop="0px"
 		android:layout_height="wrap_content" 
 		android:text="Would you like to see the game tutorial?"
-		android:textColor="#FEEE"/>
+		android:textColor="@color/coffeelightbrown"/>
 
 
 	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -21,20 +21,24 @@
 		<Button android:id="@+id/ok"
 			android:layout_margin="6px"
 			android:layout_marginRight="2px"
-			android:padding="0px"
+			android:padding="15dp"
 			android:layout_width="0pt" 
 			android:layout_height="wrap_content"
 			android:layout_alignParentBottom="true"
 			android:layout_weight="1"
+			android:background="@drawable/coffee_button"
+			style="@style/dialogbuttontext"
 			android:text="Yes" />
 		<Button android:id="@+id/cancel"
 			android:layout_margin="6px"
 			android:layout_marginLeft="2px"
-			android:padding="0px"
+			android:padding="15dp"
 			android:layout_width="0pt"
 			android:layout_height="wrap_content"
 			android:layout_alignParentBottom="true"
 			android:layout_weight="1"
+			android:background="@drawable/coffee_button"
+			style="@style/dialogbuttontext"
 			android:text="No" />
 	</LinearLayout>
 </LinearLayout>

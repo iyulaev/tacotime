@@ -15,7 +15,7 @@ import org.coffeecats.coffeetime.gameobjects.upgradedefs.FastShoesUpgrade;
 import org.coffeecats.coffeetime.gameobjects.upgradedefs.FasterShoesUpgrade;
 import org.coffeecats.coffeetime.gameobjects.upgradedefs.QuickBrewingUpgrade;
 
-import com.yulaev.tacotime.R;
+import org.coffeecats.coffeetime.R;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
@@ -51,6 +51,12 @@ public class CharacterSelectListActivity extends ListActivity {
 		me=this;
 		
 		setContentView(R.layout.upgradelist);
+		
+		TextView title = (TextView) findViewById(R.id.title);
+		TextView subtitle = (TextView) findViewById(R.id.subtitle);
+		
+		title.setText("Character Selection");
+		subtitle.setVisibility(View.GONE);
 		
 		gameDB = new GameDatabase(me);
 		gameDB.open();
@@ -112,7 +118,7 @@ public class CharacterSelectListActivity extends ListActivity {
 			//Fill in the last finished level for this character
 			TextView level=(TextView)row.findViewById(R.id.character_level);
 			//Add 1 because SavedCharacter.level reflects the last COMPLETED level by that character
-			level.setText(Integer.toString(1 + gameDB.databaseCache.get(characterNames.get(position)).level)); 
+			level.setText("Level " + Integer.toString(1 + gameDB.databaseCache.get(characterNames.get(position)).level)); 
 			
 			//Fill in the description for this SavedCharacter (corresponding to this row in the ListView)
 			TextView description=(TextView)row.findViewById(R.id.character_description);

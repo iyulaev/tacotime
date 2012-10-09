@@ -13,7 +13,7 @@ import java.util.Iterator;
 import org.coffeecats.coffeetime.gamelogic.GameGrid;
 import org.coffeecats.coffeetime.gameobjects.ViewObject;
 
-import com.yulaev.tacotime.R;
+import org.coffeecats.coffeetime.R;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -174,7 +174,6 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 	boolean static_setup_done = false;
 	//Paint that we use in onDraw(); these are class variables so that we don't keep creating new ones
 	Paint gridPaint;
-	Rect playAreaRect; //rectangle for the area that will be filled with tiles
 	//Paint counterPaint;
 	Rect counterAreaFullRect;
 	
@@ -236,7 +235,7 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 					0,
 					GameGrid.canvasX(GameGrid.GAMEGRID_WIDTH),
 					GameGrid.canvasY(GameGrid.GAMEGRID_HEIGHT));*/
-			background = BitmapFactory.decodeResource(this.getResources(), R.drawable.background);
+			background = BitmapFactory.decodeResource(this.getResources(), R.drawable.background_brown);
 			int background_side = (GameGrid.canvasX(GameGrid.GAMEGRID_WIDTH)>GameGrid.canvasY(GameGrid.GAMEGRID_HEIGHT)) ? 
 					GameGrid.canvasX(GameGrid.GAMEGRID_WIDTH) : 
 					GameGrid.canvasY(GameGrid.GAMEGRID_HEIGHT);

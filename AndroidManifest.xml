@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.yulaev.tacotime"
+    package="org.coffeecats.coffeetime"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -9,7 +9,7 @@
 
     <application
         android:icon="@drawable/ic_launcher"
-        android:name=".TacoTimeApplicationetime.TacoTimeApplication"
+        android:name=".TacoTimeApplication"
         android:hardwareAccelerated="true"
         android:label="@string/app_name" >  <!-- Use TacoTimeApplication instead of plain-old android.app.Application -->
         

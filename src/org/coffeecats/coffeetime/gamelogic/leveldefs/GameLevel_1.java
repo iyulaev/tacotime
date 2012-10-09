@@ -29,7 +29,7 @@ import org.coffeecats.coffeetime.gameobjects.objectdefs.TrashCan;
 
 import android.content.Context;
 
-import com.yulaev.tacotime.R;
+import org.coffeecats.coffeetime.R;
 
 /** Describes level #1 for the Coffee Time game! */
 
@@ -43,7 +43,7 @@ public class GameLevel_1 extends GameLevel {
 		this.point_mult = 1.0f;
 		this.money_mult = 1.0f;
 		this.customer_impatience = 0.6f;
-		this.time_limit_sec = 45;
+		this.time_limit_sec = 5;
 		this.customer_max_order_size = 1;
 		
 		this.point_bonus = 20;

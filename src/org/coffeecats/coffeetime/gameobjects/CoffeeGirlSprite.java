@@ -15,7 +15,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-import com.yulaev.tacotime.R;
+import org.coffeecats.coffeetime.R;
 
 public class CoffeeGirlSprite extends GameSprite {
 	

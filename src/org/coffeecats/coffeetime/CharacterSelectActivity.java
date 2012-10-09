@@ -12,7 +12,7 @@ import org.coffeecats.coffeetime.gamelogic.GameDatabase;
 import org.coffeecats.coffeetime.gamelogic.GameInfo;
 import org.coffeecats.coffeetime.gamelogic.SavedCharacter;
 
-import com.yulaev.tacotime.R;
+import org.coffeecats.coffeetime.R;
 
 import android.app.Activity;
 import android.app.Dialog;

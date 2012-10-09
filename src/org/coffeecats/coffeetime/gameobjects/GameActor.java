@@ -9,7 +9,7 @@ import org.coffeecats.coffeetime.gamelogic.State;
 import org.coffeecats.coffeetime.utility.CircularList;
 import org.coffeecats.coffeetime.utility.DirectionBitmapMap;
 
-import com.yulaev.tacotime.R;
+import org.coffeecats.coffeetime.R;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

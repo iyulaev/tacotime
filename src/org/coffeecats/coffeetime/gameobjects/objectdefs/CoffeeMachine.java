@@ -4,7 +4,7 @@ import org.coffeecats.coffeetime.gamelogic.GameGrid;
 import org.coffeecats.coffeetime.gamelogic.GameInfo;
 import org.coffeecats.coffeetime.gameobjects.GameItem;
 
-import com.yulaev.tacotime.R;
+import org.coffeecats.coffeetime.R;
 
 import android.content.Context;
 

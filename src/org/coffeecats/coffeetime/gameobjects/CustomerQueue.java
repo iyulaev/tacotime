@@ -18,7 +18,7 @@ import java.util.List;
 import org.coffeecats.coffeetime.gamelogic.GameInfo;
 import org.coffeecats.coffeetime.gamelogic.Interaction;
 
-import com.yulaev.tacotime.R;
+import org.coffeecats.coffeetime.R;
 
 import android.content.Context;
 import android.graphics.Canvas;

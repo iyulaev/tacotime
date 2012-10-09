@@ -10,7 +10,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.os.SystemClock;
 
-import com.yulaev.tacotime.R;
+import org.coffeecats.coffeetime.R;
 
 /** This is a TrashCan. It is a GameItem. It is used for disposing of things for a (small) point penalty. */
 

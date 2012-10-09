@@ -171,6 +171,8 @@ public class SavedCharacter implements Comparable{
 	/** Return a String representation of this SavedCharacter. Typically used for debugging */
 	public String toString() {
 		String returned = new String();
+		
+		/* Old-style, for debugging
 		returned += "Character_id=" + _id;
 		returned += " => {";
 		returned += name + ", ";
@@ -178,7 +180,12 @@ public class SavedCharacter implements Comparable{
 		returned += money + ", ";
 		returned += points + ", ";
 		returned += level + ", ";
-		returned += "(" + upgrades + ")" + "}";
+		returned += "(" + upgrades + ")" + "}";*/
+		
+		returned += type + "\n";
+		returned += "Money: $" + money + "\n";
+		returned += "Points: " + points + "\n";
+		returned += "Upgrades: " + upgrades;
 		
 		return returned;
 	}

@@ -29,7 +29,7 @@ import org.coffeecats.coffeetime.gameobjects.objectdefs.TrashCan;
 
 import android.content.Context;
 
-import com.yulaev.tacotime.R;
+import org.coffeecats.coffeetime.R;
 
 /** Describes level #2 for the Coffee Time game! */
 

@@ -11,7 +11,7 @@ import java.util.HashMap;
 
 import org.coffeecats.coffeetime.gamelogic.GameInfo;
 
-import com.yulaev.tacotime.R;
+import org.coffeecats.coffeetime.R;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

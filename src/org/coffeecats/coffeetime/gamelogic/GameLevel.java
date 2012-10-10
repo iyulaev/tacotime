@@ -37,7 +37,8 @@ public class GameLevel {
 
 	protected int customer_dissatisfaction_penalty = 10;
 	
-	protected float proportion_customers_until_bonus = 0.8f;
+	protected float proportion_customers_until_cleared = 0.7f;
+	protected float proportion_customers_until_bonus = 0.85f;
 	
 	/** Set up this level; add all GameItems and such to the Threads, set up the Customers and such
 	 * with the per-level parameters.
@@ -83,6 +84,10 @@ public class GameLevel {
 	
 	public int customersUntilBonus() {
 		return ((int)(proportion_customers_until_bonus * customerQueue_length));
+	}
+	
+	public int customersUntilCleared() {
+		return ((int)(proportion_customers_until_cleared * customerQueue_length));
 	}
 	
 	public int numberOfCustomers() { return customerQueue_length; }

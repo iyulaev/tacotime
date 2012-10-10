@@ -1,7 +1,7 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
-	android:orientation="horizontal"
+	android:orientation="vertical"
 	android:cacheColorHint="#FFFF"
 	android:gravity="center_vertical"
 	android:background="@drawable/coffee_listitem">
@@ -19,7 +19,6 @@
 		<TextView
 			android:id="@+id/upgrade_cost"
 			android:layout_marginLeft="5px"
-			android:layout_alignBaseline="@id/upgrade_name"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_gravity="center_vertical"
@@ -29,7 +28,6 @@
 		/>
 		<TextView
 			android:id="@+id/upgrade_description"
-			android:layout_below="@id/upgrade_cost"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_gravity="center_vertical"
@@ -38,4 +36,4 @@
 			style="@style/listitemsmallcontents"
 		/>
 
-</RelativeLayout>
+</LinearLayout>

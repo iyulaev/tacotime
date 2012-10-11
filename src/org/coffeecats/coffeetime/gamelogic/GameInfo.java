@@ -34,10 +34,11 @@ public class GameInfo {
 	
 	//These variables keep track of what level we are on, how many game ticks remain on the clock,
 	//and whether the level is in play or not
-	public static final int MAX_GAME_LEVEL=7;
+	public static final int MAX_GAME_LEVEL=49;
 	private static int level;
 	private static int levelTime;
 	private static int customersLeftforLevel;
+	private static int customersLeftforCleared;
 	private static int customersLeftforBonus;
 	
 	//This string array represents the various upgrades that the user has bought 
@@ -141,13 +142,15 @@ public class GameInfo {
 	public static synchronized int getGameMode() { return gameMode; }
 	
 	/** Set the number of customers left in the current level */
-	public static synchronized void setCustomersLeft(int customersLeftforLevel, int customersLeftforBonus) {
+	public static synchronized void setCustomersLeft(int customersLeftforLevel, int customersLeftforBonus, int customersLeftforCleared) {
 		GameInfo.customersLeftforLevel = customersLeftforLevel;
 		GameInfo.customersLeftforBonus = customersLeftforBonus;
+		GameInfo.customersLeftforCleared = customersLeftforCleared;
 	}
 	
 	public static synchronized int getCustomersLeftForLevel() { return customersLeftforLevel; }
 	public static synchronized int getCustomersLeftForBonus() { return customersLeftforBonus; }
+	public static synchronized int getCustomersLeftForCleared() { return customersLeftforCleared; }
 	
 	
 	/** Reset this GameInfo, effectively clearing global game state. Note, however, that characterName, 
@@ -176,7 +179,8 @@ public class GameInfo {
 		level_money = 0;
 		level_points = 0;
 		customersLeftforLevel = 0;
-		customersLeftforBonus = 0;	
+		customersLeftforBonus = 0;
+		customersLeftforCleared = 0;
 	}
 	
 	/** Initializes the database and either loads the SavedCharacter keyed by GameInfo.characterName 

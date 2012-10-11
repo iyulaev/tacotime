@@ -17,6 +17,7 @@ import org.coffeecats.coffeetime.gamelogic.leveldefs.GameLevel_4;
 import org.coffeecats.coffeetime.gamelogic.leveldefs.GameLevel_5;
 import org.coffeecats.coffeetime.gamelogic.leveldefs.GameLevel_6;
 import org.coffeecats.coffeetime.gamelogic.leveldefs.GameLevel_7;
+import org.coffeecats.coffeetime.gamelogic.leveldefs.GameLevel_n;
 import org.coffeecats.coffeetime.gameobjects.CoffeeGirl;
 import org.coffeecats.coffeetime.gameobjects.CustomerQueue;
 import org.coffeecats.coffeetime.gameobjects.GameFoodItem;
@@ -66,6 +67,7 @@ public class GameLogicThread extends Thread {
 	//Define types of messages accepted by OTHER threads/handlers
 	public static final int MESSAGE_LEVEL_END = -1;
 	public static final int MESSAGE_GAME_END = -2;
+	public static final int MESSAGE_LEVEL_FAILED = -3;
 	
 	//Define the period between state machine updates
 	public static final int TIMER_GRANULARITY = 1000;
@@ -254,7 +256,9 @@ public class GameLogicThread extends Thread {
 			Log.v(activitynametag, "GLT is loading a new level!");
 			GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_PREPLAY_MESSAGE);
 			
-			GameInfo.setCustomersLeft(customerQueueWrapper.numberOfCustomersLeft(), currLevel.customersUntilBonus() - customerQueueWrapper.numberOfCustomersServed());
+			GameInfo.setCustomersLeft(customerQueueWrapper.numberOfCustomersLeft(), 
+					currLevel.customersUntilBonus() - customerQueueWrapper.numberOfCustomersServed(),
+					currLevel.customersUntilCleared() - customerQueueWrapper.numberOfCustomersServed());
 			
 			MessageRouter.sendLoadLevelMusicMessage(GameInfo.getLevel());
 		}
@@ -277,7 +281,9 @@ public class GameLogicThread extends Thread {
 				MessageRouter.sendPlayLevelMusicMessage(GameInfo.getLevel());
 			}
 			
-			GameInfo.setCustomersLeft(customerQueueWrapper.numberOfCustomersLeft(), currLevel.customersUntilBonus() - customerQueueWrapper.numberOfCustomersServed());
+			GameInfo.setCustomersLeft(customerQueueWrapper.numberOfCustomersLeft(), 
+					currLevel.customersUntilBonus() - customerQueueWrapper.numberOfCustomersServed(),
+					currLevel.customersUntilCleared() - customerQueueWrapper.numberOfCustomersServed());
 		}
 		
 		//In-game state - we are in this state when the user is playing the level
@@ -306,7 +312,9 @@ public class GameLogicThread extends Thread {
 				GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_POSTPLAY_MESSAGE);
 			}
 			
-			GameInfo.setCustomersLeft(customerQueueWrapper.numberOfCustomersLeft(), currLevel.customersUntilBonus() - customerQueueWrapper.numberOfCustomersServed());
+			GameInfo.setCustomersLeft(customerQueueWrapper.numberOfCustomersLeft(), 
+					currLevel.customersUntilBonus() - customerQueueWrapper.numberOfCustomersServed(),
+					currLevel.customersUntilCleared() - customerQueueWrapper.numberOfCustomersServed());
 		}
 		
 		//Post-play state: we enter this state as soon as the level finished - we display a message indicating that
@@ -314,7 +322,10 @@ public class GameLogicThread extends Thread {
 		else if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_POSTPLAY_MESSAGE) {
 			if(message_timer > 0) {
 				message_timer--;
-				GameInfo.setCustomersLeft(customerQueueWrapper.numberOfCustomersLeft(), currLevel.customersUntilBonus() - customerQueueWrapper.numberOfCustomersServed());
+				
+				GameInfo.setCustomersLeft(customerQueueWrapper.numberOfCustomersLeft(), 
+						currLevel.customersUntilBonus() - customerQueueWrapper.numberOfCustomersServed(),
+						currLevel.customersUntilCleared() - customerQueueWrapper.numberOfCustomersServed());
 			}
 			//We use message_timer again to make sure we only display the post-level dialog once :)
 			else if (message_timer == 0){
@@ -326,12 +337,17 @@ public class GameLogicThread extends Thread {
 				GameInfo.setAndReturnPoints(currLevel.getCustomerDissatisfactionPenalty(customerQueueWrapper.numberOfCustomersIgnored()));
 				
 				//Send all of the accrued bonuses to the level-end dialog
+				//but ONLY display this dialog if the user has actually cleared the level (by serving more customers than
+				//currLevel.customersUntilCleared())
 				//See MessageRouter.sendPostLevelDialogOpenMessage() javadocs for an explanation of the arguments given
-				MessageRouter.sendPostLevelDialogOpenMessage( GameInfo.points, GameInfo.money, 
-						GameInfo.level_points-currLevel.getBonusPoints(customerQueueWrapper.numberOfCustomersServed()), 
-						GameInfo.level_money-currLevel.getBonusMoney(customerQueueWrapper.numberOfCustomersServed()),
-						currLevel.getBonusPoints(customerQueueWrapper.numberOfCustomersServed()),
-						currLevel.getBonusMoney(customerQueueWrapper.numberOfCustomersServed()) );
+				if(customerQueueWrapper.numberOfCustomersServed() >= currLevel.customersUntilCleared())
+					MessageRouter.sendPostLevelDialogOpenMessage( GameInfo.points, GameInfo.money, 
+							GameInfo.level_points-currLevel.getBonusPoints(customerQueueWrapper.numberOfCustomersServed()), 
+							GameInfo.level_money-currLevel.getBonusMoney(customerQueueWrapper.numberOfCustomersServed()),
+							currLevel.getBonusPoints(customerQueueWrapper.numberOfCustomersServed()),
+							currLevel.getBonusMoney(customerQueueWrapper.numberOfCustomersServed()) );
+				else
+					GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_POSTPLAY);
 				
 				message_timer--;
 			}
@@ -341,10 +357,24 @@ public class GameLogicThread extends Thread {
 		//that the game is over
 		else if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_POSTPLAY) {
 			if(GameInfo.getLevel() < GameInfo.MAX_GAME_LEVEL && GameInfo.getLevel() > 0) {
+				Analytics.reportLevelFailed(GameInfo.getLevel(), 
+						customerQueueWrapper.numberOfCustomersServed(),
+						currLevel.customersUntilCleared(),
+						((float) customerQueueWrapper.numberOfCustomersServed()) / ((float) currLevel.numberOfCustomers()));
+				
 				MessageRouter.sendPauseMessage(true);
-				MessageRouter.sendLevelEndMessage();
+				
+				if(customerQueueWrapper.numberOfCustomersServed() < currLevel.customersUntilCleared())
+					MessageRouter.sendLevelFailedMessage(currLevel.customersUntilCleared(), customerQueueWrapper.numberOfCustomersServed());
+				else
+					MessageRouter.sendLevelEndMessage();
 			}
 			else if(GameInfo.getLevel() == 0) {
+				Analytics.reportLevelFinished(GameInfo.getLevel(), 
+						customerQueueWrapper.numberOfCustomersServed() == currLevel.numberOfCustomers(),
+						customerQueueWrapper.numberOfCustomersServed() >= currLevel.customersUntilBonus(), 
+						((float) customerQueueWrapper.numberOfCustomersServed()) / ((float) currLevel.numberOfCustomers()));
+				
 				GameInfo.reset();
 				MessageRouter.sendPauseUIMessage(false);
 				GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_PREPLAY);
@@ -352,10 +382,7 @@ public class GameLogicThread extends Thread {
 			else {
 				MessageRouter.sendGameOverMessage();
 			}
-			
-			Analytics.reportLevelFinished(GameInfo.getLevel(), 
-					currLevel.customersUntilBonus()<=0, 
-					((float) customerQueueWrapper.numberOfCustomersServed()) / ((float) currLevel.numberOfCustomers()));
+
 		}
 	}
 	
@@ -588,7 +615,8 @@ public class GameLogicThread extends Thread {
 			newLevel = new GameLevel_7();
 		}
 		else {
-			Log.e(activitynametag, "Invalid level reached!");
+			//Log.e(activitynametag, "Invalid level reached!");
+			newLevel = new GameLevel_n(levelNumber);
 		}
 		
 		return(newLevel);

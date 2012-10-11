@@ -220,6 +220,7 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 			int level_time,
 			int customers_left,
 			int customers_until_bonus,
+			int customer_until_cleared,
 			boolean use_italic_announcement_font) {
 		
 		//Set up all of the Paint objects if we haven't done this yet! (should only happen once per game)
@@ -299,8 +300,15 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		final int SPACE_BETWEEN_ANNOUNCEMENT_LINES = 40;
 		
 		//Draw information regarding how many customers are left
-		String customersLeftStr = new String("Customers Left: " + Integer.toString(customers_left));
-		if(customers_until_bonus<=0) customersLeftStr += " (BONUS ACHIEVED)";
+		String customersLeftStr;
+		if(customer_until_cleared > 0) {
+			customersLeftStr = new String("Customers Left: " + Integer.toString(customer_until_cleared));
+		} else if (customers_until_bonus > 0) {
+			customersLeftStr = new String("Customers Left: " + Integer.toString(customers_until_bonus) + " (level cleared)");
+		} else {
+			customersLeftStr = new String("Customers Left: " + Integer.toString(customers_left) + " (bonus achieved)");
+		}
+		
 		canvas.drawText(customersLeftStr, 14, canvas.getHeight()-15-SPACE_BETWEEN_ANNOUNCEMENT_LINES*3, customersLeftPaint);
 		
 		//Draw money, points and display an announcement message IF there is an announcement

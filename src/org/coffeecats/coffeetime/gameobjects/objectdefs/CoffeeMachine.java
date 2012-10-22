@@ -49,7 +49,7 @@ public class CoffeeMachine extends GameItem {
 		//Add states that describe behavior of coffee machine
 		//super.addState(String stateName, int state_delay_ms, int r_bitmap, boolean input_sensitive, boolean time_sensitive)
 		this.addState("idle", 0, R.drawable.coffeemachine_idle, true, false);
-		this.addState("brewing", brew_time, R.drawable.coffeemachine_brewing, false, true);
+		this.addState("brewing", brew_time, R.drawable.coffeemachine, false, true);
 		this.addState("done", 10000, R.drawable.coffeemachine_done, true, "nothing", true);
 	}
 }

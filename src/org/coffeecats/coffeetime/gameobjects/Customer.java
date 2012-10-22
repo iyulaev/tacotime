@@ -45,7 +45,7 @@ public class Customer extends GameActor {
 	
 	//Define waiting time and correpsonding mood
 	private int seconds_between_pissed_off;
-	public static int SECONDS_BW_PO_STARTING = 25;
+	public static int SECONDS_BW_PO_STARTING = 15;
 	private int curr_mood;
 	private long mood_last_updated; //time (in seconds) when mood was last updated
 	
@@ -205,8 +205,17 @@ public class Customer extends GameActor {
 			if(mood_last_updated + seconds_between_pissed_off < GameInfo.currentTimeMillis()/1000) {
 				mood_last_updated = GameInfo.currentTimeMillis()/1000;
 				
-				if(this.getState() == STATE_INLINE_HAPPY) setState(STATE_INLINE_OK);
-				else if(this.getState() == STATE_INLINE_OK) setState(STATE_ANGRY);
+				if(this.getState() == STATE_INLINE_HAPPY) {
+					setState(STATE_INLINE_OK);
+					/*Log.d(activitynametag, "Customer state transitioned to OK, will update at " + (mood_last_updated + seconds_between_pissed_off) + 
+							", it is currently " + (GameInfo.currentTimeMillis()/1000));*/
+				}
+				else if(this.getState() == STATE_INLINE_OK) {
+					setState(STATE_ANGRY);
+					//Log.d(activitynametag, "Customer state transitioned to ANGRY");
+				}
+				
+				
 			}
 		}
 		

@@ -22,7 +22,12 @@ Released under Creative Commons Attribution-NonCommercial (CC BY-NC) license.
 All proprietary art (c) 2012 Coffeecats.
 Released under Creative Commons Attribution-NonCommercial (CC BY-NC) license.
 
-All software code, including XML, is (c) 2012 Coffeecats. Released under BSD License
+Selected 3rd party artwork property of respective owners.
+Coffee cup icon: Property of Aha-Soft, http://www.aha-soft.com/
+Coffee cup background for menus: Property of Filippo, http://www.flickr.com/people/fdiotalevi/
+Microwave, sandwich, speakers, trashcan, and some other artwork taken from WP Clipart (http://www.wpclipart.com/). Support public domain art!
+
+All software code, including XML, is (c) 2012 Coffeecats. Released under BSD License:
 
 Copyright (c) 2012, Coffeecats
 All rights reserved.

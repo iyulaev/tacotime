@@ -247,7 +247,7 @@ public class TacoTimeMainGameActivity extends Activity {
 				okButton.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
 						MessageRouter.sendPostLevelDialogClosedMessage();
-						dialog.dismiss();
+						if(dialog != null) dialog.dismiss();
 						dialog = null;
 					}
 				});
@@ -256,12 +256,12 @@ public class TacoTimeMainGameActivity extends Activity {
 				dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
 					public void onCancel(DialogInterface dialog) {
 						MessageRouter.sendPostLevelDialogClosedMessage();
-						dialog.dismiss();
+						if(dialog != null) dialog.dismiss();
 						dialog = null;
 					}
 				});
 				
-				dialog.show();
+				if(dialog != null) dialog.show();
 				break;
 				
 				
@@ -282,7 +282,7 @@ public class TacoTimeMainGameActivity extends Activity {
 				mmButton.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
 						MessageRouter.sendInGameDialogResult(InputThread.INGAMEDIALOGRESULT_MAIN_MENU);
-						dialog.dismiss();
+						if(dialog != null) dialog.dismiss();
 						dialog = null;
 						//Destroy TTMGA/MGP and go back to the main menu activity
 						finish();
@@ -293,7 +293,7 @@ public class TacoTimeMainGameActivity extends Activity {
 				retryButton.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
 						MessageRouter.sendInGameDialogResult(InputThread.INGAMEDIALOGRESULT_RETRY_LEVEL);
-						dialog.dismiss();
+						if(dialog != null) dialog.dismiss();
 						dialog = null;
 					}
 				});
@@ -301,7 +301,7 @@ public class TacoTimeMainGameActivity extends Activity {
 				continueButton.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
 						MessageRouter.sendInGameDialogResult(InputThread.INGAMEDIALOGRESULT_CONTINUE);
-						dialog.dismiss();
+						if(dialog != null) dialog.dismiss();
 						dialog = null;
 					}
 				});
@@ -310,12 +310,12 @@ public class TacoTimeMainGameActivity extends Activity {
 				dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
 					public void onCancel(DialogInterface dialog) {
 						MessageRouter.sendInGameDialogResult(InputThread.INGAMEDIALOGRESULT_CONTINUE);
-						dialog.dismiss();
+						if(dialog != null) dialog.dismiss();
 						dialog = null;
 					}
 				});
 				
-				dialog.show();
+				if(dialog != null) dialog.show();
 				break;
 				
 				
@@ -337,7 +337,7 @@ public class TacoTimeMainGameActivity extends Activity {
 				okButton.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
 						MessageRouter.sendLoadGameMessage();
-						dialog.dismiss();
+						if(dialog != null) dialog.dismiss();
 						dialog = null;
 					}
 				});
@@ -346,12 +346,12 @@ public class TacoTimeMainGameActivity extends Activity {
 				dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
 					public void onCancel(DialogInterface dialog) {
 						MessageRouter.sendLoadGameMessage();
-						dialog.dismiss();
+						if(dialog != null) dialog.dismiss();
 						dialog = null;
 					}
 				});
 				
-				dialog.show();
+				if(dialog != null) dialog.show();
 				break;
 		}
 		

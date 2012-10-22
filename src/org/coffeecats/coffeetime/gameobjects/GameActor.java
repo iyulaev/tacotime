@@ -108,7 +108,7 @@ public abstract class GameActor implements ViewObject {
 		
 		bitmapmap = new DirectionBitmapMap(false);
 		bitmapmap.setDirectionList(0, new CircularList<Bitmap>(1,
-				BitmapFactory.decodeResource(caller.getResources(), R.drawable.coffeegirl)));
+				BitmapFactory.decodeResource(caller.getResources(), R.drawable.blender)));
 		
 		myLock = new ReentrantLock();
 	}

@@ -150,11 +150,11 @@ public class Customer extends GameActor {
 	//Define the starting location of customers, the position if they're first or second,  
 	//and the exit location of customers
 	private static int location_start_x = 40;
-	private static int location_start_y = GameGrid.GAMEGRID_HEIGHT - 5;
+	private static int location_start_y = 0;
 	private static int locations_queue_x[] = {40,40};
-	private static int locations_queue_y[] = {GameGrid.GAMEGRID_HEIGHT - 30, GameGrid.GAMEGRID_HEIGHT - 12};
+	private static int locations_queue_y[] = {19, 7};
 	private static int locations_exit_x = GameGrid.GAMEGRID_WIDTH - 5;
-	private static int locations_exit_y = GameGrid.GAMEGRID_HEIGHT - 30;
+	private static int locations_exit_y = locations_queue_y[0];
 	
 	/** Sets the state of this customer
 	 * @param new_state The State to put this customer into

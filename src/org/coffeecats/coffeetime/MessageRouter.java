@@ -410,4 +410,15 @@ public class MessageRouter {
 			Log.v("MessageRouter", "Told SoundThread to play nothing");
 		}
 	}
+	
+	/** Typically called by InputThread to toggle whether the current music is playing or not */
+	public synchronized static void sendTogglePausedMessage() {
+		if(soundThread != null) {
+			Message message = Message.obtain();
+			message.what = SoundThread.MESSAGE_TOGGLE_PAUSED;
+			soundThread.handler.sendMessage(message);
+			
+			Log.v("MessageRouter", "Told SoundThread to toggle paused");
+		}
+	}
 }

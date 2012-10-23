@@ -285,7 +285,7 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		canvas.drawBitmap(background, 0,0, null);
 		canvas.drawRect(0, GameGrid.canvasY(GameGrid.GAMEGRID_HEIGHT), GameGrid.maxCanvasX(), canvas.getHeight(), gridPaint);
 		//Draw countertop 
-		canvas.drawBitmap(counterTopFull, 0,0, null);
+		canvas.drawBitmap(counterTopFull, 0,GameGrid.canvasY(25), null);
 		
 		
 		

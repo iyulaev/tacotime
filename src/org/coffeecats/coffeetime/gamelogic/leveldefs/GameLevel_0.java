@@ -86,7 +86,7 @@ public class GameLevel_0 extends GameLevel {
 		
 		if(GameInfo.hasUpgrade("countertop")) {
 			CounterTop counterTop = new CounterTop(caller, R.drawable.countertop_grey, 
-					CounterTop.DEFAULT_XPOS, CounterTop.DEFAULT_YPOS, GameItem.ORIENTATION_NORTH);
+					CounterTop.DEFAULT_XPOS, CounterTop.DEFAULT_YPOS, GameItem.ORIENTATION_SOUTH);
 			viewThread.addGameItem(counterTop);
 			inputThread.addViewObject(counterTop);
 			gameLogicThread.addGameItem(counterTop);
@@ -113,7 +113,9 @@ public class GameLevel_0 extends GameLevel {
 		
 		//Magic numbers: 40 - x-position of Customers, (GameGrid.GAMEGRID_HEIGHT-45) - y-position of customers
 		//1 - starting customer queue length, 
-		CustomerQueue custQueue = new CustomerQueue(caller, 40, GameGrid.GAMEGRID_HEIGHT-40, GameItem.ORIENTATION_SOUTH, 
+		CustomerQueue custQueue = new CustomerQueue(caller, CustomerQueue.X_POS, 
+				CustomerQueue.Y_POS_FROM_GG_TOP, 
+				GameItem.ORIENTATION_NORTH, 
 				customerQueue_length, point_mult, money_mult, 
 				customer_impatience, customer_max_order_size, 
 				gameLogicThread.getFoodItems());

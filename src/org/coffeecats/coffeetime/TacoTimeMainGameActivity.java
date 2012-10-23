@@ -248,7 +248,6 @@ public class TacoTimeMainGameActivity extends Activity {
 					public void onClick(View v) {
 						MessageRouter.sendPostLevelDialogClosedMessage();
 						if(dialog != null) dialog.dismiss();
-						dialog = null;
 					}
 				});
 				
@@ -257,7 +256,6 @@ public class TacoTimeMainGameActivity extends Activity {
 					public void onCancel(DialogInterface dialog) {
 						MessageRouter.sendPostLevelDialogClosedMessage();
 						if(dialog != null) dialog.dismiss();
-						dialog = null;
 					}
 				});
 				
@@ -283,7 +281,6 @@ public class TacoTimeMainGameActivity extends Activity {
 					public void onClick(View v) {
 						MessageRouter.sendInGameDialogResult(InputThread.INGAMEDIALOGRESULT_MAIN_MENU);
 						if(dialog != null) dialog.dismiss();
-						dialog = null;
 						//Destroy TTMGA/MGP and go back to the main menu activity
 						finish();
 						
@@ -294,7 +291,6 @@ public class TacoTimeMainGameActivity extends Activity {
 					public void onClick(View v) {
 						MessageRouter.sendInGameDialogResult(InputThread.INGAMEDIALOGRESULT_RETRY_LEVEL);
 						if(dialog != null) dialog.dismiss();
-						dialog = null;
 					}
 				});
 				
@@ -302,7 +298,6 @@ public class TacoTimeMainGameActivity extends Activity {
 					public void onClick(View v) {
 						MessageRouter.sendInGameDialogResult(InputThread.INGAMEDIALOGRESULT_CONTINUE);
 						if(dialog != null) dialog.dismiss();
-						dialog = null;
 					}
 				});
 				
@@ -311,7 +306,6 @@ public class TacoTimeMainGameActivity extends Activity {
 					public void onCancel(DialogInterface dialog) {
 						MessageRouter.sendInGameDialogResult(InputThread.INGAMEDIALOGRESULT_CONTINUE);
 						if(dialog != null) dialog.dismiss();
-						dialog = null;
 					}
 				});
 				
@@ -338,7 +332,6 @@ public class TacoTimeMainGameActivity extends Activity {
 					public void onClick(View v) {
 						MessageRouter.sendLoadGameMessage();
 						if(dialog != null) dialog.dismiss();
-						dialog = null;
 					}
 				});
 				
@@ -347,7 +340,6 @@ public class TacoTimeMainGameActivity extends Activity {
 					public void onCancel(DialogInterface dialog) {
 						MessageRouter.sendLoadGameMessage();
 						if(dialog != null) dialog.dismiss();
-						dialog = null;
 					}
 				});
 				

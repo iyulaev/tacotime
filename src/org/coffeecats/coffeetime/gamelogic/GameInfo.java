@@ -260,6 +260,11 @@ public class GameInfo {
 		gameDB.close();
 	}
 	
+	/** return the gender of the current character */
+	public static synchronized String getCharacterGender() {
+		return(myCharacter.type);
+	}
+	
 	
 	
 	

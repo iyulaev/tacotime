@@ -81,6 +81,7 @@ public class InputThread extends Thread {
 				//Pauses the game!
 				else if (msg.what == MESSAGE_INGAME_DIALOG_LAUNCHED) {
 					MessageRouter.sendPauseMessage(true);
+					MessageRouter.sendTogglePausedMessage();
 					setPaused(true);
 				}
 				//Called when the in-game dialog (back button during game play dialog) finishes
@@ -88,6 +89,7 @@ public class InputThread extends Thread {
 				else if (msg.what == MESSAGE_INGAME_DIALOG_FINISHED) {
 					setPaused(false);
 					MessageRouter.sendPauseMessage(false);
+					MessageRouter.sendTogglePausedMessage();
 					int result = msg.arg1;
 					
 					//debugging only...

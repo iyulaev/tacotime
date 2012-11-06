@@ -31,22 +31,22 @@ import android.content.Context;
 
 import org.coffeecats.coffeetime.R;
 
-/** Describes level #2 for the Coffee Time game! */
+/** Describes level #3 for the Coffee Time game! */
 
-public class GameLevel_2 extends GameLevel {
-	public GameLevel_2() {
-		this.level_number = 2;
-		this.customerQueue_length = 13;
-		this.point_mult = 1.3f;
-		this.money_mult = 1.3f;
-		this.customer_impatience = 0.7f;
-		this.time_limit_sec = 80;
-		this.customer_max_order_size = 2;
+public class GameLevel_n extends GameLevel {
+	public GameLevel_n(int n) {
+		this.level_number = n;
+		this.customerQueue_length = 40 + 5*n;
+		this.point_mult = 1.6f + 0.2f*n;
+		this.money_mult = 1.6f + 0.1f*n;
+		this.customer_impatience = 1.0f + 0.05f*n;
+		this.time_limit_sec = 3 * 60 + (4*5*n) ;
+		this.customer_max_order_size = 3;
 		
-		this.point_bonus = 30;
-		this.money_bonus = 15;
-		this.point_bonus_derating = 0.5f;
-		this.money_bonus_derating = 0.5f;
+		this.point_bonus = 125+ 15*n;
+		this.money_bonus = 100 + 10*n;
+		this.point_bonus_derating = 0.3f - 0.05f*n;
+		this.money_bonus_derating = 0.3f - 0.05f*n;
 	}
 	
 	/** Set up this level; add all GameItems and such to the Threads, set up the Customers and such
@@ -105,12 +105,35 @@ public class GameLevel_2 extends GameLevel {
 		inputThread.addViewObject(cupcakeTray);
 		gameLogicThread.addGameItem(cupcakeTray);
 		
+		PieTray pieTray = new PieTray(caller, R.drawable.cake_tray, 
+				PieTray.DEFAULT_XPOS, PieTray.DEFAULT_YPOS, GameItem.ORIENTATION_EAST);
+		//viewThread.addViewObject(cupcakeTray);
+		viewThread.addGameItem(pieTray);
+		inputThread.addViewObject(pieTray);
+		gameLogicThread.addGameItem(pieTray);
+		
 		Blender blender = new Blender(caller, R.drawable.blender_idle, 
 				Blender.DEFAULT_XPOS, Blender.DEFAULT_YPOS, GameItem.ORIENTATION_WEST);
 		//viewThread.addViewObject(blender);
 		viewThread.addGameItem(blender);
 		inputThread.addViewObject(blender);
 		gameLogicThread.addGameItem(blender);
+		
+		Microwave microwave = new Microwave(caller, R.drawable.microwave_inactive, 
+				Microwave.DEFAULT_XPOS, Microwave.DEFAULT_YPOS, GameItem.ORIENTATION_EAST);
+		//viewThread.addViewObject(blender);
+		viewThread.addGameItem(microwave);
+		inputThread.addViewObject(microwave);
+		gameLogicThread.addGameItem(microwave);
+		
+		if(GameInfo.hasUpgrade("espressomachine")) {
+			EspressoMachine espressomachine = new EspressoMachine(caller, R.drawable.espresso_machine_inactive, 
+					EspressoMachine.DEFAULT_XPOS, EspressoMachine.DEFAULT_YPOS, GameItem.ORIENTATION_SOUTH);
+			//viewThread.addViewObject(blender);
+			viewThread.addGameItem(espressomachine);
+			inputThread.addViewObject(espressomachine);
+			gameLogicThread.addGameItem(espressomachine);
+		}
 		
 		if(GameInfo.hasUpgrade("soundsystem")) {
 			SoundSystem soundsystem = new SoundSystem(caller);
@@ -127,6 +150,11 @@ public class GameLevel_2 extends GameLevel {
 		gameLogicThread.addNewFoodItem(new FoodItemCoffee(caller), CoffeeGirl.STATE_CARRYING_COFFEE);
 		gameLogicThread.addNewFoodItem(new FoodItemCupcake(caller), CoffeeGirl.STATE_CARRYING_CUPCAKE);
 		gameLogicThread.addNewFoodItem(new FoodItemBlendedDrink(caller), CoffeeGirl.STATE_CARRYING_BLENDEDDRINK);
+		gameLogicThread.addNewFoodItem(new FoodItemPieSlice(caller), CoffeeGirl.STATE_CARRYING_PIESLICE);
+		gameLogicThread.addNewFoodItem(new FoodItemSandwich(caller), CoffeeGirl.STATE_CARRYING_SANDWICH);
+		
+		if(GameInfo.hasUpgrade("espressomachine"))
+			gameLogicThread.addNewFoodItem(new FoodItemEspresso(caller), CoffeeGirl.STATE_CARRYING_ESPRESSO);
 		
 		//Magic numbers: 40 - x-position of Customers, (GameGrid.GAMEGRID_HEIGHT-45) - y-position of customers
 		//1 - starting customer queue length, 

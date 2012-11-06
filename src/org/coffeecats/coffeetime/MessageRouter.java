@@ -282,6 +282,19 @@ public class MessageRouter {
 		}
 	}
 	
+	/** Called by GLT when the user has failed to clear the level. */
+	public synchronized static void sendLevelFailedMessage(int customers_required, int customers_cleared) {
+		if(ttaHandler != null) {
+			Message message = Message.obtain();
+			message.what = GameLogicThread.MESSAGE_LEVEL_FAILED;
+			message.arg1 = customers_required;
+			message.arg2 = customers_cleared;
+			ttaHandler.sendMessage(message);
+			
+			Log.v("MessageRouter", "Sent level FAIL message to the TacoTimeActivity handler");
+		}
+	}
+	
 	/** Called when we are asked (typically by the betweenLevelMenuActivity) to save the game and
 	 * continue onto the next level. */
 	public synchronized static void sendLevelEndMessage() {
@@ -395,6 +408,17 @@ public class MessageRouter {
 			soundThread.handler.sendMessage(message);
 			
 			Log.v("MessageRouter", "Told SoundThread to play nothing");
+		}
+	}
+	
+	/** Typically called by InputThread to toggle whether the current music is playing or not */
+	public synchronized static void sendTogglePausedMessage() {
+		if(soundThread != null) {
+			Message message = Message.obtain();
+			message.what = SoundThread.MESSAGE_TOGGLE_PAUSED;
+			soundThread.handler.sendMessage(message);
+			
+			Log.v("MessageRouter", "Told SoundThread to toggle paused");
 		}
 	}
 }

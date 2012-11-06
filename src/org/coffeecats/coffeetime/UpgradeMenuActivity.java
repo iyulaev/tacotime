@@ -181,12 +181,24 @@ public class UpgradeMenuActivity extends ListActivity {
 		}
 		
 		//Remove upgrades that we aren't allowed to buy yet
-		if(upgradesList.get(position).getUpgradeLevel() > GameInfo.getLevel())
-			row.setVisibility(View.INVISIBLE);
+		if(upgradesList.get(position).getUpgradeLevel() > GameInfo.getLevel()){
+			//row.setVisibility(View.INVISIBLE);
+			
+			name.setText("<LOCKED>");
+			cost.setVisibility(View.GONE);
+			description.setText("Unlocked at level " + upgradesList.get(position).getUpgradeLevel());
+		}
+			
 		
 		//Remove upgrades for which prereqs aren't satisfied
-		if(!upgradesList.get(position).prerequisitesSatisfied(GameInfo.getUpgradesBoughtCopy()))
-			row.setVisibility(View.INVISIBLE);
+		if(!upgradesList.get(position).prerequisitesSatisfied(GameInfo.getUpgradesBoughtCopy())) {
+			//row.setVisibility(View.INVISIBLE);
+			
+			name.setText("<LOCKED>");
+			cost.setVisibility(View.GONE);
+			description.setText("Prerequisives not satisfied!");
+		}
+			
 		
 		//Display upgrades where the requirements are satisfied
 		if(upgradesList.get(position).prerequisitesSatisfied(GameInfo.getUpgradesBoughtCopy()) &&

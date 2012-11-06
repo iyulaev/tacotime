@@ -38,6 +38,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class TacoTimeMainGameActivity extends Activity {
@@ -46,10 +47,16 @@ public class TacoTimeMainGameActivity extends Activity {
 	
 	private TacoTimeMainGameActivity me;
 	
-	public static final int ASK_TUTORIAL_DIALOG = 0; 
+	public static final int ASK_TUTORIAL_DIALOG = 0;
+	public static final int LEVEL_END_DIALOG = 1;
+	public static final int IN_GAME_DIALOG = 2;
+	public static final int LEVEL_FAILED_DIALOG = 3;
 	
 	//The maingamepanel which will contain the canvas for the whole game
 	MainGamePanel mgpView;
+	//Dialog which gets launched
+	Dialog dialog;
+	String dialogTextStr;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -117,30 +124,15 @@ public class TacoTimeMainGameActivity extends Activity {
 					dialogMessageBuilder.append("Total Points: " + total_points + "\n\n");
 					dialogMessageBuilder.append("Accrued Money: " + accrued_money + "\n");
 					dialogMessageBuilder.append("Bonus Money: " + bonus_money + "\n");
-					dialogMessageBuilder.append("Total Money: " + total_money);					
+					dialogMessageBuilder.append("Total Money: " + total_money);			
+					dialogTextStr = dialogMessageBuilder.toString();
 					
-					//Put together the AlertDialog that will ask the user main menu/retry/continue
-					AlertDialog.Builder builder = new AlertDialog.Builder(me);
-					builder.setMessage(dialogMessageBuilder.toString())
-						.setCancelable(true)
-						
-						//Maps to "return to main menu"
-						.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								MessageRouter.sendPostLevelDialogClosedMessage();
-							}
-						});
-					
-					AlertDialog alert = builder.create();
-					
-					//use an OnDismissListener so that if the user hits back again, it is the same as hitting 'continue'
-					alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
-						public void onCancel(DialogInterface dialog) {
-							MessageRouter.sendPostLevelDialogClosedMessage();
-						}
-					});
-					
-					alert.show();
+					showDialog(LEVEL_END_DIALOG);
+				}
+				else if(msg.what == GameLogicThread.MESSAGE_LEVEL_FAILED) {
+					dialogTextStr=new String("Didn't clear enough customers! Must clear at least " + 
+							msg.arg1 + ", you cleared " + msg.arg2 + ".");
+					showDialog(LEVEL_FAILED_DIALOG);
 				}
 			}
 		};
@@ -176,6 +168,7 @@ public class TacoTimeMainGameActivity extends Activity {
 		//inform the InputThread that the in-game dialog has been launched
 		MessageRouter.sendBackButtonDuringGameplayMessage(); 
 		
+		/*
 		//Put together the AlertDialog that will ask the user main menu/retry/continue
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage("Game Paused. What would you like to do?")
@@ -217,8 +210,145 @@ public class TacoTimeMainGameActivity extends Activity {
 		});
 		
 		alert.show();
+		*/
+		
+		showDialog(IN_GAME_DIALOG);
 		
 	}
 
 	
+	
+	/** Used to launch the end-of-level dialog and also the in-game dialog
+	 * 
+	 * Level-end dialog specified points, monye, etc earned during the level and as bonus
+	 * In-game dialog asks whether user wants to continue, retry the level, or return to main menu
+	 */
+	protected Dialog onCreateDialog(int d) {
+		
+		if(dialog != null) {
+			dialog.dismiss();
+		}
+		
+		dialog = new Dialog(this);
+		TextView dialogText;
+		Button okButton;
+		
+		switch (d) {
+			//Handle the dialog that gets displayed at the very end of the level
+			case LEVEL_END_DIALOG:				
+				dialog.setContentView(R.layout.okdialog);
+				dialog.setTitle("Level Complete!");
+				
+				dialogText = (TextView) dialog.findViewById(R.id.dialogtext);
+				dialogText.setText(dialogTextStr);
+				
+				//OK button closes and ends the level
+				okButton = (Button) dialog.findViewById(R.id.ok);
+				okButton.setOnClickListener(new View.OnClickListener() {
+					public void onClick(View v) {
+						MessageRouter.sendPostLevelDialogClosedMessage();
+						if(dialog != null) dialog.dismiss();
+					}
+				});
+				
+				//back button is the same as hitting OK
+				dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+					public void onCancel(DialogInterface dialog) {
+						MessageRouter.sendPostLevelDialogClosedMessage();
+						if(dialog != null) dialog.dismiss();
+					}
+				});
+				
+				if(dialog != null) dialog.show();
+				break;
+				
+				
+				
+				
+			//Display the in-game dialog that pauses the game
+			//and asks the user what they'd like to do
+			case IN_GAME_DIALOG:				
+				dialog.setContentView(R.layout.ingamedialog);
+				dialog.setTitle("Game Paused");
+				
+				Button mmButton = (Button) dialog.findViewById(R.id.mainmenubutton);
+				Button retryButton = (Button) dialog.findViewById(R.id.retrylevelbutton);
+				Button continueButton = (Button) dialog.findViewById(R.id.continuebutton);
+				
+				
+				
+				mmButton.setOnClickListener(new View.OnClickListener() {
+					public void onClick(View v) {
+						MessageRouter.sendInGameDialogResult(InputThread.INGAMEDIALOGRESULT_MAIN_MENU);
+						if(dialog != null) dialog.dismiss();
+						//Destroy TTMGA/MGP and go back to the main menu activity
+						finish();
+						
+					}
+				});
+				
+				retryButton.setOnClickListener(new View.OnClickListener() {
+					public void onClick(View v) {
+						MessageRouter.sendInGameDialogResult(InputThread.INGAMEDIALOGRESULT_RETRY_LEVEL);
+						if(dialog != null) dialog.dismiss();
+					}
+				});
+				
+				continueButton.setOnClickListener(new View.OnClickListener() {
+					public void onClick(View v) {
+						MessageRouter.sendInGameDialogResult(InputThread.INGAMEDIALOGRESULT_CONTINUE);
+						if(dialog != null) dialog.dismiss();
+					}
+				});
+				
+				//back button is the same as hitting "Continue"
+				dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+					public void onCancel(DialogInterface dialog) {
+						MessageRouter.sendInGameDialogResult(InputThread.INGAMEDIALOGRESULT_CONTINUE);
+						if(dialog != null) dialog.dismiss();
+					}
+				});
+				
+				if(dialog != null) dialog.show();
+				break;
+				
+				
+				
+				
+			//This dialog gets launched via a message passed from GameLogicThread
+			//It tells the user that the level has been failed and they must retry it
+			case LEVEL_FAILED_DIALOG:				
+				dialog.setContentView(R.layout.okdialog);
+				dialog.setTitle("Level Failed");
+				
+				dialogText = (TextView) dialog.findViewById(R.id.dialogtext);
+				dialogText.setText(dialogTextStr);
+				
+				//OK button closes and ends the level
+				okButton = (Button) dialog.findViewById(R.id.ok);
+				okButton.setText("Retry Level");
+				
+				okButton.setOnClickListener(new View.OnClickListener() {
+					public void onClick(View v) {
+						MessageRouter.sendLoadGameMessage();
+						if(dialog != null) dialog.dismiss();
+					}
+				});
+				
+				//back button is the same as hitting OK
+				dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+					public void onCancel(DialogInterface dialog) {
+						MessageRouter.sendLoadGameMessage();
+						if(dialog != null) dialog.dismiss();
+					}
+				});
+				
+				if(dialog != null) dialog.show();
+				break;
+		}
+		
+		
+		
+		return dialog;
+	}
 }

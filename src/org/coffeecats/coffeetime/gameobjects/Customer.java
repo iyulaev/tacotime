@@ -45,7 +45,7 @@ public class Customer extends GameActor {
 	
 	//Define waiting time and correpsonding mood
 	private int seconds_between_pissed_off;
-	public static int SECONDS_BW_PO_STARTING = 25;
+	public static int SECONDS_BW_PO_STARTING = 15;
 	private int curr_mood;
 	private long mood_last_updated; //time (in seconds) when mood was last updated
 	
@@ -150,11 +150,11 @@ public class Customer extends GameActor {
 	//Define the starting location of customers, the position if they're first or second,  
 	//and the exit location of customers
 	private static int location_start_x = 40;
-	private static int location_start_y = GameGrid.GAMEGRID_HEIGHT - 5;
+	private static int location_start_y = 0;
 	private static int locations_queue_x[] = {40,40};
-	private static int locations_queue_y[] = {GameGrid.GAMEGRID_HEIGHT - 30, GameGrid.GAMEGRID_HEIGHT - 12};
+	private static int locations_queue_y[] = {19, 7};
 	private static int locations_exit_x = GameGrid.GAMEGRID_WIDTH - 5;
-	private static int locations_exit_y = GameGrid.GAMEGRID_HEIGHT - 30;
+	private static int locations_exit_y = locations_queue_y[0];
 	
 	/** Sets the state of this customer
 	 * @param new_state The State to put this customer into
@@ -205,8 +205,17 @@ public class Customer extends GameActor {
 			if(mood_last_updated + seconds_between_pissed_off < GameInfo.currentTimeMillis()/1000) {
 				mood_last_updated = GameInfo.currentTimeMillis()/1000;
 				
-				if(this.getState() == STATE_INLINE_HAPPY) setState(STATE_INLINE_OK);
-				else if(this.getState() == STATE_INLINE_OK) setState(STATE_ANGRY);
+				if(this.getState() == STATE_INLINE_HAPPY) {
+					setState(STATE_INLINE_OK);
+					/*Log.d(activitynametag, "Customer state transitioned to OK, will update at " + (mood_last_updated + seconds_between_pissed_off) + 
+							", it is currently " + (GameInfo.currentTimeMillis()/1000));*/
+				}
+				else if(this.getState() == STATE_INLINE_OK) {
+					setState(STATE_ANGRY);
+					//Log.d(activitynametag, "Customer state transitioned to ANGRY");
+				}
+				
+				
 			}
 		}
 		

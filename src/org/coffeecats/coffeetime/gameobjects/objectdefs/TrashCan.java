@@ -13,7 +13,7 @@ public class TrashCan extends GameItem {
 	
 	//Defines for default X and Y positions;
 	public static int DEFAULT_XPOS = GameGrid.GAMEGRID_WIDTH - GameGrid.GAMEGRID_PADDING_RIGHT + 10; //110
-	public static int DEFAULT_YPOS = GameGrid.GAMEGRID_PADDING_TOP + 65;//100;
+	public static int DEFAULT_YPOS = GameGrid.GAMEGRID_PADDING_TOP + 60;//100;
 	
 	/** Constructor for TrashCan; TrashCan is stateless
 	 */

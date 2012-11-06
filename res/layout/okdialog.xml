@@ -1,0 +1,33 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/layout_root" android:orientation="vertical"
+	android:layout_width="fill_parent" android:layout_height="wrap_content"
+	android:padding="5px">
+		
+	<TextView android:id="@+id/dialogtext" 
+		android:layout_width="fill_parent"
+		android:layout_margin="6dp"
+		android:layout_marginTop="0px"
+		android:layout_height="wrap_content" 
+		android:text="DIALOG TEXT LOL"
+		style="@style/dialogtexttext"/>
+
+
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:id="@+id/button_lin_container" android:orientation="horizontal"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:paddingTop="8px"
+		android:padding="0px">
+		
+		<Button android:id="@+id/ok"
+			android:layout_margin="6px"
+			android:layout_marginRight="2px"
+			android:padding="15dp"
+			android:layout_width="0pt" 
+			android:layout_height="wrap_content"
+			android:layout_alignParentBottom="true"
+			android:layout_weight="1"
+			android:background="@drawable/coffee_button"
+			style="@style/dialogbuttontext"
+			android:text="OK" />
+	</LinearLayout>
+</LinearLayout>

@@ -88,7 +88,7 @@ public class GameLevel_1 extends GameLevel {
 		
 		if(GameInfo.hasUpgrade("countertop") || TESTING_MODE) {
 			CounterTop counterTop = new CounterTop(caller, R.drawable.countertop_grey, 
-					CounterTop.DEFAULT_XPOS, CounterTop.DEFAULT_YPOS, GameItem.ORIENTATION_NORTH);
+					CounterTop.DEFAULT_XPOS, CounterTop.DEFAULT_YPOS, GameItem.ORIENTATION_SOUTH);
 			viewThread.addGameItem(counterTop);
 			inputThread.addViewObject(counterTop);
 			gameLogicThread.addGameItem(counterTop);
@@ -132,7 +132,7 @@ public class GameLevel_1 extends GameLevel {
 			
 			if(true) {
 				EspressoMachine espressomachine = new EspressoMachine(caller, R.drawable.espresso_machine_inactive, 
-						EspressoMachine.DEFAULT_XPOS, EspressoMachine.DEFAULT_YPOS, GameItem.ORIENTATION_NORTH);
+						EspressoMachine.DEFAULT_XPOS, EspressoMachine.DEFAULT_YPOS, GameItem.ORIENTATION_SOUTH);
 				//viewThread.addViewObject(blender);
 				viewThread.addGameItem(espressomachine);
 				inputThread.addViewObject(espressomachine);
@@ -167,8 +167,8 @@ public class GameLevel_1 extends GameLevel {
 		//Magic numbers: 40 - x-position of Customers, (GameGrid.GAMEGRID_HEIGHT-45) - y-position of customers
 		CustomerQueue custQueue1 = new CustomerQueue(caller, 
 				CustomerQueue.X_POS, 
-				GameGrid.GAMEGRID_HEIGHT-40, 
-				GameItem.ORIENTATION_SOUTH, 
+				CustomerQueue.Y_POS_FROM_GG_TOP,
+				GameItem.ORIENTATION_NORTH, 
 				customerQueue_length, point_mult, money_mult, 
 				customer_impatience, customer_max_order_size, 
 				gameLogicThread.getFoodItems(), 
@@ -179,8 +179,8 @@ public class GameLevel_1 extends GameLevel {
 		if(TESTING_MODE) {
 			CustomerQueue custQueue2 = new CustomerQueue(caller, 
 				CustomerQueue.X_POS + CustomerQueue.DISTANCE_TO_QUEUE_TWO, 
-				GameGrid.GAMEGRID_HEIGHT-CustomerQueue.Y_POS_FROM_GG_BOTTOM, 
-				GameItem.ORIENTATION_SOUTH, 
+				CustomerQueue.Y_POS_FROM_GG_TOP, 
+				GameItem.ORIENTATION_NORTH, 
 				customerQueue_length, point_mult, money_mult, 
 				customer_impatience, customer_max_order_size, 
 				gameLogicThread.getFoodItems(), 2);

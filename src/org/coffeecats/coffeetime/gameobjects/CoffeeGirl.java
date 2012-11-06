@@ -72,7 +72,10 @@ public class CoffeeGirl extends GameActor {
 		this.addState("carrying_sandwich", null);
 		this.addState("carrying_espresso", null);
 		
-		gameActorSprite = new CoffeeGirlSprite(caller);
+		if(GameInfo.getCharacterGender().toLowerCase().equals("boy"))
+			gameActorSprite = new CoffeeBoySprite(caller);
+		else
+			gameActorSprite = new CoffeeGirlSprite(caller);
 	}
 	
 	/** This method is called by the InputThread when a user input (a tap) occurs somewhere on the screen. We convert

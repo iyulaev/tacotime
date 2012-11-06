@@ -198,6 +198,7 @@ public class ViewThread extends Thread {
 					GameInfo.getLevelTime(),
 					GameInfo.getCustomersLeftForLevel(),
 					GameInfo.getCustomersLeftForBonus(),
+					GameInfo.getCustomersLeftForCleared(),
 					drawItalicAnnoucement());
 
 		} catch(Exception e) {;} 

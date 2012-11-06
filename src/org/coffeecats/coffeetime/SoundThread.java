@@ -26,11 +26,15 @@ public class SoundThread extends Thread {
 	private final int MUSIC_NOTHING = 0;
 	private final int MUSIC_LEVEL_1 = 1;
 	private final int MUSIC_LEVEL_2 = 2;
+	private final int MUSIC_LEVEL_3 = 3;
+	private final int MUSIC_LEVEL_4 = 4;
+	private final int MUSIC_LEVEL_5 = 5;
+	private final int MUSIC_LEVEL_6 = 6;
 	
 	private final int MUSIC_LEVEL_END = GameInfo.MAX_GAME_LEVEL + 1;
 	
 	//Count the total number of sounds in the sound pool
-	private final int SFX_COUNT = 2;
+	private final int SFX_COUNT = 7;
 	
 	//Enum message types
 	public static final int MESSAGE_PLAY_LEVEL_MUSIC = 1;
@@ -39,6 +43,7 @@ public class SoundThread extends Thread {
 	public static final int MESSAGE_SUSPEND = 4;
 	public static final int MESSAGE_UNSUSPEND = 5;
 	public static final int MESSAGE_LOAD_LEVEL_MUSIC = 6;
+	public static final int MESSAGE_TOGGLE_PAUSED = 7;
 	
 	//How long between SoundThread wake-ups
 	private static final int THREAD_DELAY_MS = 250;
@@ -64,6 +69,8 @@ public class SoundThread extends Thread {
 	private int currently_playing;
 	//The MediaPlayer object corresponding to what's currently playing
 	private MediaPlayer current_mstream;
+	//Whether this mstream is paused
+	private boolean current_mstream_paused = false;
 	//Whether this SoundThread is suspended
 	private boolean suspended;
 	//Set to true when we create the thread; it gets set to false in destroy() allowing us to
@@ -118,6 +125,10 @@ public class SoundThread extends Thread {
 				else if(msg.what == MESSAGE_UNSUSPEND) {
 					setSuspended(false);
 				}
+				
+				else if(msg.what == MESSAGE_TOGGLE_PAUSED) {
+					toggleMusicPaused();
+				}
 			}
 		};
 	}
@@ -157,6 +168,14 @@ public class SoundThread extends Thread {
 		levelMusicResourceMap.put(MUSIC_LEVEL_1, R.raw.music_level_1);
 		levelMusicMap.put(2, MUSIC_LEVEL_2);
 		levelMusicResourceMap.put(MUSIC_LEVEL_2, R.raw.music_level_2);
+		levelMusicMap.put(3, MUSIC_LEVEL_3);
+		levelMusicResourceMap.put(MUSIC_LEVEL_3, R.raw.music_level_3_4);
+		levelMusicMap.put(4, MUSIC_LEVEL_4);
+		levelMusicResourceMap.put(MUSIC_LEVEL_4, R.raw.music_level_3_4);
+		levelMusicMap.put(5, MUSIC_LEVEL_5);
+		levelMusicResourceMap.put(MUSIC_LEVEL_5, R.raw.music_level_5_6);
+		levelMusicMap.put(6, MUSIC_LEVEL_6);
+		levelMusicResourceMap.put(MUSIC_LEVEL_6, R.raw.music_level_5_6);
 		
 		//Mapping from sound effects to actual effect indices, and their durations	
 		sfxMap.put(MUSIC_LEVEL_END, MediaPlayer.create(caller, R.raw.sfx_level_end));
@@ -164,7 +183,7 @@ public class SoundThread extends Thread {
 	
 	/** Loads the music for a particular level. Unloads music for the previous level (if it was loaded). It
 	 * is optimized so that if the music is already loaded we don't re-load it.
-	 * @param level_number The level # to loda & prepare the music for
+	 * @param level_number The level # to load & prepare the music for
 	 */
 	private void loadLevelMusic(int level_number) {
 		if(!levelMusicMap.containsKey(level_number)) return;
@@ -244,6 +263,19 @@ public class SoundThread extends Thread {
 			current_mstream = sfxMap.get(sfx_idx);
 			current_mstream.setLooping(looping);
 			current_mstream.start();
+			current_mstream_paused = false;
+		}
+	}
+	
+	/** Called to pause / unpause the music */
+	private synchronized void toggleMusicPaused() {
+		if(current_mstream != null) {
+			if(current_mstream_paused) 
+				current_mstream.start();
+			else
+				current_mstream.pause();
+				
+			current_mstream_paused = !current_mstream_paused;
 		}
 	}
 	

@@ -1,13 +1,12 @@
 =-=-= TacoTime Game Engine Overview =-=-=
 
-This is the TacoTime game engine. It simulates running a coffee shop (or a Taco 
-Truck...or any other fast food sort of thing). It is inspired by a variety of 
-Flash and Symbian/JavaME games which allowed the player to assume a customer-
-service type role. The players is the sole employee of a restaurant/cafe
-consisting of a number of machines, which can be used to produce various
-food items. Customers queue up at the front of the establishment and voice 
+This is the CoffeeTime game and game engine. It simulates running a coffee shop 
+It is inspired by a variety of Flash and Symbian/JavaME games which allowed the 
+player to assume a customer-service type role. The players is the sole employee 
+of a restaurant/cafe consisting of a number of machines, which can be used to produce
+ various food items. Customers queue up at the front of the establishment and voice 
 (well, display) their orders. The player attempts to fulfill the orders
-in the least amount of time, aquiring points and money in the process.
+in the least amount of time, acquiring points and money in the process.
 
 =-=-= Programmers =-=-=
 
@@ -20,9 +19,17 @@ for your own application.
 All sound effects including music (c) 2012 Ryan Warner-Steel
 Released under Creative Commons Attribution-NonCommercial (CC BY-NC) license.
 
-All software code, including XML, released under BSD License (our group name is TBD)
+All proprietary art (c) 2012 Coffeecats.
+Released under Creative Commons Attribution-NonCommercial (CC BY-NC) license.
 
-Copyright (c) 2012, <Company Name>
+Selected 3rd party artwork property of respective owners.
+Coffee cup icon: Property of Aha-Soft, http://www.aha-soft.com/
+Coffee cup background for menus: Property of Filippo, http://www.flickr.com/people/fdiotalevi/
+Microwave, sandwich, speakers, trashcan, and some other artwork taken from WP Clipart (http://www.wpclipart.com/). Support public domain art!
+
+All software code, including XML, is (c) 2012 Coffeecats. Released under BSD License:
+
+Copyright (c) 2012, Coffeecats
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

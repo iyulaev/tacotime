@@ -26,7 +26,7 @@ public class CoffeeMachine extends GameItem {
 	
 	//Defines for default X and Y positions;
 	public static int DEFAULT_XPOS = GameGrid.GAMEGRID_PADDING_LEFT - 14;
-	public static int DEFAULT_YPOS = GameGrid.GAMEGRID_PADDING_TOP + 25;
+	public static int DEFAULT_YPOS = GameGrid.GAMEGRID_PADDING_TOP + 5;
 	
 	//keep track of how many coffee machines are instantiated (so we can name them appropriately)
 	public static int instanceCount = 0;
@@ -49,7 +49,7 @@ public class CoffeeMachine extends GameItem {
 		//Add states that describe behavior of coffee machine
 		//super.addState(String stateName, int state_delay_ms, int r_bitmap, boolean input_sensitive, boolean time_sensitive)
 		this.addState("idle", 0, R.drawable.coffeemachine_idle, true, false);
-		this.addState("brewing", brew_time, R.drawable.coffeemachine_brewing, false, true);
+		this.addState("brewing", brew_time, R.drawable.coffeemachine, false, true);
 		this.addState("done", 10000, R.drawable.coffeemachine_done, true, "nothing", true);
 	}
 }

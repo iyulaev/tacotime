@@ -35,7 +35,8 @@ public class CustomerQueue extends GameItem {
 	//Define position of customer queue
 	public static final int X_POS = 40;
 	public static final int DISTANCE_TO_QUEUE_TWO = 30;
-	public static final int Y_POS_FROM_GG_BOTTOM = 40;
+	//public static final int Y_POS_FROM_GG_BOTTOM = 40;
+	public static final int Y_POS_FROM_GG_TOP = 32;
 	
 	private static final String activitynametag = "CustomerQueue";
 	

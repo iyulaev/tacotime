@@ -30,7 +30,7 @@ public abstract class GameSprite {
 	protected final long SPRITE_FRAME_PERIOD_MS = 250;
 	
 	
-	public GameSprite(Context caller) {
+	public GameSprite(Context caller, boolean do_init_helditems) {
 		last_time_drawn = -1L;
 		
 		
@@ -38,26 +38,34 @@ public abstract class GameSprite {
 		//the item that the GameActor holds
 		heldItemMap = new TreeMap<String, Bitmap>();
 		
-		FoodItemBlendedDrink fbd = new FoodItemBlendedDrink(caller);
-		heldItemMap.put(fbd.getName(), fbd.getBitmapActive());
+		if(do_init_helditems) {
 		
-		FoodItemCoffee fic = new FoodItemCoffee(caller);
-		heldItemMap.put(fic.getName(), fic.getBitmapActive());
-		
-		FoodItemCupcake ficc = new FoodItemCupcake(caller);
-		heldItemMap.put(ficc.getName(), ficc.getBitmapActive());
-		
-		FoodItemEspresso fio = new FoodItemEspresso(caller);
-		heldItemMap.put(fio.getName(), fio.getBitmapActive());
-		
-		FoodItemPieSlice fips = new FoodItemPieSlice(caller);
-		heldItemMap.put(fips.getName(), fips.getBitmapActive());
-		
-		FoodItemSandwich fis = new FoodItemSandwich(caller);
-		heldItemMap.put(fis.getName(), fis.getBitmapActive());
-		
-		FoodItemNothing fin = new FoodItemNothing(caller);
-		heldItemMap.put(fin.getName(), fin.getBitmapActive());
+			FoodItemBlendedDrink fbd = new FoodItemBlendedDrink(caller);
+			heldItemMap.put(fbd.getName(), fbd.getBitmapActive());
+			
+			FoodItemCoffee fic = new FoodItemCoffee(caller);
+			heldItemMap.put(fic.getName(), fic.getBitmapActive());
+			
+			FoodItemCupcake ficc = new FoodItemCupcake(caller);
+			heldItemMap.put(ficc.getName(), ficc.getBitmapActive());
+			
+			FoodItemEspresso fio = new FoodItemEspresso(caller);
+			heldItemMap.put(fio.getName(), fio.getBitmapActive());
+			
+			FoodItemPieSlice fips = new FoodItemPieSlice(caller);
+			heldItemMap.put(fips.getName(), fips.getBitmapActive());
+			
+			FoodItemSandwich fis = new FoodItemSandwich(caller);
+			heldItemMap.put(fis.getName(), fis.getBitmapActive());
+			
+			FoodItemNothing fin = new FoodItemNothing(caller);
+			heldItemMap.put(fin.getName(), fin.getBitmapActive());
+			
+		}
+	}
+	
+	public GameSprite(Context caller) {
+		this(caller, true);
 	}
 	
 	

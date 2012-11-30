@@ -30,6 +30,7 @@ public class SoundThread extends Thread {
 	private final int MUSIC_LEVEL_4 = 4;
 	private final int MUSIC_LEVEL_5 = 5;
 	private final int MUSIC_LEVEL_6 = 6;
+	private final int MUSIC_LEVELS_IMPLEMENTED = 6;
 	
 	private final int MUSIC_LEVEL_END = GameInfo.MAX_GAME_LEVEL + 1;
 	
@@ -186,6 +187,8 @@ public class SoundThread extends Thread {
 	 * @param level_number The level # to load & prepare the music for
 	 */
 	private void loadLevelMusic(int level_number) {
+		level_number %= (MUSIC_LEVELS_IMPLEMENTED+1);
+		
 		if(!levelMusicMap.containsKey(level_number)) return;
 		
 		int level_enum = levelMusicMap.get(level_number);

@@ -1,4 +1,4 @@
-=-=-= TacoTime Game Engine Overview =-=-=
+=-=-= CoffeeTime Game Engine Overview =-=-=
 
 This is the CoffeeTime game and game engine. It simulates running a coffee shop 
 It is inspired by a variety of Flash and Symbian/JavaME games which allowed the 

@@ -156,17 +156,27 @@ public class GameLevel_n extends GameLevel {
 		if(GameInfo.hasUpgrade("espressomachine"))
 			gameLogicThread.addNewFoodItem(new FoodItemEspresso(caller), CoffeeGirl.STATE_CARRYING_ESPRESSO);
 		
-		//Magic numbers: 40 - x-position of Customers, (GameGrid.GAMEGRID_HEIGHT-45) - y-position of customers
-		//1 - starting customer queue length, 
 		CustomerQueue custQueue = new CustomerQueue(caller, CustomerQueue.X_POS, 
 				CustomerQueue.Y_POS_FROM_GG_TOP, 
 				GameItem.ORIENTATION_NORTH,  
-				customerQueue_length, point_mult, money_mult, 
+				customerQueue_length/2, point_mult, money_mult, 
 				customer_impatience, customer_max_order_size, 
 				gameLogicThread.getFoodItems());
-		//viewThread.addViewObject(custQueue);
+		
+		CustomerQueue custQueue2 = new CustomerQueue(caller, 
+				CustomerQueue.X_POS + CustomerQueue.DISTANCE_TO_QUEUE_TWO, 
+				CustomerQueue.Y_POS_FROM_GG_TOP, 
+				GameItem.ORIENTATION_NORTH, 
+				customerQueue_length/2, point_mult, money_mult, 
+				customer_impatience, customer_max_order_size, 
+				gameLogicThread.getFoodItems(), 2);
+			viewThread.addGameItem(custQueue2);
+			inputThread.addViewObject(custQueue2);
+		
 		viewThread.addGameItem(custQueue);
 		inputThread.addViewObject(custQueue);
-		gameLogicThread.setCustomerQueue(new CustomerQueueWrapper(custQueue));
+		viewThread.addGameItem(custQueue2);
+		inputThread.addViewObject(custQueue2);
+		gameLogicThread.setCustomerQueue(new CustomerQueueWrapper(custQueue, custQueue2));
 	}
 }

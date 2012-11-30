@@ -72,7 +72,7 @@ public class Customer extends GameActor {
 			float point_mult, float money_mult, float impatience, int max_order_size,
 			List<GameFoodItem> foodItemChoices, int queue_number) {
 			
-		super(caller, move_rate, location_start_x + ((queue_number==2) ? CustomerQueue.DISTANCE_TO_QUEUE_TWO : 0), location_start_y, false);
+		super(caller, move_rate, location_start_x + ((queue_number==2) ? CustomerQueue.DISTANCE_TO_QUEUE_TWO : 0), location_start_y, true);
 		
 		queue_position = starting_queue_position;
 		visible = false;
@@ -136,6 +136,9 @@ public class Customer extends GameActor {
 		this.addState("finished", new DirectionBitmapMap(new CircularList<Bitmap>(1,tempBitmap)));
 		
 		setState(STATE_HIDDEN);
+		
+		//Load a new CustomerSprite and set this instance's gAS to that
+		gameActorSprite = new CustomerSprite(caller);
 	}
 
 	@Override
@@ -236,7 +239,14 @@ public class Customer extends GameActor {
 	public void draw(Canvas canvas) {		
 		super.draw(canvas);
 		
-		Bitmap bitmap = bitmapmap.getDirectionList(target_x - x, target_y - y).getCurrent();
+		//Hack to draw in hands correctly for customers
+		if(this.USING_NEW_SPRITES) {
+			int vector_x = target_x - x;
+			int vector_y = target_y - y;
+			this.draw(canvas, gameActorSprite.getHandsBitmap(vector_x, vector_y, 0));
+		}
+		
+		//Bitmap bitmap = bitmapmap.getDirectionList(target_x - x, target_y - y).getCurrent();
 		
 		//draw the order using a 9patch speech bubble, if this Customer is visible and is waiting for their order
 		//to be fulfilled
@@ -250,7 +260,7 @@ public class Customer extends GameActor {
 			hasn't moved since the last time draw() was called.*/
 			NinePatchDrawable speechBubble = (NinePatchDrawable)caller.getResources().getDrawable(R.drawable.speech_bubble_sm);
 
-			int bubble_left =  GameGrid.canvasX(this.x) + bitmap.getWidth()/2 + 2; //+2 at the end for padding :)
+			int bubble_left =  GameGrid.canvasX(this.x) + 32/2 + 2; //32 is bitmap width, +2 at the end for padding :) 
 			int bubble_top = GameGrid.canvasY(this.y) - speechBubble.getMinimumHeight()/2;
 			int bubble_right = bubble_left + BUBBLE_WIDTH + (ICON_WIDTH*(customerOrderSize-1));
 			int bubble_bottom = bubble_top + BUBBLE_HEIGHT;

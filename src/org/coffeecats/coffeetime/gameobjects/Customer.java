@@ -55,6 +55,9 @@ public class Customer extends GameActor {
 	public static int DEFAULT_MAX_ORDER_SIZE = 2;
 	private int max_order_size;
 	int queue_number;
+	
+	//Define Bitmap used to represent tear drop
+	private static Bitmap tearDropBMP = null;
 
 
 	/** Initialize a new Customer.
@@ -139,6 +142,9 @@ public class Customer extends GameActor {
 		
 		//Load a new CustomerSprite and set this instance's gAS to that
 		gameActorSprite = new CustomerSprite(caller);
+		
+		//Load the teardrop
+		tearDropBMP = BitmapFactory.decodeResource(caller.getResources(), R.drawable.customer_tear_drop);
 	}
 
 	@Override
@@ -246,7 +252,11 @@ public class Customer extends GameActor {
 			this.draw(canvas, gameActorSprite.getHandsBitmap(vector_x, vector_y, 0));
 		}
 		
-		//Bitmap bitmap = bitmapmap.getDirectionList(target_x - x, target_y - y).getCurrent();
+		//Draw a "tear drop" if the customer is getting unhappy
+		if(isVisible() && this.getState() == STATE_INLINE_OK) {
+			canvas.drawBitmap(tearDropBMP, GameGrid.canvasX(this.x) - 18, GameGrid.canvasY(this.y) - 4,null);
+		}
+		
 		
 		//draw the order using a 9patch speech bubble, if this Customer is visible and is waiting for their order
 		//to be fulfilled

@@ -8,6 +8,9 @@
         <item>Boy</item>
         <item>Girl</item>
     </string-array>
+    
     <string name="flurry_apik">R7MF9ZYTTFGW2FB7Q7ZW</string>
+    
+    <string name="announcement_url">http://www.yulaev.com/~ivany/temp/coffeetime_announcement.txt</string>
 
 </resources>

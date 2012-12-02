@@ -11,6 +11,7 @@ package org.coffeecats.coffeetime;
 import org.coffeecats.coffeetime.gamelogic.GameDatabase;
 import org.coffeecats.coffeetime.gamelogic.GameInfo;
 import org.coffeecats.coffeetime.gamelogic.SavedCharacter;
+import org.coffeecats.coffeetime.utility.AnnouncementDatabase;
 
 import org.coffeecats.coffeetime.R;
 
@@ -47,6 +48,10 @@ public class CharacterSelectActivity extends Activity {
 		setContentView(R.layout.characterselectlayout);
 		//Used by Dialogs and such to access this Activity's resources
 		me = this;
+		
+		//Run the server announcement thread and see what happens!
+		ServerAnnouncementThread sat = new ServerAnnouncementThread(this);
+		sat.start();
 				
 		Button newGame = (Button) findViewById(R.id.existing_character);
 		newGame.setOnClickListener(new View.OnClickListener() {
@@ -62,6 +67,9 @@ public class CharacterSelectActivity extends Activity {
 				showDialog(CREATE_CHARACTER_DIALOG);
 			}
 		});
+		
+		//database test!
+		//AnnouncementDatabase.test(this);
 	}
 	
 	public void onPause() {

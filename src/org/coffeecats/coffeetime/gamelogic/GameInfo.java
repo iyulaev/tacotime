@@ -3,6 +3,7 @@ package org.coffeecats.coffeetime.gamelogic;
 import java.util.ArrayList;
 
 import org.coffeecats.coffeetime.gameobjects.GameUpgrade;
+import org.coffeecats.coffeetime.utility.ServerAnnouncement;
 
 
 import android.content.Context;
@@ -54,6 +55,10 @@ public class GameInfo {
 	public static final int MODE_GAMEMENU_VIEW = 7;
 	public static final int MODE_MAINMENU_VIEW = 8;
 	private static int gameMode;
+	
+	//Store information about server-based announcements
+	private static boolean new_server_announcement = false;
+	private static ServerAnnouncement serverAnnouncement;
 	
 	/*game time, only gets incremented  by the TimerThread
 	only gets incremented during active play; if the game is paused for some reason no incrementing
@@ -318,6 +323,25 @@ public class GameInfo {
 	public static synchronized long setAndGetGameTimeMillis(long increment) {
 		game_time_millis += increment;
 		return(game_time_millis);
+	}
+	
+	
+	/** Query GameInfo to see if there is a new serverAnnoucement. If there is, return it
+	 * and unset the new_server_announcement flag. Otherwise, return null.
+	 * @return serverAnnoucement if the current announcement hasn't been read yet, else null
+	 */
+	public synchronized static ServerAnnouncement getAnnouncement() {
+		if(new_server_announcement) {
+			new_server_announcement = false;
+			return serverAnnouncement;
+		}
+		else return null;
+	}
+	
+	/** Set the new announcement */
+	public synchronized static void setAnnouncement(ServerAnnouncement n_serverAnnouncement) {
+		new_server_announcement = true;
+		serverAnnouncement = n_serverAnnouncement;
 	}
 	
 }

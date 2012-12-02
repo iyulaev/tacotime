@@ -24,6 +24,14 @@ local.properties
 
 #####################################
 
+# Stuff added for CoffeeTime #
+libs/*.pdf
+libs/*.txt
+
+_src_old/
+
+#####################################
+
 # Section 2 #
 
 # Eclipse.gitignore (https://github.com/github/gitignore/blob/master/Global/Eclipse.gitignore) 

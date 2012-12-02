@@ -10,6 +10,8 @@ import org.coffeecats.coffeetime.gamelogic.GameDatabase;
 import org.coffeecats.coffeetime.gamelogic.GameInfo;
 import org.coffeecats.coffeetime.gamelogic.Interaction;
 import org.coffeecats.coffeetime.utility.Analytics;
+import org.coffeecats.coffeetime.utility.AnnouncementDatabase;
+import org.coffeecats.coffeetime.utility.ServerAnnouncement;
 
 import org.coffeecats.coffeetime.R;
 
@@ -79,7 +81,8 @@ public class TacoTimeActivity extends Activity {
 			}
 		});
 		
-		Log.v(activitynametag, "By the way, we are playing character " + GameInfo.characterName);
+		ServerAnnouncement sa = GameInfo.getAnnouncement();
+		if(sa != null) showLatestAnnouncement(sa);
 	}
 	
 	/** Called when game is exited basically */
@@ -98,6 +101,29 @@ public class TacoTimeActivity extends Activity {
         .setTitle("No Saved Game")
         .setIcon(R.drawable.fooditem_coffee )
         .setMessage("Sorry! No saved game exists for " + characterName + " yet.")
+        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                	; //onClick() does nothing, just kills the dialog.
+                }
+        });
+        
+        b.show();
+	}
+	
+	/** Displays an AlertDialog dialog to the user containing the latest server-based 
+	 * announcement.
+	 * */
+	private void showLatestAnnouncement(ServerAnnouncement sa) {
+		AnnouncementDatabase announcementDatabase = new AnnouncementDatabase(this);
+		announcementDatabase.open();
+		announcementDatabase.saveAnnouncementToDatabase(sa);
+		announcementDatabase.close();
+		
+       
+		Builder b = new AlertDialog.Builder(this)
+        .setTitle("Announcement")
+        .setIcon(R.drawable.fooditem_coffee )
+        .setMessage(sa.getServerAnnouncement())
         .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
                 	; //onClick() does nothing, just kills the dialog.

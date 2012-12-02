@@ -36,4 +36,11 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>net.sourceforge.metrics.nature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>JSON-java-d15e776</name>
+			<type>2</type>
+			<location>D:/mydocs/training/coffee_game/src/libs/JSON-java-d15e776</location>
+		</link>
+	</linkedResources>
 </projectDescription>

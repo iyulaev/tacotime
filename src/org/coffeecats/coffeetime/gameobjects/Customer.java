@@ -53,8 +53,9 @@ public class Customer extends GameActor {
 	private int queue_position;
 	
 	public static int DEFAULT_MAX_ORDER_SIZE = 2;
-	private int max_order_size;
-	int queue_number;
+	private int max_order_size; //The maximum order size that a customer can have
+	private static final int [] order_weights = {3,2,1};
+	int queue_number; //the queue that this customer resides in (of the two possible queues in later levels)
 	
 	//Define Bitmap used to represent tear drop
 	private static Bitmap tearDropBMP = null;
@@ -82,10 +83,34 @@ public class Customer extends GameActor {
 		
 		this.queue_number = queue_number;
 		
-		//Generate this customer's food item order
+		//Generate this customer's order size
 		Random random = new Random();
 		this.max_order_size = max_order_size;
-		customerOrderSize = 1+random.nextInt(max_order_size);
+
+		int order_weight_sum = 0;
+		for(int i = 0; i < ((max_order_size<order_weights.length)?max_order_size:order_weights.length); i++) 
+			order_weight_sum += order_weights[i];
+		
+		int order_bin = random.nextInt(order_weight_sum);
+		
+		int order_cumulative_size = 0;
+		customerOrderSize = -1;
+		for(int i = 0; i < order_weights.length; i++) {
+			order_cumulative_size += order_weights[i];
+			
+			if(order_bin < order_cumulative_size) {
+				customerOrderSize = i+1;
+				break;
+			}
+		}
+		
+		if(customerOrderSize == -1 || customerOrderSize > max_order_size) {
+			Log.w(activitynametag, "Customer order size calculation went astray!");
+			customerOrderSize = max_order_size;
+		}
+		
+		
+		//Generate this customer's food item order
 		customerOrder = new ArrayList<GameFoodItem>();
 		
 		//We set up the "bins" for determining each menu item
@@ -117,6 +142,10 @@ public class Customer extends GameActor {
 		float seconds_between_po_divisor = (random.nextFloat() + 1.0f) * impatience;
 		seconds_between_pissed_off = (int) (((float)SECONDS_BW_PO_STARTING) / seconds_between_po_divisor);
 		
+		
+		
+		
+		
 		//Initialize all of the states that this Customer can have
 		Bitmap tempBitmap;
 		
@@ -140,11 +169,15 @@ public class Customer extends GameActor {
 		
 		setState(STATE_HIDDEN);
 		
+		
+		
+		
 		//Load a new CustomerSprite and set this instance's gAS to that
 		gameActorSprite = new CustomerSprite(caller);
 		
 		//Load the teardrop
-		tearDropBMP = BitmapFactory.decodeResource(caller.getResources(), R.drawable.customer_tear_drop);
+		if(tearDropBMP == null)
+			tearDropBMP = BitmapFactory.decodeResource(caller.getResources(), R.drawable.customer_tear_drop);
 	}
 
 	@Override

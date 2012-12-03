@@ -36,10 +36,10 @@ import org.coffeecats.coffeetime.R;
 public class GameLevel_6 extends GameLevel {
 	public GameLevel_6() {
 		this.level_number = 6;
-		this.customerQueue_length = 40;
+		this.customerQueue_length = 35;
 		this.point_mult = 1.6f;
 		this.money_mult = 1.6f;
-		this.customer_impatience = 1.0f;
+		this.customer_impatience = 0.5f;
 		this.time_limit_sec = 3 * 60;
 		this.customer_max_order_size = 3;
 		

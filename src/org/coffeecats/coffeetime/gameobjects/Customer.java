@@ -59,6 +59,10 @@ public class Customer extends GameActor {
 	
 	//Define Bitmap used to represent tear drop
 	private static Bitmap tearDropBMP = null;
+	
+	//Instance counter
+	private static int instanceCount = 0;
+	private int instance_index;
 
 
 	/** Initialize a new Customer.
@@ -178,6 +182,8 @@ public class Customer extends GameActor {
 		//Load the teardrop
 		if(tearDropBMP == null)
 			tearDropBMP = BitmapFactory.decodeResource(caller.getResources(), R.drawable.customer_tear_drop);
+		
+		instance_index = instanceCount++;
 	}
 
 	@Override
@@ -194,7 +200,7 @@ public class Customer extends GameActor {
 	private static int location_start_x = 40;
 	private static int location_start_y = 0;
 	private static int locations_queue_x[] = {40,40};
-	private static int locations_queue_y[] = {19, 7};
+	private static int locations_queue_y[] = {19, 8};
 	private static int locations_exit_x = GameGrid.GAMEGRID_WIDTH - 5;
 	private static int locations_exit_y = locations_queue_y[0];
 	
@@ -239,12 +245,19 @@ public class Customer extends GameActor {
 			this.target_y = locations_queue_y[getQueuePosition()];
 			unLock();
 			
+			//Log.d(activitynametag, "setting y position for customer " + instance_index + " to " + this.target_y + " (currently is " + this.y + ")");
+			
 			//If we are presently in line and at the front of the queue, check if our dependencies have been met
 			//if they have then we can transition to served
 			if(orderSatisfied()) setState(STATE_SERVED);
 			
-			//Update mood?
-			if(mood_last_updated + seconds_between_pissed_off < GameInfo.currentTimeMillis()/1000) {
+			//If we are not at the front of the line, don't get angry
+			else if(getQueuePosition() > 0) {
+				mood_last_updated = GameInfo.currentTimeMillis()/1000;
+			}
+			
+			//Update mood? If we are at the front of the line...and it's been that long...
+			else if(mood_last_updated + seconds_between_pissed_off < GameInfo.currentTimeMillis()/1000) {
 				mood_last_updated = GameInfo.currentTimeMillis()/1000;
 				
 				if(this.getState() == STATE_INLINE_HAPPY) {
@@ -278,6 +291,11 @@ public class Customer extends GameActor {
 	public void draw(Canvas canvas) {		
 		super.draw(canvas);
 		
+		int drawn_x = GameGrid.canvasX(x);
+		int drawn_y = GameGrid.canvasY(y);
+		
+		//if(isVisible()) Log.d(activitynametag, "Drawing customer " + instance_index + " positions = " + target_x + ", " + target_y);
+		
 		//Hack to draw in hands correctly for customers
 		if(this.USING_NEW_SPRITES) {
 			int vector_x = target_x - x;
@@ -286,7 +304,7 @@ public class Customer extends GameActor {
 		}
 		
 		//Draw a "tear drop" if the customer is getting unhappy
-		if(isVisible() && this.getState() == STATE_INLINE_OK) {
+		if(isVisible() && (this.getState() == STATE_INLINE_OK || this.getState() == STATE_ANGRY)) {
 			canvas.drawBitmap(tearDropBMP, GameGrid.canvasX(this.x) - 18, GameGrid.canvasY(this.y) - 4,null);
 		}
 		

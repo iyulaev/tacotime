@@ -23,6 +23,7 @@ public class FoodItemCoffee extends GameFoodItem {
 	
 	public FoodItemCoffee() {
 		super("coffee");
+		super.orderProbability = 1.4f; 
 	}
 	
 	public FoodItemCoffee(Context caller) {

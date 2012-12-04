@@ -71,6 +71,9 @@ public abstract class GameActor implements ViewObject {
 	protected synchronized void setLocked(){ myLock.lock(); }
 	protected synchronized void unLock() { myLock.unlock(); }
 	
+	private static int instance_count = 0;
+	private int instance_idx = 0;
+	
 	/** Creates a new GameActor. Starting location is set to the center of the game grid
 	 * 
 	 * @param caller The calling Context, for getting resources like Bitmap ids
@@ -111,6 +114,8 @@ public abstract class GameActor implements ViewObject {
 				BitmapFactory.decodeResource(caller.getResources(), R.drawable.blender)));
 		
 		myLock = new ReentrantLock();
+		
+		instance_idx = instance_count++;
 	}
 
 	/** onUpdate() gets called when GameActor needs to be updated by ViewThread
@@ -144,6 +149,8 @@ public abstract class GameActor implements ViewObject {
 			//Calculate distance to target
 			float distance = (float) Math.sqrt((target_x - x_real)*(target_x - x_real) + (target_y - y_real)*(target_y - y_real));
 			
+			//Log.d("GameActor", "Customer " + instance_idx + " has distance=" + distance + " target_y=" + target_y + " y=" + y + " yreal=" + y_real);
+			
 			//Calculate the length of our vector motion
 			float vector_length = Math.min( max_dist_moved, distance );
 			
@@ -152,6 +159,8 @@ public abstract class GameActor implements ViewObject {
 			if(distance <= max_dist_moved) {
 				x = target_x;
 				y = target_y;
+				x_real = x;
+				y_real = y;
 			} else {
 				float vector_x, vector_y;
 				//Scale vectors by the distance that we are to traverse
@@ -162,6 +171,8 @@ public abstract class GameActor implements ViewObject {
 				y_real += vector_y;
 				x = (int) Math.round(x_real); 
 				y = (int) Math.round(y_real);
+				
+				//Log.d("GameActor", "Customer " + instance_idx + " now y=" + y + " yreal=" + y_real);
 			}
 		}
 		

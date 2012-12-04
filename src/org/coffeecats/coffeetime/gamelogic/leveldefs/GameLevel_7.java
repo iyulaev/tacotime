@@ -39,7 +39,7 @@ public class GameLevel_7 extends GameLevel {
 		this.customerQueue_length = 35;
 		this.point_mult = 1.6f;
 		this.money_mult = 1.6f;
-		this.customer_impatience = 0.5f;
+		this.customer_impatience = 0.75f;
 		this.time_limit_sec = 3 * 60 ;
 		this.customer_max_order_size = 3;
 		

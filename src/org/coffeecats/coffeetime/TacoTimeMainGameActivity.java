@@ -31,12 +31,15 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -135,6 +138,11 @@ public class TacoTimeMainGameActivity extends Activity {
 							msg.arg1 + ", you cleared " + msg.arg2 + ".");
 					showDialog(LEVEL_FAILED_DIALOG);
 				}
+				else if(msg.what == GameLogicThread.MESSAGE_NEW_MACHINES_DIALOG) {
+					ArrayList<ArrayList<Integer>> newMachines = (ArrayList<ArrayList<Integer>>) msg.obj;
+					Log.d(activitynametag, "Displaying new machines dialog");
+					displayNewMachinesDialog(newMachines);
+				}
 			}
 		};
 		
@@ -215,6 +223,19 @@ public class TacoTimeMainGameActivity extends Activity {
 		}
 		
 		return dialog;
+	}
+	
+	/** Used to launch the "New Machines" dialog
+	 * @param newMachines An array of arrays; each sub-array gives the bitmap resource values (ints)
+	 * that should be displayed to show the relationships between machines and food items
+	 */
+	private void displayNewMachinesDialog(ArrayList<ArrayList<Integer>> newMachines) {
+		MessageRouter.sendPauseGLTMessage(true); // pauses the game
+
+		NewMachinesDialog newMachinesDialog = new NewMachinesDialog(this, newMachines);
+		newMachinesDialog.show();
+		
+		dialog = newMachinesDialog;
 	}
 	
 	
@@ -339,6 +360,67 @@ public class TacoTimeMainGameActivity extends Activity {
 			setOnCancelListener(new DialogInterface.OnCancelListener() {
 				public void onCancel(DialogInterface dialog) {
 					MessageRouter.sendInGameDialogResult(InputThread.INGAMEDIALOGRESULT_CONTINUE);
+					dismiss();
+				}
+			});
+        }
+    }
+	
+	/** This is the dialog that is displayed when we begin a new level and the new level has some kind of machine(s)
+	 * that require explanation
+	 * @author ivany
+	 *
+	 */
+	class NewMachinesDialog extends Dialog {
+		/** Create a new NewMachinesDialog 
+		 * 
+		 * @param context The calling context
+		 * @param newMachines An array of arrays; each sub-array gives the bitmap resource values (ints)
+		 * that should be displayed to show the relationships between machines and food items
+		 */
+        protected NewMachinesDialog(Context context, ArrayList<ArrayList<Integer>> newMachines) {
+            super(context);
+            
+			setContentView(R.layout.newmachinesdialog);
+			setTitle("New Machines");
+			
+			Button okButton = (Button) findViewById(R.id.ok);
+			LinearLayout newMachinesContainer = (LinearLayout) findViewById(R.id.new_machines_container);
+			
+			//Figure out what bitmaps we're supposed to put into the dialog and insert them
+			LayoutInflater inflater=LayoutInflater.from(context);
+			
+			for(int i = 0; i < newMachines.size(); i++) {
+				View newEntry = inflater.inflate(R.layout.newmachinesdialogentry, null);
+				LinearLayout parent = (LinearLayout) newEntry.findViewById(R.id.newmachinesdialogentry_root);
+				
+				for(int j = 0; j < newMachines.get(i).size(); j++) {
+					if(j!=0) {
+						ImageView arrowImage = new ImageView(context);
+						arrowImage.setImageResource(R.drawable.rarrow_blue);
+						parent.addView(arrowImage);
+					}
+					
+					ImageView machineEntry = new ImageView(context);
+					machineEntry.setImageResource(newMachines.get(i).get(j));
+					parent.addView(machineEntry);
+				}
+				
+				newMachinesContainer.addView(newEntry);
+			}
+			
+			//OK button closes dialog and tells the game to continue
+			okButton.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					MessageRouter.sendPauseGLTMessage(false);
+					dismiss();
+				}
+			});
+			
+			//back button is the same as hitting "OK"
+			setOnCancelListener(new DialogInterface.OnCancelListener() {
+				public void onCancel(DialogInterface dialog) {
+					MessageRouter.sendPauseGLTMessage(false);
 					dismiss();
 				}
 			});

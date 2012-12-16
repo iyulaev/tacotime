@@ -1,0 +1,6 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/newmachinesdialogentry_root" android:orientation="horizontal"
+	android:layout_width="fill_parent" android:layout_height="wrap_content"
+	android:gravity="center"
+	android:padding="5dp"
+	android:layout_margin="5dp" />

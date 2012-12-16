@@ -19,6 +19,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -39,6 +40,9 @@ public class CharacterSelectActivity extends Activity {
 	EditText nameText;
 	Spinner typeSpinner;
 	
+	private static final int CSLA_REQUEST_CODE = 1;
+	public static final int CSLA_SELECTED_CHARACTER = RESULT_FIRST_USER + 1;
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -57,7 +61,8 @@ public class CharacterSelectActivity extends Activity {
 		newGame.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				Intent i = new Intent(v.getContext(), CharacterSelectListActivity.class);
-				startActivityForResult(i,0);
+				
+				startActivityForResult(i,CSLA_REQUEST_CODE);
 			}
 		});
 		
@@ -72,9 +77,19 @@ public class CharacterSelectActivity extends Activity {
 		//AnnouncementDatabase.test(this);
 	}
 	
+	/** Used to receive data from the calling activity indicating whether a character has been selected */
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if(requestCode == CSLA_REQUEST_CODE) {
+			if(resultCode == CSLA_SELECTED_CHARACTER) {
+				finish();
+			}
+		}
+	}
+	
 	public void onPause() {
 		super.onPause();
-		finish();
+		//finish();
 	}
 	
 	/** Used to launch the character creation dialog and process the results of the dialog once the user

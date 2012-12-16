@@ -1,5 +1,7 @@
 package org.coffeecats.coffeetime.gamelogic.leveldefs;
 
+import java.util.ArrayList;
+
 import org.coffeecats.coffeetime.GameLogicThread;
 import org.coffeecats.coffeetime.InputThread;
 import org.coffeecats.coffeetime.ViewThread;
@@ -47,6 +49,14 @@ public class GameLevel_2 extends GameLevel {
 		this.money_bonus = 15;
 		this.point_bonus_derating = 0.5f;
 		this.money_bonus_derating = 0.5f;
+		
+		//New machines? Blender! 
+		newMachines = new ArrayList<ArrayList<Integer>>();
+		
+		newMachines.add(new ArrayList<Integer>());
+		newMachines.get(0).add(R.drawable.fooditem_coffee);
+		newMachines.get(0).add(R.drawable.blender);
+		newMachines.get(0).add(R.drawable.fooditem_blendeddrink);
 	}
 	
 	/** Set up this level; add all GameItems and such to the Threads, set up the Customers and such

@@ -63,11 +63,12 @@ public class GameLogicThread extends Thread {
 	public static final int MESSAGE_SET_UNSUSPEND = 8;
 	public static final int MESSAGE_SET_PAUSED = 9;
 	public static final int MESSAGE_SET_UNPAUSED = 10;
-	
+		
 	//Define types of messages accepted by OTHER threads/handlers
 	public static final int MESSAGE_LEVEL_END = -1;
 	public static final int MESSAGE_GAME_END = -2;
 	public static final int MESSAGE_LEVEL_FAILED = -3;
+	public static final int MESSAGE_NEW_MACHINES_DIALOG = -4;
 	
 	//Define the period between state machine updates
 	public static final int TIMER_GRANULARITY = 1000;
@@ -253,7 +254,7 @@ public class GameLogicThread extends Thread {
 			//For three seconds tell the user that the evel is about to start
 			message_timer = 3;
 			
-			Log.v(activitynametag, "GLT is loading a new level!");
+			//Log.v(activitynametag, "GLT is loading a new level!");
 			GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_PREPLAY_MESSAGE);
 			
 			GameInfo.setCustomersLeft(customerQueueWrapper.numberOfCustomersLeft(), 
@@ -261,6 +262,9 @@ public class GameLogicThread extends Thread {
 					currLevel.customersUntilCleared() - customerQueueWrapper.numberOfCustomersServed());
 			
 			MessageRouter.sendLoadLevelMusicMessage(GameInfo.getLevel());
+			
+			if(currLevel.getNewMachines() != null) 
+				MessageRouter.sendNewMachinesMessage(currLevel.getNewMachines());
 		}
 		
 		//Pre-play message - this is the state we are in when we display the Level Start countdown message

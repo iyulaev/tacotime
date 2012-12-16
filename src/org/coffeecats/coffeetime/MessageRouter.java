@@ -23,17 +23,6 @@ public class MessageRouter {
 	
 	public static final String activitynametag = "MessageRouter";
 	
-	/** Called when a View Update should occur (not used) 
-	 * 
-	 */
-	public synchronized static void sendViewUpdateMessage() {
-		if(viewThread != null) {
-			Message message = Message.obtain();
-			message.what = ViewThread.MESSAGE_REFRESH_VIEW;
-			viewThread.handler.sendMessage(message);
-		}
-	}
-	
 	/** Called when a user input tap occurs; sends the co-ordinates of the tap to the InputThread so that
 	 * it can update game state accordingly.
 	 * 
@@ -419,6 +408,22 @@ public class MessageRouter {
 			soundThread.handler.sendMessage(message);
 			
 			Log.v("MessageRouter", "Told SoundThread to toggle paused");
+		}
+	}
+	
+	/** Sends a message to the TacoTimeMainGameActivity, telling it to display a new "new machines" 
+	 * dialog that informs the user of the functions (and possibly required input) associated with 
+	 * a machine that has been added to this level.
+	 */
+	public synchronized static void sendNewMachinesMessage(Object newMachines) {
+		if(ttaHandler != null) {
+			Message message = Message.obtain();
+			message.what = GameLogicThread.MESSAGE_NEW_MACHINES_DIALOG;	
+			message.obj = newMachines;
+			
+			ttaHandler.sendMessage(message);
+			
+			Log.v("MessageRouter", "Sent new machines dialog message to the TacoTimeActivity handler");
 		}
 	}
 }

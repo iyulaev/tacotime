@@ -208,9 +208,11 @@ public class Customer extends GameActor {
 	 * @param new_state The State to put this customer into
 	 */
 	protected synchronized void setState(int new_state) {
+		int old_state = getState();
+		
 		super.setState(new_state);
 		
-		if(new_state == STATE_INLINE_HAPPY) {
+		if(new_state == STATE_INLINE_HAPPY && old_state != STATE_INLINE_HAPPY) {
 			x = location_start_x + ((queue_number==2) ? CustomerQueue.DISTANCE_TO_QUEUE_TWO : 0);
 			y = location_start_y;
 		}
@@ -266,11 +268,9 @@ public class Customer extends GameActor {
 							", it is currently " + (GameInfo.currentTimeMillis()/1000));*/
 				}
 				else if(this.getState() == STATE_INLINE_OK) {
-					setState(STATE_ANGRY);
-					//Log.d(activitynametag, "Customer state transitioned to ANGRY");
+					//setState(STATE_ANGRY);
+					Log.d(activitynametag, "Customer state transitioned to ANGRY");
 				}
-				
-				
 			}
 		}
 		

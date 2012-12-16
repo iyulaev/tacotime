@@ -5,6 +5,8 @@
 
 package org.coffeecats.coffeetime.gamelogic;
 
+import java.util.ArrayList;
+
 import org.coffeecats.coffeetime.GameLogicThread;
 import org.coffeecats.coffeetime.InputThread;
 import org.coffeecats.coffeetime.ViewThread;
@@ -39,6 +41,9 @@ public class GameLevel {
 	
 	protected float proportion_customers_until_cleared = 0.7f;
 	protected float proportion_customers_until_bonus = 0.85f;
+	
+	protected ArrayList<ArrayList<Integer>> newMachines = null;
+	protected static boolean have_shown_espresso_machine = false;
 	
 	/** Set up this level; add all GameItems and such to the Threads, set up the Customers and such
 	 * with the per-level parameters.
@@ -91,4 +96,8 @@ public class GameLevel {
 	}
 	
 	public int numberOfCustomers() { return customerQueue_length; }
+	
+	public ArrayList<ArrayList<Integer>> getNewMachines() {
+		return newMachines;
+	}
 }

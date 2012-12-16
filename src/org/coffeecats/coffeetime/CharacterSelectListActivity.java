@@ -75,7 +75,7 @@ public class CharacterSelectListActivity extends ListActivity {
 	
 	@Override
 	public void onPause() {
-		super.onPause();
+		super.onPause();		
 		finish();
 	}
 	
@@ -89,6 +89,8 @@ public class CharacterSelectListActivity extends ListActivity {
 		}
 		String characterName = characterNames.get(position);
 		GameInfo.characterName = characterName;
+		
+		setResult(CharacterSelectActivity.CSLA_SELECTED_CHARACTER);
 		
 		Intent i = new Intent(v.getContext(), TacoTimeActivity.class);
 		startActivityForResult(i,0);

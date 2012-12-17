@@ -45,6 +45,8 @@ public class GameLevel {
 	protected ArrayList<ArrayList<Integer>> newMachines = null;
 	protected static boolean have_shown_espresso_machine = false;
 	
+	protected float customer_impatience_modifier_for_2_lines = 1.1f;
+	
 	/** Set up this level; add all GameItems and such to the Threads, set up the Customers and such
 	 * with the per-level parameters.
 	 * @param vT ViewThread associated with this game session

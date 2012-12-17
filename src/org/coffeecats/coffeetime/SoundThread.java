@@ -18,6 +18,7 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 public class SoundThread extends Thread {
 	private final String activitynametag = "SoundThread";
@@ -100,13 +101,13 @@ public class SoundThread extends Thread {
 			public void handleMessage(Message msg) {
 				//Handle message to play level music
 				if(msg.what == MESSAGE_PLAY_LEVEL_MUSIC) {
-					if(levelMusicMap != null && levelMusicMap.containsKey(msg.arg1))
-						setMusicPlaying(levelMusicMap.get(msg.arg1), true);
+					if(levelMusicMap != null)
+						setMusicPlaying(levelMusicMap.get(adjustLevelNumber(msg.arg1)), true);
 				}
 				//Handle message to *load* level music for a particular level, prepare to play it
 				else if(msg.what == MESSAGE_LOAD_LEVEL_MUSIC) {
-					if(levelMusicMap != null && levelMusicMap.containsKey(msg.arg1))
-						loadLevelMusic(msg.arg1);
+					if(levelMusicMap != null)
+						loadLevelMusic(adjustLevelNumber(msg.arg1));
 				}
 				
 				//Handle message to play the level end sfx
@@ -132,6 +133,13 @@ public class SoundThread extends Thread {
 				}
 			}
 		};
+	}
+	
+	private int adjustLevelNumber(int level_number) {
+		if(level_number > MUSIC_LEVELS_IMPLEMENTED)
+			return ( ((level_number-1) % MUSIC_LEVELS_IMPLEMENTED) + 1 );
+		else
+			return level_number;
 	}
 	
 	/** Called when the SoundThread is to be wound down. Releases all associated resources, mostly the
@@ -186,8 +194,8 @@ public class SoundThread extends Thread {
 	 * is optimized so that if the music is already loaded we don't re-load it.
 	 * @param level_number The level # to load & prepare the music for
 	 */
-	private void loadLevelMusic(int level_number) {
-		level_number %= (MUSIC_LEVELS_IMPLEMENTED+1);
+	private void loadLevelMusic(int level_number) {		
+		Log.d(activitynametag, "Going to load music for level " + level_number);
 		
 		if(!levelMusicMap.containsKey(level_number)) return;
 		

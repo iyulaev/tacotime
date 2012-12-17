@@ -26,7 +26,8 @@ public class CoffeeMachine extends GameItem {
 	
 	//Defines for default X and Y positions;
 	public static int DEFAULT_XPOS = GameGrid.GAMEGRID_PADDING_LEFT - 14;
-	public static int DEFAULT_YPOS = GameGrid.GAMEGRID_PADDING_TOP + 5;
+	public static int DEFAULT_YPOS = GameGrid.GAMEGRID_PADDING_TOP;
+	public static int Y_DIST_TO_SECOND_MACHINE = 20;
 	
 	//keep track of how many coffee machines are instantiated (so we can name them appropriately)
 	public static int instanceCount = 0;

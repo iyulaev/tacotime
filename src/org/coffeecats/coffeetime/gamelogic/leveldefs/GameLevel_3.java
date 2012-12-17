@@ -86,7 +86,7 @@ public class GameLevel_3 extends GameLevel {
 		
 		if(GameInfo.hasUpgrade("secondcoffeemachine")) {
 			coffeeMachine = new CoffeeMachine(caller, R.drawable.coffeemachine, 
-					CoffeeMachine.DEFAULT_XPOS, CoffeeMachine.DEFAULT_YPOS+20, GameItem.ORIENTATION_WEST);
+					CoffeeMachine.DEFAULT_XPOS, CoffeeMachine.DEFAULT_YPOS+CoffeeMachine.Y_DIST_TO_SECOND_MACHINE, GameItem.ORIENTATION_WEST);
 			viewThread.addGameItem(coffeeMachine);
 			inputThread.addViewObject(coffeeMachine);
 			gameLogicThread.addGameItem(coffeeMachine);
@@ -127,6 +127,14 @@ public class GameLevel_3 extends GameLevel {
 		viewThread.addGameItem(blender);
 		inputThread.addViewObject(blender);
 		gameLogicThread.addGameItem(blender);
+		
+		if(GameInfo.hasUpgrade("secondblender")) {
+			blender = new Blender(caller, R.drawable.blender_idle, 
+					Blender.DEFAULT_XPOS, Blender.DEFAULT_YPOS+Blender.Y_DIST_TO_SECOND_BLENDER, GameItem.ORIENTATION_WEST);
+			viewThread.addGameItem(blender);
+			inputThread.addViewObject(blender);
+			gameLogicThread.addGameItem(blender);
+		}
 		
 		if(GameInfo.hasUpgrade("soundsystem")) {
 			SoundSystem soundsystem = new SoundSystem(caller);

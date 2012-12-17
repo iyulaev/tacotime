@@ -41,7 +41,7 @@ public class GameLevel_n extends GameLevel {
 		this.customerQueue_length = 40 + 5*n;
 		this.point_mult = 1.6f + 0.2f*n;
 		this.money_mult = 1.6f + 0.1f*n;
-		this.customer_impatience = 1.0f + 0.05f*n;
+		this.customer_impatience = (.3f + 0.05f*n) * customer_impatience_modifier_for_2_lines;
 		this.time_limit_sec = 3 * 60 + (4*5*n) ;
 		this.customer_max_order_size = 3;
 		
@@ -89,7 +89,7 @@ public class GameLevel_n extends GameLevel {
 		
 		if(GameInfo.hasUpgrade("secondcoffeemachine")) {
 			coffeeMachine = new CoffeeMachine(caller, R.drawable.coffeemachine, 
-					CoffeeMachine.DEFAULT_XPOS, CoffeeMachine.DEFAULT_YPOS+20, GameItem.ORIENTATION_WEST);
+					CoffeeMachine.DEFAULT_XPOS, CoffeeMachine.DEFAULT_YPOS+CoffeeMachine.Y_DIST_TO_SECOND_MACHINE, GameItem.ORIENTATION_WEST);
 			viewThread.addGameItem(coffeeMachine);
 			inputThread.addViewObject(coffeeMachine);
 			gameLogicThread.addGameItem(coffeeMachine);
@@ -130,6 +130,14 @@ public class GameLevel_n extends GameLevel {
 		viewThread.addGameItem(blender);
 		inputThread.addViewObject(blender);
 		gameLogicThread.addGameItem(blender);
+		
+		if(GameInfo.hasUpgrade("secondblender")) {
+			blender = new Blender(caller, R.drawable.blender_idle, 
+					Blender.DEFAULT_XPOS, Blender.DEFAULT_YPOS+Blender.Y_DIST_TO_SECOND_BLENDER, GameItem.ORIENTATION_WEST);
+			viewThread.addGameItem(blender);
+			inputThread.addViewObject(blender);
+			gameLogicThread.addGameItem(blender);
+		}
 		
 		Microwave microwave = new Microwave(caller, R.drawable.microwave_inactive, 
 				Microwave.DEFAULT_XPOS, Microwave.DEFAULT_YPOS, GameItem.ORIENTATION_EAST);

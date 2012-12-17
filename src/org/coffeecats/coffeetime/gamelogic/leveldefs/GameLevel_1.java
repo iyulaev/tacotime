@@ -37,7 +37,7 @@ import org.coffeecats.coffeetime.R;
 
 public class GameLevel_1 extends GameLevel {
 	
-	private static boolean TESTING_MODE = false; 
+	private static boolean TESTING_MODE = true; 
 	
 	public GameLevel_1() {
 		this.level_number = 1;
@@ -93,10 +93,18 @@ public class GameLevel_1 extends GameLevel {
 		
 		if(GameInfo.hasUpgrade("secondcoffeemachine") || TESTING_MODE) {
 			coffeeMachine = new CoffeeMachine(caller, R.drawable.coffeemachine, 
-					CoffeeMachine.DEFAULT_XPOS, CoffeeMachine.DEFAULT_YPOS+20, GameItem.ORIENTATION_WEST);
+					CoffeeMachine.DEFAULT_XPOS, CoffeeMachine.DEFAULT_YPOS+CoffeeMachine.Y_DIST_TO_SECOND_MACHINE, GameItem.ORIENTATION_WEST);
 			viewThread.addGameItem(coffeeMachine);
 			inputThread.addViewObject(coffeeMachine);
 			gameLogicThread.addGameItem(coffeeMachine);
+		}
+		
+		if(GameInfo.hasUpgrade("secondblender") || TESTING_MODE) {
+			Blender blender = new Blender(caller, R.drawable.blender_idle, 
+					Blender.DEFAULT_XPOS, Blender.DEFAULT_YPOS+Blender.Y_DIST_TO_SECOND_BLENDER, GameItem.ORIENTATION_WEST);
+			viewThread.addGameItem(blender);
+			inputThread.addViewObject(blender);
+			gameLogicThread.addGameItem(blender);
 		}
 		
 		if(GameInfo.hasUpgrade("countertop") || TESTING_MODE) {

@@ -361,17 +361,28 @@ public class GameLogicThread extends Thread {
 		//that the game is over
 		else if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_POSTPLAY) {
 			if(GameInfo.getLevel() < GameInfo.MAX_GAME_LEVEL && GameInfo.getLevel() > 0) {
-				Analytics.reportLevelFailed(GameInfo.getLevel(), 
-						customerQueueWrapper.numberOfCustomersServed(),
-						currLevel.customersUntilCleared(),
-						((float) customerQueueWrapper.numberOfCustomersServed()) / ((float) currLevel.numberOfCustomers()));
+				
 				
 				MessageRouter.sendPauseMessage(true);
 				
-				if(customerQueueWrapper.numberOfCustomersServed() < currLevel.customersUntilCleared())
+				//if the level was failed (fewer customers served than required to clear)
+				if(customerQueueWrapper.numberOfCustomersServed() < currLevel.customersUntilCleared()) {
 					MessageRouter.sendLevelFailedMessage(currLevel.customersUntilCleared(), customerQueueWrapper.numberOfCustomersServed());
-				else
+					
+					Analytics.reportLevelFailed(GameInfo.getLevel(), 
+						customerQueueWrapper.numberOfCustomersServed(),
+						currLevel.customersUntilCleared(),
+						((float) customerQueueWrapper.numberOfCustomersServed()) / ((float) currLevel.numberOfCustomers()));
+				}
+				//Otherwise the level was not failed!
+				else {
+					Analytics.reportLevelFinished(GameInfo.getLevel(), 
+						customerQueueWrapper.numberOfCustomersServed() == currLevel.numberOfCustomers(),
+						customerQueueWrapper.numberOfCustomersServed() >= currLevel.customersUntilBonus(), 
+						((float) customerQueueWrapper.numberOfCustomersServed()) / ((float) currLevel.numberOfCustomers()));
+					
 					MessageRouter.sendLevelEndMessage();
+				}
 			}
 			else if(GameInfo.getLevel() == 0) {
 				Analytics.reportLevelFinished(GameInfo.getLevel(), 
@@ -434,11 +445,11 @@ public class GameLogicThread extends Thread {
 		
 		//CoffeeGirl has a coffee, she interacts with blender -> she now has nothing
 		if(old_state == CoffeeGirl.STATE_CARRYING_COFFEE && 
-				interactedWith.equals("Blender")) coffeeGirl.setItemHolding("nothing");
+				interactedWith.contains("Blender")) coffeeGirl.setItemHolding("nothing");
 		
 		//CoffeeGirl's hands are empty, she interacts with a blender that is done -> she is now carrying blended drink
 		if(old_state == CoffeeGirl.STATE_NORMAL && 
-				interactedWith.equals("Blender") && 
+				interactedWith.contains("Blender") && 
 				interactee_state == Blender.STATE_DONE) coffeeGirl.setItemHolding("blended_drink");
 		
 		//CoffeeGirl's hands are NOT empty, she interacts with trashcan -> hands now empty, increment money and/or points
@@ -619,7 +630,6 @@ public class GameLogicThread extends Thread {
 			newLevel = new GameLevel_7();
 		}
 		else {
-			//Log.e(activitynametag, "Invalid level reached!");
 			newLevel = new GameLevel_n(levelNumber);
 		}
 		

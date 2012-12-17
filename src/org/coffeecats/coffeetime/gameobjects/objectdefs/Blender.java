@@ -22,7 +22,11 @@ public class Blender extends GameItem {
 	
 	//Defines for default X and Y positions;
 	public static int DEFAULT_XPOS = GameGrid.GAMEGRID_PADDING_LEFT - 14;
-	public static int DEFAULT_YPOS = GameGrid.GAMEGRID_PADDING_TOP + 45;
+	public static int DEFAULT_YPOS = GameGrid.GAMEGRID_PADDING_TOP + 40;
+	
+	public static int Y_DIST_TO_SECOND_BLENDER = 20;
+	
+	public static int instanceCount = 0;
 	
 	/** Constructor for CoffeeMachine mostly mimics a game items, except it sets the name by itself. Also it sets up
 	 * all of the CoffeeMachine states and the associated bitmaps; the bitmap provided as an argument is just a "default" bitmap
@@ -34,7 +38,7 @@ public class Blender extends GameItem {
 	 * @param orientation
 	 */
 	public Blender(Context caller, int r_bitmap, int x_pos, int y_pos, int orientation) {
-		super(caller, "Blender", r_bitmap, x_pos, y_pos, orientation, 15, 20);
+		super(caller, "Blender" + (++instanceCount), r_bitmap, x_pos, y_pos, orientation, 15, 20);
 		
 		//Add states that describe behavior of coffee machine
 		//super.addState(String stateName, int state_delay_ms, int r_bitmap, boolean input_sensitive, boolean time_sensitive)

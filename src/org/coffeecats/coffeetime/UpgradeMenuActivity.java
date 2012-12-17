@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import org.coffeecats.coffeetime.gamelogic.GameInfo;
 import org.coffeecats.coffeetime.gameobjects.GameUpgrade;
+import org.coffeecats.coffeetime.gameobjects.upgradedefs.BlenderUpgrade;
 import org.coffeecats.coffeetime.gameobjects.upgradedefs.CoffeeMachineUpgrade;
 import org.coffeecats.coffeetime.gameobjects.upgradedefs.CounterTopUpgrade;
 import org.coffeecats.coffeetime.gameobjects.upgradedefs.EspressoMachineUpgrade;
@@ -54,6 +55,7 @@ public class UpgradeMenuActivity extends ListActivity {
 		upgradesList.add(new QuickBrewingUpgrade());
 		upgradesList.add(new SoundSystemUpgrade());
 		upgradesList.add(new EspressoMachineUpgrade());
+		upgradesList.add(new BlenderUpgrade());
 		
 		theListAdapter = new IconicAdapter(this);
 		setListAdapter(theListAdapter);

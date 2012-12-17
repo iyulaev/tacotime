@@ -35,7 +35,7 @@ public class GameLevel_4 extends GameLevel {
 		this.customerQueue_length = 30;
 		this.point_mult = 1.5f;
 		this.money_mult = 1.5f;
-		this.customer_impatience = 0.6f;
+		this.customer_impatience = 0.6f * customer_impatience_modifier_for_2_lines;
 		this.time_limit_sec = 3 * 60 - 10;
 		this.customer_max_order_size = 3;
 		
@@ -73,7 +73,7 @@ public class GameLevel_4 extends GameLevel {
 		
 		if(GameInfo.hasUpgrade("secondcoffeemachine")) {
 			coffeeMachine = new CoffeeMachine(caller, R.drawable.coffeemachine, 
-					CoffeeMachine.DEFAULT_XPOS, CoffeeMachine.DEFAULT_YPOS+20, GameItem.ORIENTATION_WEST);
+					CoffeeMachine.DEFAULT_XPOS, CoffeeMachine.DEFAULT_YPOS+CoffeeMachine.Y_DIST_TO_SECOND_MACHINE, GameItem.ORIENTATION_WEST);
 			viewThread.addGameItem(coffeeMachine);
 			inputThread.addViewObject(coffeeMachine);
 			gameLogicThread.addGameItem(coffeeMachine);
@@ -114,6 +114,14 @@ public class GameLevel_4 extends GameLevel {
 		viewThread.addGameItem(blender);
 		inputThread.addViewObject(blender);
 		gameLogicThread.addGameItem(blender);
+		
+		if(GameInfo.hasUpgrade("secondblender")) {
+			blender = new Blender(caller, R.drawable.blender_idle, 
+					Blender.DEFAULT_XPOS, Blender.DEFAULT_YPOS+Blender.Y_DIST_TO_SECOND_BLENDER, GameItem.ORIENTATION_WEST);
+			viewThread.addGameItem(blender);
+			inputThread.addViewObject(blender);
+			gameLogicThread.addGameItem(blender);
+		}
 		
 		if(GameInfo.hasUpgrade("soundsystem")) {
 			SoundSystem soundsystem = new SoundSystem(caller);

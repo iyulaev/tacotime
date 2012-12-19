@@ -34,7 +34,7 @@ public class GameItem implements ViewObject {
 	public static final int EVENT_DEFAULT = 1;
 	
 	//Determine whether to draw the sensitivity area
-	public static final boolean DRAW_SENSITIVITY_AREA = true;
+	public static final boolean DRAW_SENSITIVITY_AREA = false;
 	
 	static final String activitynametag = "GameItem";
 	

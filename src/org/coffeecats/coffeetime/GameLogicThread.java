@@ -247,7 +247,7 @@ public class GameLogicThread extends Thread {
 		//IF we are viewing the main panel AND we are ready to play a level, this means the
 		//game is ready for another level - load one!
 		if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_PREPLAY) {
-			//At the very beginning of the level, load the current level (increment previous level # by one)
+			//At the very beginning of the level, load the current level (increment previous level # by one, but at the minimum load level #1!)
 			loadLevel(GameInfo.getLevel() + 1);
 			currLevel = getLevelInstance(GameInfo.getLevel());
 			
@@ -274,6 +274,7 @@ public class GameLogicThread extends Thread {
 			if(message_timer > 0) {
 				message_timer--;
 				MessageRouter.sendAnnouncementMessage("Level " + GameInfo.getLevel() + " Start in " + message_timer, true);
+				MessageRouter.sendPlayNothingMessage(); //make sure we're not playing anything!
 			}
 			else {
 				GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_INPLAY);

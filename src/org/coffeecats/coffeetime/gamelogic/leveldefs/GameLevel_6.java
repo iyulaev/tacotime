@@ -38,7 +38,7 @@ import org.coffeecats.coffeetime.R;
 public class GameLevel_6 extends GameLevel {
 	public GameLevel_6() {
 		this.level_number = 6;
-		this.customerQueue_length = 35;
+		this.customerQueue_length = 40;
 		this.point_mult = 1.6f;
 		this.money_mult = 1.6f;
 		this.customer_impatience = 0.65f * customer_impatience_modifier_for_2_lines;
@@ -50,17 +50,12 @@ public class GameLevel_6 extends GameLevel {
 		this.point_bonus_derating = 0.3f;
 		this.money_bonus_derating = 0.3f;
 		
-		//New machines? Sammich oven, maybe espesso machine
-		newMachines = new ArrayList<ArrayList<Integer>>();
-		
-		newMachines.add(new ArrayList<Integer>());
-		newMachines.get(0).add(R.drawable.microwave_active);
-		newMachines.get(0).add(R.drawable.fooditem_sandwich);
-		
+		//New machine? espresso machine?
 		if(GameInfo.hasUpgrade("espressomachine") && !have_shown_espresso_machine) {
+			newMachines = new ArrayList<ArrayList<Integer>>();
 			newMachines.add(new ArrayList<Integer>());
-			newMachines.get(1).add(R.drawable.espresso_machine_active);
-			newMachines.get(1).add(R.drawable.fooditem_espresso);
+			newMachines.get(0).add(R.drawable.espresso_machine_active);
+			newMachines.get(0).add(R.drawable.fooditem_espresso);
 			have_shown_espresso_machine = true;
 		}
 	}

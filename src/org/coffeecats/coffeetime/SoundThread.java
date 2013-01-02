@@ -282,7 +282,10 @@ public class SoundThread extends Thread {
 	private synchronized void toggleMusicPaused() {
 		if(current_mstream != null) {
 			if(current_mstream_paused) 
-				current_mstream.start();
+				//If we are NOT looping the mstream AND we are within 10ms of the end, don't play it
+				if(!getMusicLoop() && current_mstream.getCurrentPosition() >= (current_mstream.getDuration()-10));
+				//otherwise, do play it
+				else current_mstream.start();
 			else
 				current_mstream.pause();
 				

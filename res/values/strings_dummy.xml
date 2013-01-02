@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="flurry_apik">nokeyspecified</string>
+    <string name="announcement_url">nourlspecified</string>
+
+</resources>

@@ -18,9 +18,26 @@ public class Analytics {
 	private static final String tutorialRunStr = "TutorialRun";
 	
 	private static Context caller;
+	private static boolean have_warned_about_no_key = false;
+	
+	private static boolean apiKeyGood() {
+		String apiKey = (String) caller.getResources().getString(R.string.flurry_apik);
+		
+		if(apiKey.equals("nokeyspecified")) {
+			if(!have_warned_about_no_key)
+				Log.w("Analytics", "No API Key for analytics specified! Ignore this message if you are not running the public build.");
+			
+			have_warned_about_no_key = true;
+			return(false);
+		}
+		
+		return(true);
+	}
 
 	/** Initialize a new flurry analytics session */
 	public static void beginSession(Context caller) {
+		if(!apiKeyGood()) return;
+		
 		String apiKey = (String) caller.getResources().getString(R.string.flurry_apik);
 		Analytics.caller = caller; 
 		FlurryAgent.onStartSession(caller, apiKey);
@@ -28,6 +45,8 @@ public class Analytics {
 	
 	/* Ends this flurry analytics session */
 	public static void endSession() {
+		if(!apiKeyGood()) return;
+		
 		FlurryAgent.onEndSession(Analytics.caller);
 	}
 	
@@ -39,6 +58,8 @@ public class Analytics {
 	 * @param customer_satisfied_proportion The proportions of customers that were served (versus the total size of the queue)
 	 */
 	public static void reportLevelFinished(int level, boolean  all_customers_served, boolean gotBonus, float customer_satisfied_proportion) {
+		if(!apiKeyGood()) return;
+		
 		TreeMap<String, String> parameters = new TreeMap<String, String>();
 		parameters.put("level", Integer.toString(level));
 		parameters.put("servedallcust", Boolean.toString(all_customers_served));
@@ -55,6 +76,8 @@ public class Analytics {
 	 * @param customer_satisfied_proportion The proportion of customers that was served
 	 */
 	public static void reportLevelFailed(int level, int customer_served, int required_to_clear, float customer_satisfied_proportion) {
+		if(!apiKeyGood()) return;
+		
 		TreeMap<String, String> parameters = new TreeMap<String, String>();
 		parameters.put("level", Integer.toString(level));
 		parameters.put("customersserved", Integer.toString(customer_served));
@@ -68,6 +91,8 @@ public class Analytics {
 	 * @param was_run Whether the user ran the tutorial or not 
 	 */
 	public static void reportTutorialRun(boolean was_run) {
+		if(!apiKeyGood()) return;
+		
 		TreeMap<String, String> parameters = new TreeMap<String, String>();
 		parameters.put("run?", Boolean.toString(was_run));
 		FlurryAgent.logEvent(tutorialRunStr, parameters);

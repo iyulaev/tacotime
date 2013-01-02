@@ -72,7 +72,7 @@ public class SavedCharacter implements Comparable{
 	 * @param type
 	 */
 	public SavedCharacter(String name, String type) {
-		this(name, type, 0, 0, 0, "");
+		this(name, type, 0, 0, -1, "");
 	}
 	
 	/** Set the ID for this character, and mark it as being valid */

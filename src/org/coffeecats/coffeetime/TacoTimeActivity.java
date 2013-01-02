@@ -54,7 +54,10 @@ public class TacoTimeActivity extends Activity {
 		testDB.open();
 		testDB.loadDatabase();
 		testDB.printCache();
-		if(testDB.databaseCache.containsKey(GameInfo.characterName)) saved_game_exists = true;
+		if(testDB.databaseCache.containsKey(GameInfo.characterName) && 
+				testDB.databaseCache.get(GameInfo.characterName).level != -1) {
+			saved_game_exists = true;
+		}
 		testDB.close();
 		
 		//Setup analytics
@@ -83,6 +86,9 @@ public class TacoTimeActivity extends Activity {
 		
 		ServerAnnouncement sa = GameInfo.getAnnouncement();
 		if(sa != null) showLatestAnnouncement(sa);
+		
+		//So that the CSA quits!
+		setResult(CharacterSelectActivity.CSLA_SELECTED_CHARACTER);
 	}
 	
 	/** Called when game is exited basically */

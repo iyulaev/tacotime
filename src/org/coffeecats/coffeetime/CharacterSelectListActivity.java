@@ -120,7 +120,10 @@ public class CharacterSelectListActivity extends ListActivity {
 			//Fill in the last finished level for this character
 			TextView level=(TextView)row.findViewById(R.id.character_level);
 			//Add 1 because SavedCharacter.level reflects the last COMPLETED level by that character
-			level.setText("Level " + Integer.toString(1 + gameDB.databaseCache.get(characterNames.get(position)).level)); 
+			if(gameDB.databaseCache.get(characterNames.get(position)).level > 0)
+				level.setText("Level " + Integer.toString(1 + gameDB.databaseCache.get(characterNames.get(position)).level)); 
+			else
+				level.setText("New Game");
 			
 			//Fill in the description for this SavedCharacter (corresponding to this row in the ListView)
 			TextView description=(TextView)row.findViewById(R.id.character_description);
@@ -148,7 +151,7 @@ public class CharacterSelectListActivity extends ListActivity {
 	    	
 	    	AlertDialog.Builder builder = new AlertDialog.Builder(me);
 	    	
-			builder.setMessage("Are you sure you want to delete " + characterName + "?")
+			builder.setMessage("Are you sure you want to delete " + characterName + "? Hit back to abort.")
 				.setCancelable(true)
 				
 				//Maps to "return to main menu"

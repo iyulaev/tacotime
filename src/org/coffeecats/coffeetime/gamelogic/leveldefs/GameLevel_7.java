@@ -38,7 +38,7 @@ import org.coffeecats.coffeetime.R;
 public class GameLevel_7 extends GameLevel {
 	public GameLevel_7() {
 		this.level_number = 7;
-		this.customerQueue_length = 40;
+		this.customerQueue_length = 45;
 		this.point_mult = 1.6f;
 		this.money_mult = 1.6f;
 		this.customer_impatience = 0.75f * customer_impatience_modifier_for_2_lines;

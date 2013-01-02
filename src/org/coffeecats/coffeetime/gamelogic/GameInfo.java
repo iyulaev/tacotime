@@ -230,10 +230,7 @@ public class GameInfo {
 	
 	/** Loads the saved game for this character. Since myCharacter should have already been loaded from the
 	 * database in initDB() we simply re-load the data in myCharacter to the GameInfo data. */
-	public static synchronized void loadSavedGame() {
-		/*Log.d(activitynametag, "GameInfo got loadSavedGame() call, but not implemented yet. Restarting the level instead...");
-		level -= 1;*/
-		
+	public static synchronized void loadSavedGame() {		
 		Log.d(activitynametag, "GameInfo got loadSavedGame() call!");
 				
 		level = myCharacter.level;

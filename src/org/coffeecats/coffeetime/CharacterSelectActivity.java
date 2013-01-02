@@ -141,7 +141,7 @@ public class CharacterSelectActivity extends Activity {
 							removeDialog(CREATE_CHARACTER_DIALOG);
 							
 							Intent i = new Intent(me, TacoTimeActivity.class);
-							startActivityForResult(i,0);
+							startActivityForResult(i,CSLA_REQUEST_CODE);
 						}
 						gameDB.close();
 					}

@@ -30,9 +30,13 @@ public class ServerAnnouncementThread extends Thread {
 	
 	AnnouncementDatabase announcementDatabase;
 	
+	private boolean url_is_valid = true;
+	
 	public ServerAnnouncementThread(Context caller) {
 		announcementDatabase = new AnnouncementDatabase(caller);
 		announcementURL = (String) caller.getResources().getString(R.string.announcement_url);
+		
+		if(announcementURL.equals("nourlspecified")) url_is_valid = false;
 	}
 	
 	//This method lifted from http://stackoverflow.com/questions/4308554/simplest-way-to-read-json-from-a-url-in-java
@@ -84,6 +88,12 @@ public class ServerAnnouncementThread extends Thread {
 	 * the annoucement is new (hasn't been saved into the database yet).
 	 */
 	public void run() {	
+		//Don't run if there isn't a valid URL
+		if(!url_is_valid) {
+			Log.w(activitynametag, "No valid announcement_url specified in string resources. Check your strings.xml file. Ignore if you are not running the public build.");
+			return;
+		}
+		
 		String jsonString = jsonStringFromURLString(announcementURL);
 		
 		if(jsonString == null) {

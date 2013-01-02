@@ -8,6 +8,7 @@ package org.coffeecats.coffeetime.utility;
 import java.util.TreeMap;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.flurry.android.FlurryAgent;
 import org.coffeecats.coffeetime.R;
@@ -36,10 +37,11 @@ public class Analytics {
 
 	/** Initialize a new flurry analytics session */
 	public static void beginSession(Context caller) {
+		Analytics.caller = caller; 
+		
 		if(!apiKeyGood()) return;
 		
 		String apiKey = (String) caller.getResources().getString(R.string.flurry_apik);
-		Analytics.caller = caller; 
 		FlurryAgent.onStartSession(caller, apiKey);
 	}
 	

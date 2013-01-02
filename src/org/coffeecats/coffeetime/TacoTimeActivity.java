@@ -84,11 +84,13 @@ public class TacoTimeActivity extends Activity {
 			}
 		});
 		
+		//Check for announcements
 		ServerAnnouncement sa = GameInfo.getAnnouncement();
 		if(sa != null) showLatestAnnouncement(sa);
 		
 		//So that the CSA quits!
 		setResult(CharacterSelectActivity.CSLA_SELECTED_CHARACTER);
+
 	}
 	
 	/** Called when game is exited basically */

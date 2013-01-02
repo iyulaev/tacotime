@@ -1,7 +1,7 @@
 =-=-= CoffeeTime Game Engine Overview =-=-=
 
 This is the CoffeeTime game and game engine. It simulates running a coffee shop 
-It is inspired by a variety of Flash and Symbian/JavaME games which allowed the 
+It is inspired by a variety of Flash games which allowed the 
 player to assume a customer-service type role. The players is the sole employee 
 of a restaurant/cafe consisting of a number of machines, which can be used to produce
  various food items. Customers queue up at the front of the establishment and voice 
@@ -14,12 +14,16 @@ See the doc/ folder for various useful documentation regarding the TacoTime
 game engine, particularly if you are interested in employing and extending it
 for your own application.
 
+=-=-= Privacy Policy =-=-=
+
+During gameplay, we collect anonymous usage statistics to help us better design future versions of the game. These include which which levels get completed, what the failure rates for each level are, and other gameplay stats. They are anonymous and furthermore will NEVER be sold to any third parties (not that they would be useful to anyone). The statistics are soley to help is improve future versions of our products.
+
 =-=-= Licensing =-=-=
 
 All sound effects including music (c) 2012 Ryan Warner-Steel
 Released under Creative Commons Attribution-NonCommercial (CC BY-NC) license.
 
-All proprietary art (c) 2012 Coffeecats.
+All proprietary art (c) 2012 Coffee Cats Games
 Released under Creative Commons Attribution-NonCommercial (CC BY-NC) license.
 
 Selected 3rd party artwork property of respective owners.
@@ -27,9 +31,9 @@ Coffee cup icon: Property of Aha-Soft, http://www.aha-soft.com/
 Coffee cup background for menus: Property of Filippo, http://www.flickr.com/people/fdiotalevi/
 Microwave, sandwich, speakers, trashcan, and some other artwork taken from WP Clipart (http://www.wpclipart.com/). Support public domain art!
 
-All software code, including XML, is (c) 2012 Coffeecats. Released under BSD License:
+All software code, including XML, is (c) 2012 Coffee Cats Games. Released under BSD License:
 
-Copyright (c) 2012, Coffeecats
+Copyright (c) 2012, Coffee Cats Games.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -46,7 +50,7 @@ modification, are permitted provided that the following conditions are met:
    names of its contributors may be used to endorse or promote products
    derived from this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY <Company Name> ''AS IS'' AND ANY
+THIS SOFTWARE IS PROVIDED BY Coffee Cats Games ''AS IS'' AND ANY
 EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY

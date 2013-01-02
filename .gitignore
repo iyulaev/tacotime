@@ -25,10 +25,18 @@ local.properties
 #####################################
 
 # Stuff added for CoffeeTime #
-libs/*.pdf
+libs/doc/*
 libs/*.txt
+doc/flurrydoc/*
 
 _src_old/
+
+# Don't upload APKs and stuff
+res/values/strings_local.xml
+# Don't upload keys
+private/*
+# Don't upload proguard output
+proguard/*
 
 #####################################
 

@@ -75,6 +75,13 @@ public class CharacterSelectActivity extends Activity {
 		
 		//database test!
 		//AnnouncementDatabase.test(this);
+		
+		//test Log
+		Log.e(activitynametag, "This is an error.");
+		Log.w(activitynametag, "This is a warning.");
+		Log.i(activitynametag, "This is an info.");
+		Log.d(activitynametag, "This is a debug.");
+		Log.v(activitynametag, "This is a verbose.");
 	}
 	
 	/** Used to receive data from the calling activity indicating whether a character has been selected */

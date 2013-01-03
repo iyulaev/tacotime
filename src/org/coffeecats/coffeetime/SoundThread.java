@@ -101,7 +101,7 @@ public class SoundThread extends Thread {
 			public void handleMessage(Message msg) {
 				//Handle message to play level music
 				if(msg.what == MESSAGE_PLAY_LEVEL_MUSIC) {
-					if(levelMusicMap != null)
+					if( levelMusicMap != null && levelMusicMap.containsKey(adjustLevelNumber(msg.arg1)) )
 						setMusicPlaying(levelMusicMap.get(adjustLevelNumber(msg.arg1)), true);
 				}
 				//Handle message to *load* level music for a particular level, prepare to play it

@@ -54,12 +54,16 @@ public class TacoTimeMainGameActivity extends Activity {
 	public static final int LEVEL_END_DIALOG = 1;
 	public static final int IN_GAME_DIALOG = 2;
 	public static final int LEVEL_FAILED_DIALOG = 3;
+	public static final int OVERRIDE_BACK_BUTTON = 4;
 	
 	//The maingamepanel which will contain the canvas for the whole game
 	MainGamePanel mgpView;
 	//Dialog which gets launched
 	Dialog dialog;
 	String dialogTextStr;
+	
+	//Determines whether back button causes the in-game dialog to come up or just ttmga to exit (off by default)
+	private boolean back_causes_ttmga_to_exit = false;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -94,7 +98,7 @@ public class TacoTimeMainGameActivity extends Activity {
 		
 		//Used only for allocating an intent to be launched from 
 		final Context ttmgaContext = mgpView.getContext(); //this seems wrong...
-		
+
 		//Define a handler for handling messages from things like GLT, informing us that we need to launch an activity
 		Handler handler = new Handler() {
 			@SuppressWarnings("deprecation")
@@ -143,6 +147,9 @@ public class TacoTimeMainGameActivity extends Activity {
 					Log.d(activitynametag, "Displaying new machines dialog");
 					displayNewMachinesDialog(newMachines);
 				}
+				else if(msg.what == OVERRIDE_BACK_BUTTON) {
+					back_causes_ttmga_to_exit = (msg.arg1!=0) ? true : false;
+				}
 			}
 		};
 		
@@ -175,10 +182,13 @@ public class TacoTimeMainGameActivity extends Activity {
 	public void onBackPressed() {
 		Log.d(activitynametag, "onBackPressed Called");
 		
-		//inform the InputThread that the in-game dialog has been launched
-		MessageRouter.sendBackButtonDuringGameplayMessage(); 
-		
-		showDialog(IN_GAME_DIALOG);
+		if(back_causes_ttmga_to_exit) {
+			finish();
+		} else {
+			//inform the InputThread that the in-game dialog has been launched
+			MessageRouter.sendBackButtonDuringGameplayMessage(); 
+			showDialog(IN_GAME_DIALOG);
+		}
 	}
 	
 	

@@ -27,9 +27,8 @@ All proprietary art (c) 2012 Coffee Cats Games
 Released under Creative Commons Attribution-NonCommercial (CC BY-NC) license.
 
 Selected 3rd party artwork property of respective owners.
-Coffee cup icon: Property of Aha-Soft, http://www.aha-soft.com/
 Coffee cup background for menus: Property of Filippo, http://www.flickr.com/people/fdiotalevi/
-Microwave, sandwich, speakers, trashcan, and some other artwork taken from WP Clipart (http://www.wpclipart.com/). Support public domain art!
+Microwave, sandwich, coffee cup, speakers, trashcan, and some other artwork taken from WP Clipart (http://www.wpclipart.com/). Support public domain art!
 
 All software code, including XML, is (c) 2012 Coffee Cats Games. Released under BSD License:
 
@@ -45,15 +44,15 @@ modification, are permitted provided that the following conditions are met:
    documentation and/or other materials provided with the distribution.
 3. All advertising materials mentioning features or use of this software
    must display the following acknowledgement:
-   This product includes software developed by the <organization>.
-4. Neither the name of the <organization> nor the
+   This product includes software developed by Coffee Cats Games.
+4. Neither the name of Coffee Cats Games nor the
    names of its contributors may be used to endorse or promote products
    derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY Coffee Cats Games ''AS IS'' AND ANY
 EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+DISCLAIMED. IN NO EVENT SHALL Coffee Cats Games BE LIABLE FOR ANY
 DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND

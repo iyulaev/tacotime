@@ -92,7 +92,10 @@ public class MessageRouter {
 	 * @param paused Whether to pause the game or not.
 	 */
 	public synchronized static void sendPauseMessage(boolean paused) {
-		if(inputThread != null) {
+		sendPauseMessage(paused, false);
+	}
+	public synchronized static void sendPauseMessage(boolean paused, boolean affectInputThread) {
+		if(affectInputThread && inputThread != null) {
 			Message message = Message.obtain();
 			if(paused) message.what = InputThread.MESSAGE_SET_PAUSED;
 			else message.what = InputThread.MESSAGE_SET_UNPAUSED;
@@ -128,6 +131,14 @@ public class MessageRouter {
 			inputThread.handler.sendMessage(message);
 			
 			Log.d(activitynametag, "MessageRouter sendPauseUIMessage(" + paused + ")");
+		}
+		
+		if(ttaHandler != null) {
+			Message message = Message.obtain();
+			message.what = TacoTimeMainGameActivity.OVERRIDE_BACK_BUTTON;
+			if(paused) message.arg1 = 1;
+			else message.arg1 = 0;
+			ttaHandler.sendMessage(message);
 		}
 	}
 	

@@ -45,7 +45,7 @@ public class InputThread extends Thread {
 	ArrayList<ViewObject> viewObjects;
 	
 	//True if this thread is running and sending input results through message router
-	private boolean paused;
+	private static boolean paused;
 
 	/** Mostly just sets up a Handler that receives messages from the main game Activity 
 	 * and calls the handleTap() methods for all of the ViewObjects in the game screen */
@@ -60,7 +60,10 @@ public class InputThread extends Thread {
 				if(msg.what == MESSAGE_HANDLE_ONTAP) {
 					Log.d(activitynametag, "Got input message!");
 					//If we are paused, do not propagate user input to rest of the game
-					if(!paused) handleTap(msg.arg1, msg.arg2);
+					if(!paused) {
+						Log.d(activitynametag, "Decided we weren't paused and HANDLED the input message.");
+						handleTap(msg.arg1, msg.arg2);
+					}
 				}
 				
 				//Handle a simulated tap; don't care if we're paused or not

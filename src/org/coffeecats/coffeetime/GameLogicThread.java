@@ -265,6 +265,9 @@ public class GameLogicThread extends Thread {
 			
 			if(currLevel.getNewMachines() != null) 
 				MessageRouter.sendNewMachinesMessage(currLevel.getNewMachines());
+			
+			if(GameInfo.getLevel() == 0)
+				MessageRouter.sendPauseUIMessage(true);
 		}
 		
 		//Pre-play message - this is the state we are in when we display the Level Start countdown message
@@ -279,8 +282,13 @@ public class GameLogicThread extends Thread {
 			else {
 				GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_INPLAY);
 				MessageRouter.sendAnnouncementMessage("", false); //remove the announcement message
-				MessageRouter.sendPauseMessage(false); //unpauses ViewThread and InputThread
-				if(GameInfo.getLevel() == 0) MessageRouter.sendPauseUIMessage(true);
+				
+				if(GameInfo.getLevel() == 0) {
+					MessageRouter.sendPauseMessage(false, false); //unpauses ViewThread but not InputThread
+				} else {
+					MessageRouter.sendPauseMessage(false); //unpauses ViewThread and InputThread
+				}
+				
 				Log.v(activitynametag, "GLT is starting a new level!");
 				
 				MessageRouter.sendPlayLevelMusicMessage(GameInfo.getLevel());

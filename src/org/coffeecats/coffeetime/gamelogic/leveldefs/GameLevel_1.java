@@ -37,7 +37,7 @@ import org.coffeecats.coffeetime.R;
 
 public class GameLevel_1 extends GameLevel {
 	
-	private static boolean TESTING_MODE = true; 
+	private static boolean TESTING_MODE = false; 
 	
 	public GameLevel_1() {
 		this.level_number = 1;

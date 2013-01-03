@@ -158,6 +158,9 @@ public class MainGamePanel extends SurfaceView implements SurfaceHolder.Callback
 		MessageRouter.sendSuspendTimerThreadMessage(true);
 		MessageRouter.sendSuspendViewThreadMessage(true);
 		MessageRouter.sendSuspendSoundThreadMessage(true);
+		
+		if(tutorialThread != null)
+			tutorialThread.finish();
 	}
 	
 	/** Responds to a touch event; mostly just sends the tap event to the InputThread via MessageRouter. 

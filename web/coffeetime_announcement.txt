@@ -1,3 +1,3 @@
 [
-	{"announcement_id":2,"announcement_text":"This is the second announcement!"}
+	{"announcement_id":3,"announcement_text":"Welcome to Coffee Time, a Coffee Cats Games production! Please visit our website, iyulaev.github.com/tacotime/, for updates on our game."}
 ]

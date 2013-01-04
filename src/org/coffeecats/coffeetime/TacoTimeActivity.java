@@ -32,34 +32,23 @@ import android.widget.Button;
 public class TacoTimeActivity extends Activity {
 	
 	private static final String activitynametag = "TacoTimeActivity";
-	private boolean saved_game_exists;
 	
 	Dialog dialog;
 	private static final int ASK_TUTORIAL_DIALOG = 1;
+	Activity me;
 	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		me = this;
 		
 		// Change content view so that we are using mainmenulayout now!
 		setContentView(R.layout.mainmenulayout);
 		
-		saved_game_exists = false;
-		
+		//(Disabled) unit test of database
 		//GameDatabase.test(this);
-		//Load the database so that we can check whether or not we have a saved game for the
-		//character name specified in GameInfo.characterName
-		GameDatabase testDB = new GameDatabase(this);
-		testDB.open();
-		testDB.loadDatabase();
-		testDB.printCache();
-		if(testDB.databaseCache.containsKey(GameInfo.characterName) && 
-				testDB.databaseCache.get(GameInfo.characterName).level != -1) {
-			saved_game_exists = true;
-		}
-		testDB.close();
-		
+				
 		//Setup analytics
 		Analytics.beginSession(this);
 		
@@ -73,6 +62,20 @@ public class TacoTimeActivity extends Activity {
 		Button continueGame = (Button) findViewById(R.id.continue_game);
 		continueGame.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
+				boolean saved_game_exists = false;
+				
+				//Load the database so that we can check whether or not we have a saved game for the
+				//character name specified in GameInfo.characterName
+				GameDatabase testDB = new GameDatabase(me);
+				testDB.open();
+				testDB.loadDatabase();
+				testDB.printCache();
+				if(testDB.databaseCache.containsKey(GameInfo.characterName) && 
+						testDB.databaseCache.get(GameInfo.characterName).level != -1) {
+					saved_game_exists = true;
+				}
+				testDB.close();
+				
 				if(saved_game_exists) {
 					Intent i = new Intent(v.getContext(), TacoTimeMainGameActivity.class);
 					i.putExtra("LoadSavedGame", true);

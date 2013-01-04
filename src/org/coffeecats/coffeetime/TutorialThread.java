@@ -28,7 +28,7 @@ public class TutorialThread extends Thread {
 	
 	private static final String activitynametag = "TutorialThread";
 	
-	//Set how often Tick messages get sent
+	//Set how often the tutorial thread gets clock ticks
 	public static final int TIMER_GRANULARIY = 1000;
 	
 	private static boolean running;
@@ -37,14 +37,12 @@ public class TutorialThread extends Thread {
 	int tickCount;
 	long lastTimerTick;
 
-	/** TimerThread constructor does nothing much except for initializing handler, which will handle messages 
-	 * sent to this timer thread. Mostly these messages pause or suspend (or un-pause/un-suspend) the timer thread.
-	 * When the thread is suspended, no call-backs occur and the thread basically stops cycling. When paused, callbacks
-	 * still occur but no messages are sent out via MessageRouter.
+	/** TutorialThread runs through a time-delimited "script" of announcements and simulated input, to
+	 * show the user how the Coffee Time game works. The constructor just initalizes some variables.
 	 */
 	public TutorialThread() {
 		super();
-		tickCount = -2;
+		tickCount = -2; //-2 because there is a 3-second count at level start
 		running = true;
 	}
 	
@@ -53,8 +51,8 @@ public class TutorialThread extends Thread {
 		running = false; 
 	}
 
-	/** The run() method doesn't do very much anymore; it really just un-suspends itself and then returns. The 
-	 * delayed callback method (callRefreshDelayed()) implements the timer loop now. 
+	/** The run() method doesn't do very much anymore; it really just un-suspends itself and then returns. It
+	 * uses sleep to wait for some period of time. 
 	 */
 	@Override
 	public void run() {
@@ -107,6 +105,7 @@ public class TutorialThread extends Thread {
 			
 			tickCount++;
 			
+			//Sleep for a little bit
 			try { Thread.sleep(TIMER_GRANULARIY); }
 			catch (InterruptedException e) { e.printStackTrace(); }
 		}

@@ -68,13 +68,30 @@ public class CustomerQueue extends GameItem {
 	public CustomerQueue(Context caller, int x_pos, int y_pos, int orientation, 
 			int queue_length, float point_mult, float money_mult, 
 			float impatience, int max_items_in_order, 
-			List<GameFoodItem> foodItemMenu, int queue_number) {
+			List<GameFoodItem> foodItemMenuGlobal, int queue_number) {
 		//public GameItem(Context caller, String name, int r_bitmap, int x_pos, int y_pos, int orientation, int gg_width, int gg_height)
 		super(caller, "CustomerQueue" + Integer.toString(queue_number), R.drawable.countertop, x_pos, y_pos, orientation, 20, 17);
 		
 		//Create and fill up the CustomerQueue
 		this.queue_length = queue_length;
 		this.queue_number = queue_number;
+		
+		List<GameFoodItem> foodItemMenu = new ArrayList<GameFoodItem>(foodItemMenuGlobal.size());
+		for(GameFoodItem gfi : foodItemMenuGlobal) foodItemMenu.add(gfi);
+		List<Integer> foodItemCounts = generateFoodItemCounts(foodItemMenu, max_items_in_order * queue_length);
+		
+		String foodICDebug = "CustomerQueue generated foodItemCounts {";
+		for(Integer count : foodItemCounts) { foodICDebug += count; foodICDebug += ", "; }
+		foodICDebug += "}";
+		
+		Log.d(activitynametag, foodICDebug);
+		
+		foodICDebug = "CustomerQueue corresponding items were {";
+		for(GameFoodItem gfi : foodItemMenu) { foodICDebug += gfi; foodICDebug += ", "; }
+		foodICDebug += "}";
+		
+		Log.d(activitynametag, foodICDebug);
+		
 		customerList = new ArrayList<Customer>(queue_length);
 		for(int i = 0; i < queue_length; i++) {
 			customerList.add(new Customer(caller, 
@@ -85,7 +102,8 @@ public class CustomerQueue extends GameItem {
 					impatience, 
 					max_items_in_order, 
 					foodItemMenu,
-					queue_number));
+					queue_number,
+					foodItemCounts));
 		}
 		
 		for(int i = 0; i < queue_length; i++) {
@@ -96,6 +114,28 @@ public class CustomerQueue extends GameItem {
 		
 		customers_satisfied = 0;
 		customers_processed = 0;
+	}
+	
+	/** Used to determine how many of each food item can be served from a particular CustomerQueue. The math is pretty 
+	 * straight-forward: given a maximum number of items (usually queue_length * max_order_size), determine how many items
+	 * should be ordered based on GameFoodItem.orderProbability. We create a List of integers that reflects the item 
+	 * count for each item in foodItemMenu
+	 */
+	public ArrayList<Integer> generateFoodItemCounts(List<GameFoodItem> foodItemMenu, int total_number_of_items) {
+		float total_probability = 0.0f;
+		
+		for(GameFoodItem fi : foodItemMenu) total_probability += fi.orderProbability;
+		
+		ArrayList<Integer> returned = new ArrayList<Integer>(foodItemMenu.size());
+		
+		for(GameFoodItem fi : foodItemMenu) {
+			returned.add( ((int) ((fi.orderProbability/total_probability) * ((float) total_number_of_items))) + 1);
+		}
+		
+		//The zero-th index is food item "nothing" so it should never get picked
+		returned.set(0, 0);
+		
+		return(returned);
 	}
 	
 	public CustomerQueue(Context caller, int x_pos, int y_pos, int orientation, 

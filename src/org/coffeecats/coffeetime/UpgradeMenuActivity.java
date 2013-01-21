@@ -45,6 +45,7 @@ public class UpgradeMenuActivity extends ListActivity {
 		me=this;
 		
 		setContentView(R.layout.upgradelist);
+		updateMoneyDisplayed(GameInfo.money); //display the amount of money the player has
 		
 		//Add ALL upgrades to this UpgradeMenuActivity
 		upgradesList = new ArrayList<GameUpgrade>();
@@ -106,7 +107,7 @@ public class UpgradeMenuActivity extends ListActivity {
 		}
 		
 		//If the user doesn't have enough money, inform them of this
-		else if(GameInfo.money >= upgrade.getUpgradeCost()) {
+		else if(GameInfo.money < upgrade.getUpgradeCost()) {
 			Toast t = Toast.makeText(me, "Sorry, not enough money to buy " + upgrade.getUpgradeLongName(), Toast.LENGTH_SHORT);
 			t.show();
 		}
@@ -120,11 +121,11 @@ public class UpgradeMenuActivity extends ListActivity {
 	}
 	
 	/** Buy GameUpgrad upgrade. Changes GameInfo.money and adds the upgrade to the upgradesBought list in
-	 * GameInfo
+	 * GameInfo. Also updates the subtitle that displays how much money is had.
 	 * @param upgrade The GameUpgrade to buy.
 	 */
 	private void buyUpgrade(GameUpgrade upgrade) {
-		GameInfo.setAndReturnMoney(-1 * upgrade.getUpgradeCost());
+		updateMoneyDisplayed( GameInfo.setAndReturnMoney(-1 * upgrade.getUpgradeCost()) );
 		GameInfo.addUpgrade(upgrade);
 	}
 	
@@ -206,5 +207,13 @@ public class UpgradeMenuActivity extends ListActivity {
 		if(upgradesList.get(position).prerequisitesSatisfied(GameInfo.getUpgradesBoughtCopy()) &&
 				upgradesList.get(position).getUpgradeLevel() <= GameInfo.getLevel())
 			row.setVisibility(View.VISIBLE);
+	}
+	
+	/** Used to update the subtitle of the List View, that tells the user how much money they have */
+	public void updateMoneyDisplayed(int current_money) {
+		TextView subtitle = (TextView) findViewById(R.id.subtitle);
+		
+		if(subtitle != null)
+			subtitle.setText("Currenly have $" + current_money);
 	}
 }

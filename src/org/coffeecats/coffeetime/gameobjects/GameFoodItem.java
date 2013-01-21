@@ -74,4 +74,7 @@ public abstract class GameFoodItem {
 	
 	/**Return this GameFoodItem's order probability */
 	public float getOrderProbability() { return orderProbability; }
+	
+	/** Returns the name, same as getName() */
+	public String toString() { return getName(); }
 }

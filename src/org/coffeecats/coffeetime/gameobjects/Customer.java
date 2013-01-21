@@ -7,6 +7,7 @@ import java.util.Random;
 import org.coffeecats.coffeetime.gamelogic.GameGrid;
 import org.coffeecats.coffeetime.gamelogic.GameInfo;
 import org.coffeecats.coffeetime.gamelogic.Interaction;
+import org.coffeecats.coffeetime.gameobjects.fooditemdefs.FoodItemCoffee;
 import org.coffeecats.coffeetime.utility.CircularList;
 import org.coffeecats.coffeetime.utility.DirectionBitmapMap;
 
@@ -78,7 +79,7 @@ public class Customer extends GameActor {
 	 */
 	public Customer(Context caller, int move_rate, int starting_queue_position, 
 			float point_mult, float money_mult, float impatience, int max_order_size,
-			List<GameFoodItem> foodItemChoices, int queue_number) {
+			List<GameFoodItem> foodItemChoices, int queue_number, List<Integer> foodItemCounts) {
 			
 		super(caller, move_rate, location_start_x + ((queue_number==2) ? CustomerQueue.DISTANCE_TO_QUEUE_TWO : 0), location_start_y, true);
 		
@@ -121,7 +122,7 @@ public class Customer extends GameActor {
 		//The size of the bin will be the orderProbability of each GameFoodItem
 		//If we pick a random integer, and it is between bin[i-1] and bin[i], we pick foodItemChoices.get(i)
 		//Thus, items with higher orderProbability will be more likely to be chosen
-		float [] order_bins = new float[foodItemChoices.size()];
+		/*float [] order_bins = new float[foodItemChoices.size()];
 		for(int i = 0; i < foodItemChoices.size(); i++) {
 			if(i == 0)
 				order_bins[i] = 0 + foodItemChoices.get(i).getOrderProbability();
@@ -136,6 +137,44 @@ public class Customer extends GameActor {
 			int item_choice = 0;
 			while(order_bins[item_choice] < item_choice_f && item_choice < order_bins.length) item_choice++;
 			customerOrder.add(foodItemChoices.get(item_choice).clone());
+		}*/
+		
+		for(int i = 0; i < customerOrderSize; i++) {
+			int total_food_items_avail = 0;
+			for(Integer count : foodItemCounts) total_food_items_avail += count;
+			
+			int item_picked;
+			if(total_food_items_avail <= 0) {
+				Log.d(activitynametag, "Somehow zero items were available, hmm...");
+				item_picked = -1;
+			}
+			else item_picked = random.nextInt(total_food_items_avail);
+			
+			int item_picked_idx = 1; //start at 1 because 0 is "nothing"
+			int cumulative_items = 0;
+			
+			while(item_picked_idx < foodItemCounts.size() &&
+					cumulative_items + foodItemCounts.get(item_picked_idx) < item_picked) {
+				cumulative_items += foodItemCounts.get(item_picked_idx);
+				item_picked_idx++;
+			}
+			
+			if(item_picked_idx > foodItemCounts.size() || item_picked < 0) {
+				Log.w(activitynametag, "Customer hit an invalid code section; picking food items didn't go so well.");
+				customerOrder.add(new FoodItemCoffee()); //if something goes wrong, pick coffee, that one is always available on all levels
+			}
+			else {
+				Log.d(activitynametag, "Customer " + starting_queue_position + " picked item idx = " + item_picked_idx + " which was the " + item_picked + "th item.");
+				
+				customerOrder.add(foodItemChoices.get(item_picked_idx).clone());
+				
+				foodItemCounts.set(item_picked_idx, foodItemCounts.get(item_picked_idx)-1);
+				
+				if(foodItemCounts.get(item_picked_idx) <= 0) {
+					foodItemCounts.remove(item_picked_idx);
+					foodItemChoices.remove(item_picked_idx);
+				}
+			}
 		}
 		
 		//Generate this customer's "point multiplier"

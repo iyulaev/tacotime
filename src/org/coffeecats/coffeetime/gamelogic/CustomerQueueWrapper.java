@@ -11,6 +11,8 @@ import java.util.List;
 
 import org.coffeecats.coffeetime.gameobjects.CustomerQueue;
 
+import android.util.Log;
+
 
 public class CustomerQueueWrapper {
 	final int EXPECTED_MAX_CUSTOMERQUEUES = 4;
@@ -52,7 +54,7 @@ public class CustomerQueueWrapper {
 	/** Calculate the number of customers remaining in ALL of the CustomerQueues contained by
 	 * this composite
 	 */
-	public int numberOfCustomersLeft() {
+	public synchronized int numberOfCustomersLeft() {
 		int retval = 0;
 		
 		for(CustomerQueue cq : customerQueues) {
@@ -65,7 +67,7 @@ public class CustomerQueueWrapper {
 	/** Calculate the number of customers served in ALL of the CustomerQueues contained by
 	 * this composite
 	 */
-	public int numberOfCustomersServed() {
+	public synchronized int numberOfCustomersServed() {
 		int retval = 0;
 		
 		for(CustomerQueue cq : customerQueues) {
@@ -77,7 +79,7 @@ public class CustomerQueueWrapper {
 	
 	/** Returns true iff all of the member queues have finished
 	 */
-	public boolean isFinished() {
+	public synchronized boolean isFinished() {
 		for(CustomerQueue cq : customerQueues) {
 			if(!cq.isFinished()) return false;
 		}
@@ -88,7 +90,7 @@ public class CustomerQueueWrapper {
 	/** Calculate the number of customers ignored in ALL of the CustomerQueues contained by
 	 * this composite
 	 */
-	public int numberOfCustomersIgnored() {
+	public synchronized int numberOfCustomersIgnored() {
 		int retval = 0;
 		
 		for(CustomerQueue cq : customerQueues) {

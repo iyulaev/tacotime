@@ -3,7 +3,9 @@ package org.coffeecats.coffeetime.gameobjects.objectdefs;
 import org.coffeecats.coffeetime.gamelogic.GameGrid;
 import org.coffeecats.coffeetime.gameobjects.GameItem;
 
+import org.coffeecats.coffeetime.MessageRouter;
 import org.coffeecats.coffeetime.R;
+import org.coffeecats.coffeetime.SoundThread;
 
 import android.content.Context;
 
@@ -31,6 +33,10 @@ public class Microwave extends GameItem {
 	public static int DEFAULT_XPOS = GameGrid.GAMEGRID_WIDTH - GameGrid.GAMEGRID_PADDING_RIGHT + 13; //113
 	public static int DEFAULT_YPOS = GameGrid.GAMEGRID_PADDING_TOP + 2;//40;
 	
+	//State indexes for states we need to pay attention to, to play an sfx appropriately
+	private int state_idx_baking;
+	private int state_idx_done;
+	
 	/** Constructor for CoffeeMachine mostly mimics a game items, except it sets the name by itself. Also it sets up
 	 * all of the CoffeeMachine states and the associated bitmaps; the bitmap provided as an argument is just a "default" bitmap
 	 * that probably never gets used.
@@ -49,7 +55,12 @@ public class Microwave extends GameItem {
 		//Add states that describe behavior of coffee machine
 		//super.addState(String stateName, int state_delay_ms, int r_bitmap, boolean input_sensitive, boolean time_sensitive)
 		this.addState("idle", 0, R.drawable.microwave_inactive, true, false);
-		this.addState("baking", bake_time, R.drawable.microwave_active, false, true);
-		this.addState("done", 10000, R.drawable.microwave_done, true, "nothing", true);
+		state_idx_baking = this.addState("baking", bake_time, R.drawable.microwave_active, false, true);
+		state_idx_done = this.addState("done", 10000, R.drawable.microwave_done, true, "nothing", true);
+	}
+	
+	protected void onChangeStatePlaySfx(int old_state, int new_state) {
+		if(old_state == state_idx_baking && new_state == state_idx_done)
+			MessageRouter.sendPlayShortSfxMessage(SoundThread.SFX_STEAM);
 	}
 }

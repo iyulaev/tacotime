@@ -19,7 +19,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 
-public class BetweenLevelMenuActivity extends Activity {
+public class BetweenLevelMenuActivity extends SoundPlayingActivity {
 	
 	private static final String activitynametag = "BetweenLevelMenuActivity";
 	
@@ -36,6 +36,7 @@ public class BetweenLevelMenuActivity extends Activity {
 		Button retryLevel = (Button) findViewById(R.id.retry_level);
 		retryLevel.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
+				playLongTap();
 				MessageRouter.sendLoadGameMessage();
 				finish();
 			}
@@ -45,6 +46,7 @@ public class BetweenLevelMenuActivity extends Activity {
 		Button saveAndContinue = (Button) findViewById(R.id.save_and_continue);
 		saveAndContinue.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
+				playLongTap();
 				MessageRouter.sendNextLevelMessage();
 				finish();
 			}
@@ -54,6 +56,7 @@ public class BetweenLevelMenuActivity extends Activity {
 		Button viewBuyUpgrades = (Button) findViewById(R.id.view_buy_upgrades);
 		viewBuyUpgrades.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
+				playLongTap();
 				//showUnimplementedError("View / Buy Upgrades");
 				Intent i = new Intent(v.getContext(), UpgradeMenuActivity.class);
 				startActivityForResult(i,0);
@@ -63,6 +66,7 @@ public class BetweenLevelMenuActivity extends Activity {
 	
 	/** When back is pressed between levels, assume the user means "save and continue" */
 	public void onBackPressed() {
+		playLongTap();
 		MessageRouter.sendNextLevelMessage();
 		finish();
 	}

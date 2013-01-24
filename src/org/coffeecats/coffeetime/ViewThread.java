@@ -182,8 +182,13 @@ public class ViewThread extends Thread {
 				if(gameItems.get(i).inSensitivityArea(actor)) {				
 					int consumed_event = gameItems.get(i).consumeEvent();
 					//Notify the GLT (via MessageRouter) if an Interaction generates some non-null event
-					if(consumed_event != GameItem.EVENT_NULL) 
+					if(consumed_event != GameItem.EVENT_NULL) {
+						//play a short sfx indicating successful interaction (if it's not with a customer)
+						if(!gameItems.get(i).getName().contains("Customer"))
+							MessageRouter.sendPlayShortSfxMessage(SoundThread.SFX_RUB); 
+						
 						MessageRouter.sendInteractionEvent(gameItems.get(i).getName());
+					}
 				}
 			}
 		}

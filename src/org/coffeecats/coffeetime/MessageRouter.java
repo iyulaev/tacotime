@@ -437,4 +437,16 @@ public class MessageRouter {
 			Log.v("MessageRouter", "Sent new machines dialog message to the TacoTimeActivity handler");
 		}
 	}
+	
+	/** Sends a message to the SoundThread, telling it to play a short sfx */
+	public synchronized static void sendPlayShortSfxMessage(int sfx_to_play) {
+		if(soundThread != null) {
+			Message message = Message.obtain();
+			message.what = SoundThread.MESSAGE_PLAY_SFX;
+			message.arg1 = sfx_to_play;
+			soundThread.handler.sendMessage(message);
+			
+			Log.v("MessageRouter", "Told SoundThread to play short sfx " + sfx_to_play);
+		}
+	}
 }

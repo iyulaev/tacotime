@@ -370,8 +370,6 @@ public class GameLogicThread extends Thread {
 		//that the game is over
 		else if(GameInfo.getGameMode() == GameInfo.MODE_MAINGAMEPANEL_POSTPLAY) {
 			if(GameInfo.getLevel() < GameInfo.MAX_GAME_LEVEL && GameInfo.getLevel() > 0) {
-				
-				
 				MessageRouter.sendPauseMessage(true);
 				
 				//if the level was failed (fewer customers served than required to clear)
@@ -391,6 +389,8 @@ public class GameLogicThread extends Thread {
 						((float) customerQueueWrapper.numberOfCustomersServed()) / ((float) currLevel.numberOfCustomers()));
 					
 					MessageRouter.sendLevelEndMessage();
+					//Play a yeah!
+					MessageRouter.sendPlayShortSfxMessage(SoundThread.SFX_YEAH);
 				}
 			}
 			else if(GameInfo.getLevel() == 0) {
@@ -405,6 +405,7 @@ public class GameLogicThread extends Thread {
 			}
 			else {
 				MessageRouter.sendGameOverMessage();
+				MessageRouter.sendPlayShortSfxMessage(SoundThread.SFX_YEAH);
 			}
 
 		}
@@ -474,6 +475,7 @@ public class GameLogicThread extends Thread {
 		if(old_state != CoffeeGirl.STATE_NORMAL && 
 				interactedWith.contains("CustomerQueue") &&
 				interactionResult.was_success) {
+			MessageRouter.sendPlayShortSfxMessage(SoundThread.SFX_BLOOP); //play bloop sfx
 			GameInfo.setAndReturnPoints(interactionResult.point_result);
 			GameInfo.setAndReturnMoney(interactionResult.money_result);
 			coffeeGirl.setItemHolding("nothing");

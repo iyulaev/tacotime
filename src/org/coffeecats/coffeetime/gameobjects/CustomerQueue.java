@@ -191,7 +191,10 @@ public class CustomerQueue extends GameItem {
 		
 		//Advance the queue if customer at position 0 has finished
 		if(head() != null && (head().getState() == Customer.STATE_ANGRY || head().getState() == Customer.STATE_SERVED || head().getState() == Customer.STATE_FINISHED)) {
-			if(head().getState() == Customer.STATE_SERVED) customers_satisfied++;
+			if(head().getState() == Customer.STATE_SERVED) {
+				customers_satisfied++;
+				Log.d(activitynametag, this.getName() + " has served " + customers_satisfied + " customers.");
+			}
 			advanceQueue(); 
 		}
 				

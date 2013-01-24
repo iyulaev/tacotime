@@ -37,7 +37,7 @@ import org.coffeecats.coffeetime.R;
 
 public class GameLevel_1 extends GameLevel {
 	
-	private static boolean TESTING_MODE = false; 
+	private static boolean TESTING_MODE = true; 
 	
 	public GameLevel_1() {
 		this.level_number = 1;
@@ -46,7 +46,7 @@ public class GameLevel_1 extends GameLevel {
 		this.money_mult = 1.0f;
 		this.customer_impatience = 0.6f;
 		this.time_limit_sec = 45;
-		this.customer_max_order_size = 1;
+		this.customer_max_order_size = TESTING_MODE ? 2 : 1;
 		
 		this.point_bonus = 20;
 		this.money_bonus = 10;

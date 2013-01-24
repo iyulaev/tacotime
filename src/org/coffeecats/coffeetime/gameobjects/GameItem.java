@@ -299,7 +299,7 @@ public class GameItem implements ViewObject {
 	 * @param time_sensitive Whether this State requires that some amount of time elapse before we can exit it
 	 * 
 	 * */
-	protected void addState(String stateName, int state_delay_ms, int r_bitmap, boolean input_sensitive, String requiredInput, boolean time_sensitive) {
+	protected int addState(String stateName, int state_delay_ms, int r_bitmap, boolean input_sensitive, String requiredInput, boolean time_sensitive) {
 		if(validStates == null) validStates = new ArrayList<State<Bitmap>>();
 		
 		State <Bitmap> newState = new State<Bitmap>();
@@ -312,10 +312,13 @@ public class GameItem implements ViewObject {
 		
 		validStates.add(newState);
 		
-		if(currentState == null) setState(0);		
+		if(currentState == null) setState(0);	
+		
+		//Return the index of the newly added state
+		return(validStates.indexOf(newState));
 	}
-	protected void addState(String stateName, int state_delay_ms, int r_bitmap, boolean input_sensitive, boolean time_sensitive) {
-		addState(stateName, state_delay_ms, r_bitmap, input_sensitive, "null", time_sensitive);
+	protected int addState(String stateName, int state_delay_ms, int r_bitmap, boolean input_sensitive, boolean time_sensitive) {
+		return addState(stateName, state_delay_ms, r_bitmap, input_sensitive, "null", time_sensitive);
 	}
 	
 	/** Called by onInteraction only. Used to (try) to transition states. If enough time has passed and/or an interaction has occured 
@@ -354,6 +357,10 @@ public class GameItem implements ViewObject {
 		int next_state = (current_state_idx+1 < validStates.size()) ? current_state_idx+1 : 0;
 		int old_state = current_state_idx;
 		setState(next_state);
+		
+		//perform side effects
+		onChangeStatePlaySfx(old_state, next_state);
+		
 		return(new Interaction(old_state));
 	}
 	
@@ -366,5 +373,16 @@ public class GameItem implements ViewObject {
 		current_state_idx = new_state;
 		time_of_state_transition = GameInfo.currentTimeMillis();
 		this.bitmap = currentState.bitmap;
+	}
+	
+	/** This method is used to do something, like play a sound effect, when a state change occurs. For
+	 * typical GameItems it does nothing but it allows GameItems to override it so that something does,
+	 * in fact, occur.
+	 * 
+	 * @param old_state The state idx we transitioned from.
+	 * @param next_state The state idx we transitioned to.
+	 */
+	protected void onChangeStatePlaySfx(int old_state, int next_state) {
+		;
 	}
 }

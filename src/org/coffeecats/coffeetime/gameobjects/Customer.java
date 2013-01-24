@@ -11,7 +11,9 @@ import org.coffeecats.coffeetime.gameobjects.fooditemdefs.FoodItemCoffee;
 import org.coffeecats.coffeetime.utility.CircularList;
 import org.coffeecats.coffeetime.utility.DirectionBitmapMap;
 
+import org.coffeecats.coffeetime.MessageRouter;
 import org.coffeecats.coffeetime.R;
+import org.coffeecats.coffeetime.SoundThread;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -64,6 +66,9 @@ public class Customer extends GameActor {
 	//Instance counter
 	private static int instanceCount = 0;
 	private int instance_index;
+	
+	//Used to play a cheer :)
+	private boolean has_cheered = false;
 
 
 	/** Initialize a new Customer.
@@ -286,8 +291,6 @@ public class Customer extends GameActor {
 			this.target_y = locations_queue_y[getQueuePosition()];
 			unLock();
 			
-			//Log.d(activitynametag, "setting y position for customer " + instance_index + " to " + this.target_y + " (currently is " + this.y + ")");
-			
 			//If we are presently in line and at the front of the queue, check if our dependencies have been met
 			//if they have then we can transition to served
 			if(orderSatisfied()) setState(STATE_SERVED);
@@ -303,8 +306,6 @@ public class Customer extends GameActor {
 				
 				if(this.getState() == STATE_INLINE_HAPPY) {
 					setState(STATE_INLINE_OK);
-					/*Log.d(activitynametag, "Customer state transitioned to OK, will update at " + (mood_last_updated + seconds_between_pissed_off) + 
-							", it is currently " + (GameInfo.currentTimeMillis()/1000));*/
 				}
 				else if(this.getState() == STATE_INLINE_OK) {
 					//setState(STATE_ANGRY);
@@ -315,6 +316,11 @@ public class Customer extends GameActor {
 		
 		//If we have been served and have advanced to the exit location then set state to finished
 		if(this.getState() == STATE_SERVED || this.getState() == STATE_ANGRY) {
+			if(this.getState() == STATE_SERVED && !has_cheered) {
+				has_cheered = true;
+				MessageRouter.sendPlayShortSfxMessage(SoundThread.SFX_CUSTOMER_SERVED);
+			}
+			
 			if(x == locations_exit_x && y == locations_exit_y) {
 				setState(STATE_FINISHED);
 			}

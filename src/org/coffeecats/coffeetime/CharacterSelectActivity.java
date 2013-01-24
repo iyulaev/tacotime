@@ -27,7 +27,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-public class CharacterSelectActivity extends Activity {
+public class CharacterSelectActivity extends SoundPlayingActivity {
 	
 	private static final String activitynametag = "CharacterSelectActivity";
 	private CharacterSelectActivity me;
@@ -60,8 +60,9 @@ public class CharacterSelectActivity extends Activity {
 		Button newGame = (Button) findViewById(R.id.existing_character);
 		newGame.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Intent i = new Intent(v.getContext(), CharacterSelectListActivity.class);
+				playLongTap();
 				
+				Intent i = new Intent(v.getContext(), CharacterSelectListActivity.class);
 				startActivityForResult(i,CSLA_REQUEST_CODE);
 			}
 		});
@@ -69,6 +70,7 @@ public class CharacterSelectActivity extends Activity {
 		Button continueGame = (Button) findViewById(R.id.new_character);
 		continueGame.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
+				playLongTap();
 				showDialog(CREATE_CHARACTER_DIALOG);
 			}
 		});
@@ -147,6 +149,8 @@ public class CharacterSelectActivity extends Activity {
 							gameDB.saveCharacterToDatabase(new SavedCharacter(createdCharacterName, createdCharacterType));
 							removeDialog(CREATE_CHARACTER_DIALOG);
 							
+							playLongTap();
+							
 							Intent i = new Intent(me, TacoTimeActivity.class);
 							startActivityForResult(i,CSLA_REQUEST_CODE);
 						}
@@ -156,7 +160,10 @@ public class CharacterSelectActivity extends Activity {
 				
 				Button cancelButton = (Button) dialog.findViewById(R.id.cancel);
 				cancelButton.setOnClickListener(new View.OnClickListener() {
-					public void onClick(View v) { removeDialog(CREATE_CHARACTER_DIALOG); } 
+					public void onClick(View v) { 
+						playQuickTap();
+						removeDialog(CREATE_CHARACTER_DIALOG); 
+					} 
 				});
 
 				dialog.show();

@@ -52,9 +52,9 @@ public class CounterTop extends GameItem {
 		this.addState("holding_coffee", 2000, R.drawable.countertop_grey_w_coffee, true, false);
 		this.addState("holding_cupcake", 2000, R.drawable.countertop_grey_w_cupcake, true, false);
 		this.addState("holding_blendeddrink", 2000, R.drawable.countertop_grey_w_blendeddrink, true, false);
-		this.addState("holding_blendeddrink", 2000, R.drawable.countertop_grey_w_espresso, true, false);
-		this.addState("holding_blendeddrink", 2000, R.drawable.countertop_grey_w_pie, true, false);
-		this.addState("holding_blendeddrink", 2000, R.drawable.countertop_grey_w_sandwich, true, false);
+		this.addState("holding_espresso", 2000, R.drawable.countertop_grey_w_espresso, true, false);
+		this.addState("holding_pie", 2000, R.drawable.countertop_grey_w_pie, true, false);
+		this.addState("holding_sandwich", 2000, R.drawable.countertop_grey_w_sandwich, true, false);
 	}
 	
 	/** Called by onInteraction only. Used to (try) to transition states. We define the state machine for CounterTop explicitly 

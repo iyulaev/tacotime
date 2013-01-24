@@ -3,7 +3,9 @@ package org.coffeecats.coffeetime.gameobjects.objectdefs;
 import org.coffeecats.coffeetime.gamelogic.GameGrid;
 import org.coffeecats.coffeetime.gameobjects.GameItem;
 
+import org.coffeecats.coffeetime.MessageRouter;
 import org.coffeecats.coffeetime.R;
+import org.coffeecats.coffeetime.SoundThread;
 
 import android.content.Context;
 
@@ -28,6 +30,9 @@ public class Blender extends GameItem {
 	
 	public static int instanceCount = 0;
 	
+	private int state_idx_blending;
+	private int state_idx_done;
+	
 	/** Constructor for CoffeeMachine mostly mimics a game items, except it sets the name by itself. Also it sets up
 	 * all of the CoffeeMachine states and the associated bitmaps; the bitmap provided as an argument is just a "default" bitmap
 	 * that probably never gets used.
@@ -43,7 +48,12 @@ public class Blender extends GameItem {
 		//Add states that describe behavior of coffee machine
 		//super.addState(String stateName, int state_delay_ms, int r_bitmap, boolean input_sensitive, boolean time_sensitive)
 		this.addState("idle", 0, R.drawable.blender_idle, true, "coffee", false);
-		this.addState("blending", 1000, R.drawable.blender, false, true);
-		this.addState("done", 7500, R.drawable.blender_done, true, "nothing", true);
+		state_idx_blending = this.addState("blending", 1000, R.drawable.blender, false, true);
+		state_idx_done = this.addState("done", 7500, R.drawable.blender_done, true, "nothing", true);
+	}
+	
+	protected void onChangeStatePlaySfx(int old_state, int new_state) {
+		if(old_state == state_idx_blending && new_state == state_idx_done)
+			MessageRouter.sendPlayShortSfxMessage(SoundThread.SFX_BLENDER);
 	}
 }

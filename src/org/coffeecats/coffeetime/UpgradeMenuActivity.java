@@ -17,6 +17,7 @@ import org.coffeecats.coffeetime.gameobjects.upgradedefs.FastShoesUpgrade;
 import org.coffeecats.coffeetime.gameobjects.upgradedefs.FasterShoesUpgrade;
 import org.coffeecats.coffeetime.gameobjects.upgradedefs.QuickBrewingUpgrade;
 import org.coffeecats.coffeetime.gameobjects.upgradedefs.SoundSystemUpgrade;
+import org.coffeecats.coffeetime.utility.SoundPlayer;
 
 import org.coffeecats.coffeetime.R;
 
@@ -40,6 +41,8 @@ public class UpgradeMenuActivity extends ListActivity {
 	static final int COLOR_GREYED_OUT = 0xFF555555;
 	static final int COLOR_RED = 0xFFFF0000;
 	
+	SoundPlayer mSoundPlayer;
+	
 	@Override
 	public void onCreate(Bundle bundle) {
 		me=this;
@@ -61,7 +64,15 @@ public class UpgradeMenuActivity extends ListActivity {
 		theListAdapter = new IconicAdapter(this);
 		setListAdapter(theListAdapter);
 		
+		mSoundPlayer = new SoundPlayer(this);
+		
 		super.onCreate(bundle);
+	}
+	
+	@Override
+	public void onDestroy() {
+		playLongTap();
+		super.onDestroy();
 	}
 	
 	/** Called when the user clicks on a particular list item. Attempts to buy the upgrade 
@@ -110,11 +121,13 @@ public class UpgradeMenuActivity extends ListActivity {
 		else if(GameInfo.money < upgrade.getUpgradeCost()) {
 			Toast t = Toast.makeText(me, "Sorry, not enough money to buy " + upgrade.getUpgradeLongName(), Toast.LENGTH_SHORT);
 			t.show();
+			playQuickTap();
 		}
 		//If we've already bought the upgrade, inform the user and don't buy it
 		else if(!GameInfo.hasUpgrade(upgrade)) {
 			Toast t = Toast.makeText(me, "You've already bought " + upgrade.getUpgradeLongName() + "!", Toast.LENGTH_SHORT);
 			t.show();
+			playQuickTap();
 		}
 		
 		return(false);
@@ -127,6 +140,8 @@ public class UpgradeMenuActivity extends ListActivity {
 	private void buyUpgrade(GameUpgrade upgrade) {
 		updateMoneyDisplayed( GameInfo.setAndReturnMoney(-1 * upgrade.getUpgradeCost()) );
 		GameInfo.addUpgrade(upgrade);
+		
+		playLongTap();
 	}
 	
 	/** IconicAdapter is used to populate our ListView with the available GameUpgrades. We also present the upgrade 
@@ -215,5 +230,13 @@ public class UpgradeMenuActivity extends ListActivity {
 		
 		if(subtitle != null)
 			subtitle.setText("Currenly have $" + current_money);
+	}
+	
+	protected void playQuickTap() {
+		mSoundPlayer.playSound(SoundPlayer.SFX_TAP);
+	}
+	
+	protected void playLongTap() {
+		mSoundPlayer.playSound(SoundPlayer.SFX_MENU_TAP);
 	}
 }

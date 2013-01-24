@@ -29,7 +29,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 
-public class TacoTimeActivity extends Activity {
+public class TacoTimeActivity extends SoundPlayingActivity {
 	
 	private static final String activitynametag = "TacoTimeActivity";
 	
@@ -77,6 +77,8 @@ public class TacoTimeActivity extends Activity {
 				testDB.close();
 				
 				if(saved_game_exists) {
+					playLongTap();
+					
 					Intent i = new Intent(v.getContext(), TacoTimeMainGameActivity.class);
 					i.putExtra("LoadSavedGame", true);
 					i.putExtra("WatchTutorial", false);
@@ -161,6 +163,8 @@ public class TacoTimeActivity extends Activity {
 					public void onClick(View v) {
 						Analytics.reportTutorialRun(true);
 						
+						playLongTap();
+						
 						Intent i = new Intent(v.getContext(), TacoTimeMainGameActivity.class);
 						i.putExtra("LoadSavedGame", false);
 						i.putExtra("WatchTutorial", true);
@@ -174,6 +178,8 @@ public class TacoTimeActivity extends Activity {
 				cancelButton.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
 						Analytics.reportTutorialRun(false);
+						
+						playLongTap();
 						
 						Intent i = new Intent(v.getContext(), TacoTimeMainGameActivity.class);
 						i.putExtra("LoadSavedGame", false);

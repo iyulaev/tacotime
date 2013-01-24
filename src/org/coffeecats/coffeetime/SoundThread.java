@@ -20,10 +20,16 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import android.media.AudioManager;
+import android.media.SoundPool;
+
 public class SoundThread extends Thread {
 	private final String activitynametag = "SoundThread";
+	
+	//Set music volume
+	private final float MUSIC_VOLUME = 0.2f;
 	 
-	//Enum all music & sfx
+	//Enum all music & level end music (this gets played continuously during gameplay)
 	private final int MUSIC_NOTHING = 0;
 	private final int MUSIC_LEVEL_1 = 1;
 	private final int MUSIC_LEVEL_2 = 2;
@@ -38,6 +44,18 @@ public class SoundThread extends Thread {
 	//Count the total number of sounds in the sound pool
 	private final int SFX_COUNT = 7;
 	
+	//Enum all short sound effects (that get played on interactions etc...)
+	public static final int SFX_NOTHING = -1;
+	public static final int SFX_BLOOP = 0;
+	public static final int SFX_GURGLE = 1;
+	public static final int SFX_RUB = 2;
+	public static final int SFX_STEAM = 3;
+	public static final int SFX_TAP = 4;
+	public static final int SFX_YEAH = 5;
+	public static final int SFX_MENU_TAP = 6;
+	public static final int SFX_CUSTOMER_SERVED = 7;
+	public static final int SFX_BLENDER = 8;
+	
 	//Enum message types
 	public static final int MESSAGE_PLAY_LEVEL_MUSIC = 1;
 	public static final int MESSAGE_PLAY_LEVEL_END = 2;
@@ -46,6 +64,7 @@ public class SoundThread extends Thread {
 	public static final int MESSAGE_UNSUSPEND = 5;
 	public static final int MESSAGE_LOAD_LEVEL_MUSIC = 6;
 	public static final int MESSAGE_TOGGLE_PAUSED = 7;
+	public static final int MESSAGE_PLAY_SFX = 8;
 	
 	//How long between SoundThread wake-ups
 	private static final int THREAD_DELAY_MS = 250;
@@ -62,6 +81,12 @@ public class SoundThread extends Thread {
 	private HashMap<Integer, Integer> levelMusicResourceMap;
 	//Map from sound effect enum -> MediaPlayer resource for that sound effect
 	private HashMap<Integer, MediaPlayer> sfxMap;
+	//Map from short sound effect to the SoundPool stream index; used for really short sfx like taps and bloops
+	private HashMap<Integer, Integer> mShortSfxMap;
+	//Used to play the short sound effects
+	private static int mShortSfxPlaying = -1;
+	private static SoundPool mSoundPool;
+	private static AudioManager mAudioManager;
 	
 	//Keeps track of state - what is playing and whether it has been changed
 	private boolean currently_playing_changed;
@@ -88,7 +113,7 @@ public class SoundThread extends Thread {
 		
 		running = true;
 		
-		setupSoundMap();
+		setupSoundMap(caller);
 		currently_playing = MUSIC_NOTHING;
 		currently_playing_changed = false;
 		current_mstream = null;
@@ -131,6 +156,10 @@ public class SoundThread extends Thread {
 				else if(msg.what == MESSAGE_TOGGLE_PAUSED) {
 					toggleMusicPaused();
 				}
+				
+				else if(msg.what == MESSAGE_PLAY_SFX) {
+					playShortSfx(msg.arg1);
+				}
 			}
 		};
 	}
@@ -167,7 +196,7 @@ public class SoundThread extends Thread {
 	 * is to be done by loadLevelMusic().
 	 */
 	@SuppressLint("UseSparseArrays")
-	private void setupSoundMap() {
+	private void setupSoundMap(Context caller) {
 		levelMusicMap = new HashMap<Integer, Integer>(4*SFX_COUNT);
 		levelMusicResourceMap = new HashMap<Integer, Integer>(4*SFX_COUNT);
 		sfxMap = new HashMap<Integer, MediaPlayer>(4*SFX_COUNT);
@@ -188,6 +217,21 @@ public class SoundThread extends Thread {
 		
 		//Mapping from sound effects to actual effect indices, and their durations	
 		sfxMap.put(MUSIC_LEVEL_END, MediaPlayer.create(caller, R.raw.sfx_level_end));
+		
+		//Setup stuff to play short sound effects with SoundPool
+		mSoundPool = new SoundPool(2, AudioManager.STREAM_MUSIC, 0);
+    	mAudioManager = (AudioManager)caller.getSystemService(Context.AUDIO_SERVICE);
+    	mShortSfxMap = new HashMap<Integer, Integer>();
+    	
+    	mShortSfxMap.put(SFX_BLOOP, mSoundPool.load(caller, R.raw.sfx_bloop, 1));
+    	mShortSfxMap.put(SFX_GURGLE, mSoundPool.load(caller, R.raw.sfx_gurgle, 1));
+    	mShortSfxMap.put(SFX_RUB, mSoundPool.load(caller, R.raw.sfx_rub, 1));
+    	mShortSfxMap.put(SFX_STEAM, mSoundPool.load(caller, R.raw.sfx_steam, 1));
+    	mShortSfxMap.put(SFX_TAP, mSoundPool.load(caller, R.raw.sfx_tap, 1));
+    	mShortSfxMap.put(SFX_YEAH, mSoundPool.load(caller, R.raw.sfx_yeah, 1));
+    	mShortSfxMap.put(SFX_MENU_TAP, mSoundPool.load(caller, R.raw.sfx_menu_tap, 1));
+    	mShortSfxMap.put(SFX_CUSTOMER_SERVED, mSoundPool.load(caller, R.raw.sfx_customer_served, 1));
+    	mShortSfxMap.put(SFX_BLENDER, mSoundPool.load(caller, R.raw.sfx_blender, 1));
 	}
 	
 	/** Loads the music for a particular level. Unloads music for the previous level (if it was loaded). It
@@ -273,10 +317,13 @@ public class SoundThread extends Thread {
 		if(sfx_idx != MUSIC_NOTHING && sfxMap != null && sfxMap.containsKey(sfx_idx)) {
 			current_mstream = sfxMap.get(sfx_idx);
 			current_mstream.setLooping(looping);
+			current_mstream.setVolume(MUSIC_VOLUME, MUSIC_VOLUME);
 			current_mstream.start();
 			current_mstream_paused = false;
 		}
 	}
+	
+	
 	
 	/** Called to pause / unpause the music */
 	private synchronized void toggleMusicPaused() {
@@ -290,6 +337,22 @@ public class SoundThread extends Thread {
 				current_mstream.pause();
 				
 			current_mstream_paused = !current_mstream_paused;
+		}
+	}
+	
+	/** This method is used to play short sound effects, the kind that are played using the SoundPool. If
+	 * called with parameter SFX_NOTHING, it will simply stop playing the current sound effect. Otherwise 
+	 * it will stop the current sfx AND play the sound effect called out by sfx_number.
+	 *  
+	 */
+	private synchronized void playShortSfx(int sfx_number) {
+		if(mSoundPool == null || mAudioManager == null || mShortSfxMap == null) return;
+		
+		//Make sure we're not to play nothing, or that sfx_number is a valid short sound effect
+		if(sfx_number == SFX_NOTHING || !mShortSfxMap.containsKey(sfx_number)) mSoundPool.stop(mShortSfxPlaying);
+		else {
+			float streamVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+	    	mShortSfxPlaying = mSoundPool.play(mShortSfxMap.get(sfx_number), streamVolume, streamVolume, 1, 0, 1f);
 		}
 	}
 	

@@ -20,11 +20,14 @@ During gameplay, we collect anonymous usage statistics to help us better design 
 
 =-=-= Licensing =-=-=
 
-All sound effects including music (c) 2012 Ryan Warner-Steel
+All music (c) 2012 Ryan Warner-Steel
 Released under Creative Commons Attribution-NonCommercial (CC BY-NC) license.
 
 All proprietary art (c) 2012 Coffee Cats Games
 Released under Creative Commons Attribution-NonCommercial (CC BY-NC) license.
+
+All sound effects excluding music from freesound.org
+Thanks to orginaljun.deviantart.com, FawfulGrox, totya, cmusounddesign, Nathan_Lomeli, fins, grunz, and timlaroche for sound effects found on freesound!
 
 Selected 3rd party artwork property of respective owners.
 Coffee cup background for menus: Property of Filippo, http://www.flickr.com/people/fdiotalevi/

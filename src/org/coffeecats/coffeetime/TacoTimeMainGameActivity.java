@@ -44,7 +44,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class TacoTimeMainGameActivity extends Activity {
+public class TacoTimeMainGameActivity extends SoundPlayingActivity {
 	
 	private static final String activitynametag = "TacoTimeMainGameActivity";
 	
@@ -135,12 +135,14 @@ public class TacoTimeMainGameActivity extends Activity {
 					dialogMessageBuilder.append("Total Money: " + total_money);			
 					dialogTextStr = dialogMessageBuilder.toString();
 					
-					showDialog(LEVEL_END_DIALOG);
+					onCreateDialog(LEVEL_END_DIALOG, dialogMessageBuilder.toString());
 				}
 				else if(msg.what == GameLogicThread.MESSAGE_LEVEL_FAILED) {
 					dialogTextStr=new String("Didn't clear enough customers! Must clear at least " + 
 							msg.arg1 + ", you cleared " + msg.arg2 + ".");
-					showDialog(LEVEL_FAILED_DIALOG);
+					Log.d(activitynametag, "Displaying dialog with string: " + dialogTextStr);
+					onCreateDialog(LEVEL_FAILED_DIALOG, new String("Didn't clear enough customers! Must clear at least " + 
+							msg.arg1 + ", you cleared " + msg.arg2 + "."));
 				}
 				else if(msg.what == GameLogicThread.MESSAGE_NEW_MACHINES_DIALOG) {
 					ArrayList<ArrayList<Integer>> newMachines = (ArrayList<ArrayList<Integer>>) msg.obj;
@@ -183,11 +185,13 @@ public class TacoTimeMainGameActivity extends Activity {
 		Log.d(activitynametag, "onBackPressed Called");
 		
 		if(back_causes_ttmga_to_exit) {
+			playLongTap();
 			finish();
 		} else {
 			//inform the InputThread that the in-game dialog has been launched
+			playQuickTap();
 			MessageRouter.sendBackButtonDuringGameplayMessage(); 
-			showDialog(IN_GAME_DIALOG);
+			onCreateDialog(IN_GAME_DIALOG, "");
 		}
 	}
 	
@@ -200,7 +204,7 @@ public class TacoTimeMainGameActivity extends Activity {
 	 * Level failed dialog specifies that not enough customers were cleared when the level ended
 	 * so the player will have to retry!
 	 */
-	protected Dialog onCreateDialog(int d) {
+	protected Dialog onCreateDialog(int d, String dialogTextStr) {
 		
 		//Dismiss any old dialogs, just for fun
 		if(dialog != null) {
@@ -210,7 +214,7 @@ public class TacoTimeMainGameActivity extends Activity {
 		switch (d) {
 			//Handle the dialog that gets displayed at the very end of the level
 			case LEVEL_END_DIALOG:				
-				LevelEndDialog levelEndDialog = new LevelEndDialog(this);
+				LevelEndDialog levelEndDialog = new LevelEndDialog(this, dialogTextStr);
 				levelEndDialog.show();
 				dialog = levelEndDialog;
 				break;
@@ -226,7 +230,7 @@ public class TacoTimeMainGameActivity extends Activity {
 			//This dialog gets launched via a message passed from GameLogicThread
 			//It tells the user that the level has been failed and they must retry it
 			case LEVEL_FAILED_DIALOG:				
-				LevelFailedDialog levelFailedDialog = new LevelFailedDialog(this);
+				LevelFailedDialog levelFailedDialog = new LevelFailedDialog(this, dialogTextStr);
 				levelFailedDialog.show();
 				dialog = levelFailedDialog;
 				break;
@@ -256,7 +260,7 @@ public class TacoTimeMainGameActivity extends Activity {
 	 */
 	class LevelEndDialog extends Dialog {
 
-        protected LevelEndDialog(Context context) {
+        protected LevelEndDialog(Context context, String dialogTextStr) {
             super(context);
             
             setContentView(R.layout.okdialog);
@@ -269,6 +273,7 @@ public class TacoTimeMainGameActivity extends Activity {
         	Button okButton = (Button) findViewById(R.id.ok);
         	okButton.setOnClickListener(new View.OnClickListener() {
         		public void onClick(View v) {
+        			playLongTap();
         			MessageRouter.sendPostLevelDialogClosedMessage();
         			dismiss();
         		}
@@ -277,6 +282,7 @@ public class TacoTimeMainGameActivity extends Activity {
         	//back button is the same as hitting OK
         	this.setOnCancelListener(new DialogInterface.OnCancelListener() {
         		public void onCancel(DialogInterface dialog) {
+        			playLongTap();
         			MessageRouter.sendPostLevelDialogClosedMessage();
         			dismiss();
         		}
@@ -291,7 +297,7 @@ public class TacoTimeMainGameActivity extends Activity {
 	 */
 	class LevelFailedDialog extends Dialog {
 
-        protected LevelFailedDialog(Context context) {
+        protected LevelFailedDialog(Context context, String dialogTextStr) {
             super(context);
             
             setContentView(R.layout.okdialog);
@@ -306,6 +312,7 @@ public class TacoTimeMainGameActivity extends Activity {
         	
         	okButton.setOnClickListener(new View.OnClickListener() {
         		public void onClick(View v) {
+        			playLongTap();
         			dismiss();
         			MessageRouter.sendLoadGameMessage();
         		}
@@ -314,6 +321,7 @@ public class TacoTimeMainGameActivity extends Activity {
         	//back button is the same as hitting OK
         	this.setOnCancelListener(new DialogInterface.OnCancelListener() {
         		public void onCancel(DialogInterface dialog) {
+        			playLongTap();
         			dismiss();
         			MessageRouter.sendLoadGameMessage();
         		}
@@ -345,6 +353,7 @@ public class TacoTimeMainGameActivity extends Activity {
 			mmButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
 					MessageRouter.sendInGameDialogResult(InputThread.INGAMEDIALOGRESULT_MAIN_MENU);
+					playLongTap();
 					dismiss();
 					//Destroy TTMGA/MGP and go back to the main menu activity
 					finish();
@@ -355,6 +364,7 @@ public class TacoTimeMainGameActivity extends Activity {
 			retryButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
 					MessageRouter.sendInGameDialogResult(InputThread.INGAMEDIALOGRESULT_RETRY_LEVEL);
+					playLongTap();
 					dismiss();
 				}
 			});
@@ -362,6 +372,7 @@ public class TacoTimeMainGameActivity extends Activity {
 			continueButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
 					MessageRouter.sendInGameDialogResult(InputThread.INGAMEDIALOGRESULT_CONTINUE);
+					playQuickTap();
 					dismiss();
 				}
 			});
@@ -370,6 +381,7 @@ public class TacoTimeMainGameActivity extends Activity {
 			setOnCancelListener(new DialogInterface.OnCancelListener() {
 				public void onCancel(DialogInterface dialog) {
 					MessageRouter.sendInGameDialogResult(InputThread.INGAMEDIALOGRESULT_CONTINUE);
+					playQuickTap();
 					dismiss();
 				}
 			});
@@ -423,6 +435,7 @@ public class TacoTimeMainGameActivity extends Activity {
 			okButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
 					MessageRouter.sendPauseGLTMessage(false);
+					playQuickTap();
 					dismiss();
 				}
 			});
@@ -431,6 +444,7 @@ public class TacoTimeMainGameActivity extends Activity {
 			setOnCancelListener(new DialogInterface.OnCancelListener() {
 				public void onCancel(DialogInterface dialog) {
 					MessageRouter.sendPauseGLTMessage(false);
+					playQuickTap();
 					dismiss();
 				}
 			});

@@ -14,6 +14,7 @@ import org.coffeecats.coffeetime.gameobjects.upgradedefs.CounterTopUpgrade;
 import org.coffeecats.coffeetime.gameobjects.upgradedefs.FastShoesUpgrade;
 import org.coffeecats.coffeetime.gameobjects.upgradedefs.FasterShoesUpgrade;
 import org.coffeecats.coffeetime.gameobjects.upgradedefs.QuickBrewingUpgrade;
+import org.coffeecats.coffeetime.utility.SoundPlayer;
 
 import org.coffeecats.coffeetime.R;
 
@@ -46,6 +47,8 @@ public class CharacterSelectListActivity extends ListActivity {
 	static final int COLOR_GREYED_OUT = 0xFF555555;
 	static final int COLOR_RED = 0xFFFF0000;
 	
+	SoundPlayer mSoundPlayer;
+	
 	@Override
 	public void onCreate(Bundle bundle) {
 		me=this;
@@ -70,6 +73,8 @@ public class CharacterSelectListActivity extends ListActivity {
 		theListAdapter = new IconicAdapter(this);
 		setListAdapter(theListAdapter);
 		
+		mSoundPlayer = new SoundPlayer(this);
+		
 		super.onCreate(bundle);
 	}
 	
@@ -91,6 +96,8 @@ public class CharacterSelectListActivity extends ListActivity {
 		GameInfo.characterName = characterName;
 		
 		setResult(CharacterSelectActivity.CSLA_SELECTED_CHARACTER);
+		
+		playLongTap();
 		
 		Intent i = new Intent(v.getContext(), TacoTimeActivity.class);
 		startActivityForResult(i,0);
@@ -185,4 +192,12 @@ public class CharacterSelectListActivity extends ListActivity {
 			onClick(null);
 		}
 	 }
+	
+	protected void playQuickTap() {
+		mSoundPlayer.playSound(SoundPlayer.SFX_TAP);
+	}
+	
+	protected void playLongTap() {
+		mSoundPlayer.playSound(SoundPlayer.SFX_MENU_TAP);
+	}
 }

@@ -57,18 +57,18 @@ public class InputThread extends Thread {
 		handler = new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
-				if(msg.what == MESSAGE_HANDLE_ONTAP) {
-					Log.d(activitynametag, "Got input message!");
+				if(msg.what == MESSAGE_HANDLE_ONTAP) {					
 					//If we are paused, do not propagate user input to rest of the game
 					if(!paused) {
 						Log.d(activitynametag, "Decided we weren't paused and HANDLED the input message.");
 						handleTap(msg.arg1, msg.arg2);
 					}
+					
+					MessageRouter.sendPlayShortSfxMessage(SoundThread.SFX_TAP);
 				}
 				
 				//Handle a simulated tap; don't care if we're paused or not
 				else if(msg.what == MESSAGE_HANDLE_SIMTAP) {
-					Log.d(activitynametag, "Got SIMULATED input message!");
 					handleTap(msg.arg1, msg.arg2);
 				}
 				

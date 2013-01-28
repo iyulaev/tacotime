@@ -353,13 +353,15 @@ public class GameLogicThread extends Thread {
 				//but ONLY display this dialog if the user has actually cleared the level (by serving more customers than
 				//currLevel.customersUntilCleared())
 				//See MessageRouter.sendPostLevelDialogOpenMessage() javadocs for an explanation of the arguments given
-				if(customerQueueWrapper.numberOfCustomersServed() >= currLevel.customersUntilCleared())
+				if(customerQueueWrapper.numberOfCustomersServed() >= currLevel.customersUntilCleared()) {
 					MessageRouter.sendPostLevelDialogOpenMessage( GameInfo.points, GameInfo.money, 
 							GameInfo.level_points-currLevel.getBonusPoints(customerQueueWrapper.numberOfCustomersServed()), 
 							GameInfo.level_money-currLevel.getBonusMoney(customerQueueWrapper.numberOfCustomersServed()),
 							currLevel.getBonusPoints(customerQueueWrapper.numberOfCustomersServed()),
 							currLevel.getBonusMoney(customerQueueWrapper.numberOfCustomersServed()) );
-				else
+					//Play a yeah!
+					MessageRouter.sendPlayShortSfxMessage(SoundThread.SFX_YEAH);
+				} else
 					GameInfo.setGameMode(GameInfo.MODE_MAINGAMEPANEL_POSTPLAY);
 				
 				message_timer--;
@@ -389,8 +391,7 @@ public class GameLogicThread extends Thread {
 						((float) customerQueueWrapper.numberOfCustomersServed()) / ((float) currLevel.numberOfCustomers()));
 					
 					MessageRouter.sendLevelEndMessage();
-					//Play a yeah!
-					MessageRouter.sendPlayShortSfxMessage(SoundThread.SFX_YEAH);
+					
 				}
 			}
 			else if(GameInfo.getLevel() == 0) {
@@ -405,7 +406,6 @@ public class GameLogicThread extends Thread {
 			}
 			else {
 				MessageRouter.sendGameOverMessage();
-				MessageRouter.sendPlayShortSfxMessage(SoundThread.SFX_YEAH);
 			}
 
 		}

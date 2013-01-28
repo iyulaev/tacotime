@@ -55,6 +55,7 @@ public class TacoTimeActivity extends SoundPlayingActivity {
 		Button newGame = (Button) findViewById(R.id.new_game);
 		newGame.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
+				playQuickTap();
 				showDialog(ASK_TUTORIAL_DIALOG);
 			}
 		});
@@ -84,6 +85,7 @@ public class TacoTimeActivity extends SoundPlayingActivity {
 					i.putExtra("WatchTutorial", false);
 					startActivityForResult(i,0);
 				} else {
+					playQuickTap();
 					showNoSavedGameError(GameInfo.characterName);
 				}
 			}
@@ -116,6 +118,7 @@ public class TacoTimeActivity extends SoundPlayingActivity {
         .setMessage("Sorry! No saved game exists for " + characterName + " yet.")
         .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
+                	playQuickTap();
                 	; //onClick() does nothing, just kills the dialog.
                 }
         });

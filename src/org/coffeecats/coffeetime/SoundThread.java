@@ -27,7 +27,7 @@ public class SoundThread extends Thread {
 	private final String activitynametag = "SoundThread";
 	
 	//Set music volume
-	private final float MUSIC_VOLUME = 0.2f;
+	private final float MUSIC_VOLUME = 0.35f;
 	 
 	//Enum all music & level end music (this gets played continuously during gameplay)
 	private final int MUSIC_NOTHING = 0;

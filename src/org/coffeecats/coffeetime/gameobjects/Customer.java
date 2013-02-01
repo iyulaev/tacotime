@@ -241,9 +241,9 @@ public class Customer extends GameActor {
 	
 	//Define the starting location of customers, the position if they're first or second,  
 	//and the exit location of customers
-	private static int location_start_x = 40;
+	private static int location_start_x = CustomerQueue.X_POS-3;
 	private static int location_start_y = 0;
-	private static int locations_queue_x[] = {40,40};
+	private static int locations_queue_x[] = {location_start_x,location_start_x};
 	private static int locations_queue_y[] = {19, 8};
 	private static int locations_exit_x = GameGrid.GAMEGRID_WIDTH - 5;
 	private static int locations_exit_y = locations_queue_y[0];

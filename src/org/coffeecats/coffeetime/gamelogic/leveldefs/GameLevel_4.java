@@ -157,10 +157,11 @@ public class GameLevel_4 extends GameLevel {
 			viewThread.addGameItem(custQueue2);
 			inputThread.addViewObject(custQueue2);
 		
-		viewThread.addGameItem(custQueue);
-		inputThread.addViewObject(custQueue);
 		viewThread.addGameItem(custQueue2);
 		inputThread.addViewObject(custQueue2);
+		viewThread.addGameItem(custQueue);
+		inputThread.addViewObject(custQueue);
+		
 		gameLogicThread.setCustomerQueue(new CustomerQueueWrapper(custQueue, custQueue2));
 	}
 }

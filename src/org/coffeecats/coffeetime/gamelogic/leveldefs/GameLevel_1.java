@@ -185,6 +185,20 @@ public class GameLevel_1 extends GameLevel {
 				gameLogicThread.addNewFoodItem(new FoodItemEspresso(caller), CoffeeGirl.STATE_CARRYING_ESPRESSO);
 		}
 		
+		
+		CustomerQueue custQueue2 = null;
+		if(TESTING_MODE) {
+			custQueue2 = new CustomerQueue(caller, 
+				CustomerQueue.X_POS + CustomerQueue.DISTANCE_TO_QUEUE_TWO, 
+				CustomerQueue.Y_POS_FROM_GG_TOP, 
+				GameItem.ORIENTATION_NORTH, 
+				customerQueue_length, point_mult, money_mult, 
+				customer_impatience, customer_max_order_size, 
+				gameLogicThread.getFoodItems(), 2);
+			viewThread.addGameItem(custQueue2);
+			inputThread.addViewObject(custQueue2);
+		}
+		
 		//Magic numbers: 40 - x-position of Customers, (GameGrid.GAMEGRID_HEIGHT-45) - y-position of customers
 		CustomerQueue custQueue1 = new CustomerQueue(caller, 
 				CustomerQueue.X_POS, 
@@ -197,19 +211,9 @@ public class GameLevel_1 extends GameLevel {
 		viewThread.addGameItem(custQueue1);
 		inputThread.addViewObject(custQueue1);
 		
-		if(TESTING_MODE) {
-			CustomerQueue custQueue2 = new CustomerQueue(caller, 
-				CustomerQueue.X_POS + CustomerQueue.DISTANCE_TO_QUEUE_TWO, 
-				CustomerQueue.Y_POS_FROM_GG_TOP, 
-				GameItem.ORIENTATION_NORTH, 
-				customerQueue_length, point_mult, money_mult, 
-				customer_impatience, customer_max_order_size, 
-				gameLogicThread.getFoodItems(), 2);
-			viewThread.addGameItem(custQueue2);
-			inputThread.addViewObject(custQueue2);
-			
+		if(TESTING_MODE)
 			gameLogicThread.setCustomerQueue(new CustomerQueueWrapper(custQueue1, custQueue2));
-		} else
+		else
 			gameLogicThread.setCustomerQueue(new CustomerQueueWrapper(custQueue1));
 	}
 }

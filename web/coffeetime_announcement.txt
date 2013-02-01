@@ -1,4 +1,4 @@
 [
-	{"announcement_id":3,"announcement_text":"Welcome to Coffee Time, a Coffee Cats Games production! Please visit our website, iyulaev.github.com/tacotime/, for updates on our game."}
+	{"announcement_id":3,"announcement_text":"Welcome to Coffee Time, a Coffee Cats Games production! Please visit our website, iyulaev.github.com/tacotime/, for updates on our game."},
 	{"announcement_id":4,"announcement_text":"Welcome to Coffee Time! A new version is available as of 2013-02-01. Please visit iyulaev.github.com/tacotime/, for news & updates."}
 ]
